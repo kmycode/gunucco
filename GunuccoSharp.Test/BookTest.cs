@@ -97,6 +97,7 @@ namespace GunuccoSharp.Test
             Assert.IsTrue(e.Error.Message.Contains("No such book id found"));
         }
 
+        [TestMethod]
         public async Task GetUserBooks()
         {
             var client1 = await TestUtil.GetUserClientAsync(0);
