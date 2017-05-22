@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.6
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gunucco", "Gunucco\Gunucco.csproj", "{3CE6BAD9-6E4A-49FF-8418-F71026F42E7D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GunuccoSharp", "GunuccoSharp\GunuccoSharp.csproj", "{ACB8ACAD-4A6D-4599-83DE-52699A6466A1}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Gunucco.Entities", "Gunucco.Entities\Gunucco.Entities.shproj", "{31A3E2A1-46B2-418D-A141-B7920C06309A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GunuccoSharp.Test", "GunuccoSharp.Test\GunuccoSharp.Test.csproj", "{6326082B-46BD-4E20-B2F0-9C15BFF854C9}"
+EndProject
+Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Gunucco.Entities\Gunucco.Entities.projitems*{31a3e2a1-46b2-418d-a141-b7920c06309a}*SharedItemsImports = 13
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+		UnitTest|Any CPU = UnitTest|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3CE6BAD9-6E4A-49FF-8418-F71026F42E7D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3CE6BAD9-6E4A-49FF-8418-F71026F42E7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3CE6BAD9-6E4A-49FF-8418-F71026F42E7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3CE6BAD9-6E4A-49FF-8418-F71026F42E7D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3CE6BAD9-6E4A-49FF-8418-F71026F42E7D}.UnitTest|Any CPU.ActiveCfg = UnitTest|Any CPU
+		{3CE6BAD9-6E4A-49FF-8418-F71026F42E7D}.UnitTest|Any CPU.Build.0 = UnitTest|Any CPU
+		{ACB8ACAD-4A6D-4599-83DE-52699A6466A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACB8ACAD-4A6D-4599-83DE-52699A6466A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACB8ACAD-4A6D-4599-83DE-52699A6466A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACB8ACAD-4A6D-4599-83DE-52699A6466A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ACB8ACAD-4A6D-4599-83DE-52699A6466A1}.UnitTest|Any CPU.ActiveCfg = Release|Any CPU
+		{ACB8ACAD-4A6D-4599-83DE-52699A6466A1}.UnitTest|Any CPU.Build.0 = Release|Any CPU
+		{6326082B-46BD-4E20-B2F0-9C15BFF854C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6326082B-46BD-4E20-B2F0-9C15BFF854C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6326082B-46BD-4E20-B2F0-9C15BFF854C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6326082B-46BD-4E20-B2F0-9C15BFF854C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6326082B-46BD-4E20-B2F0-9C15BFF854C9}.UnitTest|Any CPU.ActiveCfg = Release|Any CPU
+		{6326082B-46BD-4E20-B2F0-9C15BFF854C9}.UnitTest|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
