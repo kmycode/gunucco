@@ -28,14 +28,7 @@ namespace Gunucco.Models.Entity
                 Book = this.Book,
             };
 
-            if (string.IsNullOrEmpty(this.Chapter.Name))
-            {
-                throw new GunuccoException(new ApiMessage
-                {
-                    StatusCode = 400,
-                    Message = "No chapter name set.",
-                });
-            }
+            this.CheckSentData();
 
             using (var db = new MainContext())
             {
@@ -45,39 +38,7 @@ namespace Gunucco.Models.Entity
                 // check parent chapter permission
                 if (this.Chapter.ParentId != null)
                 {
-                    Chapter parent = null;
-                    var cchap = new ChapterModel
-                    {
-                        AuthData = this.AuthData,
-                        Chapter = new Chapter { Id = this.Chapter.ParentId.Value, },
-                    };
-
-                    try
-                    {
-                        cchap.Load(db);
-                        parent = cchap.Chapter;
-                    }
-                    catch
-                    {
-                        throw new GunuccoException(new ApiMessage
-                        {
-                            StatusCode = 404,
-                            Message = "No such parent chapter id found.",
-                        });
-                    }
-
-                    try
-                    {
-                        cchap.CheckPermission(db);
-                    }
-                    catch
-                    {
-                        throw new GunuccoException(new ApiMessage
-                        {
-                            StatusCode = 403,
-                            Message = "No permissions to set parent chapter.",
-                        });
-                    }
+                    this.CheckSetParent(db, this.Chapter.ParentId.Value);
                 }
 
                 // create chapter
@@ -113,53 +74,65 @@ namespace Gunucco.Models.Entity
             this.Chapter = c;
         }
 
-        public void GetLoad(MainContext db)
-        {
-            this.Load(db);
-
-            // except for All, user must login to get chapter
-            if (this.Chapter.PublicRange != PublishRange.All)
-            {
-                if (!this.AuthData.IsAuthed)
-                {
-                    throw new GunuccoException(new ApiMessage
-                    {
-                        StatusCode = 403,
-                        Message = "You must login to get permission of this chapter.",
-                    });
-                }
-            }
-
-            // this range allows users who has permission only
-            if (this.Chapter.PublicRange == PublishRange.Private)
-            {
-                this.CheckPermission(db);
-            }
-        }
-
-        public IQueryable<Chapter> GetChildren()
+        public void LoadWithPermissionCheck()
         {
             using (var db = new MainContext())
             {
-                return this.GetChildren(db);
+                this.LoadWithPermissionCheck(db);
+            }
+        }
+
+        public void LoadWithPermissionCheck(MainContext db)
+        {
+            this.Load(db);
+
+            this.CheckLoadPermission(db);
+        }
+
+        public IEnumerable<Chapter> GetChildren()
+        {
+            using (var db = new MainContext())
+            {
+                return this.GetChildren(db).ToArray();
             }
         }
 
         public IQueryable<Chapter> GetChildren(MainContext db)
         {
+            this.Load(db);
             return db.Chapter.Where(c => c.ParentId == this.Chapter.Id);
         }
 
-        public void Save()
+        public IEnumerable<Chapter> GetChildrenWithPermissionCheck()
         {
             using (var db = new MainContext())
             {
-                this.Save(db);
+                return this.GetChildrenWithPermissionCheck(db).ToArray();
             }
         }
 
-        public void Save(MainContext db)
+        public IQueryable<Chapter> GetChildrenWithPermissionCheck(MainContext db)
         {
+            var children = this.GetChildren(db);
+
+            this.CheckLoadPermission(db);
+
+            return children;
+        }
+
+        public ApiMessage Save()
+        {
+            using (var db = new MainContext())
+            {
+                return this.Save(db);
+            }
+        }
+
+        public ApiMessage Save(MainContext db)
+        {
+            this.isLoaded = true;
+            this.CheckSentData();
+
             var current = new ChapterModel
             {
                 AuthData = this.AuthData,
@@ -174,7 +147,7 @@ namespace Gunucco.Models.Entity
                 throw new GunuccoException(new ApiMessage
                 {
                     StatusCode = 400,
-                    Message = "Cannot change book. Book_id must set current value (" + current.Chapter.BookId + ")",
+                    Message = "Cannot change book. Book_id must be set current value (" + current.Chapter.BookId + ")",
                 });
             }
 
@@ -183,13 +156,7 @@ namespace Gunucco.Models.Entity
             // check new parent permission
             if (current.Chapter.ParentId != this.Chapter.ParentId && this.Chapter.ParentId != null)
             {
-                var mparent = new ChapterModel
-                {
-                    AuthData = this.AuthData,
-                    Chapter = new Chapter { Id = this.Chapter.ParentId.Value, },
-                    Book = new Book { Id = this.Chapter.BookId, },
-                };
-                mparent.CheckPermission(db);
+                this.CheckSetParent(db, this.Chapter.ParentId.Value);
             }
 
             // save
@@ -199,24 +166,33 @@ namespace Gunucco.Models.Entity
             c.ParentId = this.Chapter.ParentId;
             c.PublicRange = this.Chapter.PublicRange;
             db.SaveChanges();
+
+            return new ApiMessage
+            {
+                StatusCode = 200,
+                Message = "Update chapter succeed.",
+            };
         }
 
-        public void Delete()
+        public ApiMessage Delete()
         {
             using (var db = new MainContext())
             {
-                this.Delete(db);
+                return this.Delete(db);
             }
         }
 
-        public void Delete(MainContext db)
+        public ApiMessage Delete(MainContext db, bool isCheckPermission = true)
         {
             // get chapter data
             this.Load(db);
 
             // check permissions to delete
             var permissions = this.GetPermissions(db);
-            this.CheckPermission(db, permissions);
+            if (isCheckPermission)
+            {
+                this.CheckPermission(db, permissions);
+            }
 
             // get children
             var children = this.GetChildren(db);
@@ -247,6 +223,12 @@ namespace Gunucco.Models.Entity
             db.BookPermission.RemoveRange(permissions);
 
             db.SaveChanges();
+
+            return new ApiMessage
+            {
+                StatusCode = 200,
+                Message = "Delete chapter succeed.",
+            };
         }
         
         public IQueryable<BookPermission> GetPermissions(MainContext db)
@@ -258,6 +240,8 @@ namespace Gunucco.Models.Entity
 
         public void CheckPermission(MainContext db)
         {
+            this.Load(db);
+
             var permissions = this.GetPermissions(db);
             this.CheckPermission(db, permissions);
         }
@@ -272,6 +256,96 @@ namespace Gunucco.Models.Entity
                     Book = new Book { Id = this.Chapter.BookId, },
                 };
                 mbook.CheckPermission(db);
+            }
+        }
+
+        public void CheckLoadPermission(MainContext db)
+        {
+            // except for All, user must login to get chapter
+            if (this.Chapter.PublicRange != PublishRange.All)
+            {
+                if (!this.AuthData.IsAuthed)
+                {
+                    throw new GunuccoException(new ApiMessage
+                    {
+                        StatusCode = 403,
+                        Message = "You must login to get permission of this chapter.",
+                    });
+                }
+            }
+
+            // this range allows users who has permission only
+            if (this.Chapter.PublicRange == PublishRange.Private)
+            {
+                this.CheckPermission(db);
+            }
+        }
+
+        private void CheckSentData()
+        {
+            if (string.IsNullOrEmpty(this.Chapter.Name))
+            {
+                //throw new GunuccoException(new ApiMessage
+                //{
+                //    StatusCode = 400,
+                //    Message = "No chapter name set.",
+                //});
+                this.Chapter.Name = string.Empty;
+            }
+            if (this.Chapter.Name.Length > 120)
+            {
+                throw new GunuccoException(new ApiMessage
+                {
+                    StatusCode = 400,
+                    Message = "Book name is too long.",
+                });
+            }
+        }
+
+        private void CheckSetParent(MainContext db, int parentId)
+        {
+            Chapter parent = null;
+            var cchap = new ChapterModel
+            {
+                AuthData = this.AuthData,
+                Chapter = new Chapter { Id = parentId, },
+            };
+
+            try
+            {
+                cchap.Load(db);
+                parent = cchap.Chapter;
+            }
+            catch
+            {
+                throw new GunuccoException(new ApiMessage
+                {
+                    StatusCode = 404,
+                    Message = "No such parent chapter id found.",
+                });
+            }
+
+            this.Load(db);
+            if (parent.BookId != this.Chapter.BookId)
+            {
+                throw new GunuccoException(new ApiMessage
+                {
+                    StatusCode = 400,
+                    Message = "Cannot set parent in different book.",
+                });
+            }
+
+            try
+            {
+                cchap.CheckPermission(db);
+            }
+            catch
+            {
+                throw new GunuccoException(new ApiMessage
+                {
+                    StatusCode = 403,
+                    Message = "No permissions to set parent chapter.",
+                });
             }
         }
     }

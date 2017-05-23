@@ -18,26 +18,29 @@ namespace GunuccoSharp.Test
             await TestUtil.CleanupAsync();
         }
 
-        [TestMethod]
-        public async Task CreateBook()
+        [DataTestMethod]
+        [DataRow("Test book")]
+        [DataRow("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")]
+        public async Task CreateBook(string name)
         {
             var client = await TestUtil.GetUserClientAsync();
 
             // create book
             var book = await TestUtil.Books.CreateAsync(client, new Book
             {
-                Name = "Test book",
+                Name = name,
             });
 
             Assert.IsNotNull(book);
             Assert.AreNotEqual(book.Id, 0);
             Assert.IsTrue(book.Created > DateTime.Now.AddMinutes(-3));
-            Assert.AreEqual(book.Name, "Test book");
+            Assert.AreEqual(book.Name, name);
         }
 
         [DataTestMethod]
         [DataRow("")]
         [DataRow(null)]
+        [DataRow("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")]
         public async Task CreateBook_Failed_InvalidBookName(string bookName)
         {
             var client = await TestUtil.GetUserClientAsync();
@@ -53,7 +56,7 @@ namespace GunuccoSharp.Test
 
             Assert.IsNotNull(e.Error);
             Assert.AreEqual(e.Error.StatusCode, 400);
-            Assert.IsTrue(e.Error.Message.Contains("No book name"));
+            Assert.IsTrue(e.Error.Message.Contains("too"));
         }
 
         [TestMethod]
@@ -97,6 +100,91 @@ namespace GunuccoSharp.Test
             Assert.IsTrue(e.Error.Message.Contains("No such book id found"));
         }
 
+        [DataTestMethod]
+        [DataRow(1)]
+        [DataRow(3)]
+        [DataRow(0)]
+        public async Task GetBookChapters(int chapterCount)
+        {
+            var client = await TestUtil.GetUserClientAsync();
+
+            // create book
+            var book = await TestUtil.Books.CreateAsync(client);
+
+            // create root chapter
+            var chap = await TestUtil.Chapters.CreateAsync(client, 0, book.Id);
+
+            // create chapter
+            for (int i = 0; i < chapterCount; i++)
+            {
+                var child = await TestUtil.Chapters.CreateAsync(client, 0, book.Id);
+                child.ParentId = chap.Id;
+                await client.Chapter.UpdateAsync(child);
+            }
+
+            // get children chapters
+            var chapters = await client.Book.GetChaptersAsync(book.Id);
+
+            Assert.IsNotNull(chapters);
+            Assert.AreEqual(chapters.Count(), chapterCount + 1);    // children and parent
+            Assert.IsTrue(chapters.All(c => c.BookId == book.Id));
+        }
+
+        [TestMethod]
+        public async Task GetBookChapters_Failed_InvalidBookId()
+        {
+            var client = await TestUtil.GetUserClientAsync();
+
+            // create book
+            var book = await TestUtil.Books.CreateAsync(client);
+
+            // get children chapters
+            var ex = await Assert.ThrowsExceptionAsync<GunuccoErrorException>(async () =>
+            {
+                await client.Book.GetChaptersAsync(book.Id + 1);
+            });
+
+            TestUtil.CheckException(ex, 404, "found");
+        }
+
+        [DataTestMethod]
+        [DataRow(1, 0)]
+        [DataRow(3, 0)]
+        [DataRow(1, 1)]
+        [DataRow(3, 5)]
+        [DataRow(0, 0)]
+        public async Task GetBookRootChapters(int chapterCount, int chapterChildCount)
+        {
+            var client = await TestUtil.GetUserClientAsync();
+
+            // create book
+            var book = await TestUtil.Books.CreateAsync(client);
+            
+            // create chapter
+            for (int i = 0; i < chapterCount; i++)
+            {
+                var chap = await TestUtil.Chapters.CreateAsync(client, 0, book.Id);
+
+                // create grandson chapter
+                if (i == 0)
+                {
+                    for (int j = 0; j < chapterChildCount; j++)
+                    {
+                        var child = await TestUtil.Chapters.CreateAsync(client, 1, book.Id);
+                        child.ParentId = chap.Id;
+                        await client.Chapter.UpdateAsync(child);
+                    }
+                }
+            }
+
+            // get children chapters
+            var chapters = await client.Book.GetRootChaptersAsync(book.Id);
+
+            Assert.IsNotNull(chapters);
+            Assert.AreEqual(chapters.Count(), chapterCount);
+            Assert.IsTrue(chapters.All(c => c.BookId == book.Id));
+        }
+
         [TestMethod]
         public async Task GetUserBooks()
         {
@@ -110,7 +198,7 @@ namespace GunuccoSharp.Test
             var book3 = await TestUtil.Books.CreateAsync(client2, 2);
 
             // get book data
-            var books = await client1.Book.GetUserBooksAsync(client3.AuthToken.UserId);
+            var books = await client3.Book.GetUserBooksAsync(client1.AuthToken.UserId);
 
             Assert.AreEqual(books.Count(), 2);
             Assert.IsTrue(books.All(b => b.Id == book1.Id || b.Id == book2.Id));
@@ -120,7 +208,32 @@ namespace GunuccoSharp.Test
         public async Task DeleteBook()
         {
             var client = await TestUtil.GetUserClientAsync();
+            var book1 = await TestUtil.Books.CreateAsync(client, 0);
+            var book2 = await TestUtil.Books.CreateAsync(client, 1);
+
+            // delete
+            var mes = await client.Book.DeleteAsync(book1.Id);
+            TestUtil.Books.Remove(book1);
+
+            Assert.AreEqual(mes.StatusCode, 200);
+            Assert.IsTrue(mes.Message.Contains("succeed"));
+
+            // get deleted book failed
+            var e = await Assert.ThrowsExceptionAsync<GunuccoErrorException>(async () =>
+            {
+                await client.Book.GetAsync(book1.Id);
+            });
+
+            // get exists book
+            await client.Book.GetAsync(book2.Id);
+        }
+
+        [TestMethod]
+        public async Task DeleteBook_WithChapter()
+        {
+            var client = await TestUtil.GetUserClientAsync();
             var book = await TestUtil.Books.CreateAsync(client);
+            var chap = await TestUtil.Chapters.CreateAsync(client, 0, book.Id);
 
             // delete
             var mes = await client.Book.DeleteAsync(book.Id);
@@ -130,9 +243,13 @@ namespace GunuccoSharp.Test
             Assert.IsTrue(mes.Message.Contains("succeed"));
 
             // get deleted book failed
-            var e = await Assert.ThrowsExceptionAsync<GunuccoErrorException>(async () =>
+            await Assert.ThrowsExceptionAsync<GunuccoErrorException>(async () =>
             {
                 await client.Book.GetAsync(book.Id);
+            });
+            await Assert.ThrowsExceptionAsync<GunuccoErrorException>(async () =>
+            {
+                await client.Chapter.GetAsync(chap.Id);
             });
         }
 

@@ -11,6 +11,9 @@ using Gunucco.Common;
 using Gunucco.Filters;
 using Gunucco.Models.Entity;
 using Gunucco.Models.Entities;
+using System.IO;
+using System.Text;
+using Newtonsoft.Json;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -108,14 +111,48 @@ namespace Gunucco.Controllers
         }
 
         [HttpGet]
+        [Route("book/get/{id}/chapters")]
+        public IActionResult GetChapters(int id)
+        {
+            var mbook = new BookModel
+            {
+                AuthData = this.AuthData,
+                Book = new Book
+                {
+                    Id = id,
+                },
+            };
+            var chapters = mbook.GetChapters();
+
+            return Json(chapters);
+        }
+
+        [HttpGet]
+        [Route("book/get/{id}/chapters/root")]
+        public IActionResult GetRootChapters(int id)
+        {
+            var mbook = new BookModel
+            {
+                AuthData = this.AuthData,
+                Book = new Book
+                {
+                    Id = id,
+                },
+            };
+            var chapters = mbook.GetRootChapters();
+
+            return Json(chapters);
+        }
+
+        [HttpGet]
         [Route("book/get/user/{id}")]
-        public IActionResult GetUserBooks(int userId)
+        public IActionResult GetUserBooks(int id)
         {
             var mbook = new BookModel
             {
                 AuthData = this.AuthData,
             };
-            var books = mbook.GetUserBooks(userId);
+            var books = mbook.GetUserBooks(id);
 
             return Json(books);
         }
@@ -141,6 +178,111 @@ namespace Gunucco.Controllers
         #endregion
 
         #region Chapter
+
+        [HttpPost]
+        [Route("chapter/create")]
+        [AuthorizeFilter]
+        public IActionResult CreateChapter(string name, int bookId)
+        {
+            var mchap = new ChapterModel
+            {
+                AuthData = this.AuthData,
+                Book = new Book
+                {
+                    Id = bookId,
+                },
+                Chapter = new Chapter
+                {
+                    Name = name,
+                    BookId = bookId,
+                    PublicRange = PublishRange.Private,
+                },
+            };
+            mchap.Create();
+
+            return Json(mchap.Chapter);
+        }
+
+        [HttpGet]
+        [Route("chapter/get/{id}")]
+        [AuthorizeFilter(IsCheckAuthorizable = false)]
+        public IActionResult GetChapter(int id)
+        {
+            var mchap = new ChapterModel
+            {
+                AuthData = this.AuthData,
+                Chapter = new Chapter
+                {
+                    Id = id,
+                },
+            };
+            mchap.LoadWithPermissionCheck();
+
+            return Json(mchap.Chapter);
+        }
+
+        [HttpGet]
+        [Route("chapter/get/{id}/children")]
+        [AuthorizeFilter(IsCheckAuthorizable = false)]
+        public IActionResult GetChildrenChapters(int id)
+        {
+            var mchap = new ChapterModel
+            {
+                AuthData = this.AuthData,
+                Chapter = new Chapter
+                {
+                    Id = id,
+                },
+            };
+            var children = mchap.GetChildrenWithPermissionCheck();
+
+            return Json(children);
+        }
+
+        [HttpPut]
+        [Route("chapter/update")]
+        [AuthorizeFilter]
+        public IActionResult UpdateChapter(string chapter)
+        {
+            Chapter chap = null;
+            try
+            {
+                chap = JsonConvert.DeserializeObject<Chapter>(chapter);
+            }
+            catch
+            {
+                throw new GunuccoException(new ApiMessage
+                {
+                    StatusCode = 400,
+                    Message = "Invalid chapter json string.",
+                });
+            }
+
+            var mchap = new ChapterModel
+            {
+                AuthData = this.AuthData,
+                Chapter = chap,
+            };
+            var mes = mchap.Save();
+
+            return Json(mes);
+        }
+
+        [HttpDelete]
+        [Route("chapter/delete")]
+        [AuthorizeFilter]
+        public IActionResult DeleteChapter(int id)
+        {
+            var mchap = new ChapterModel
+            {
+                AuthData = this.AuthData,
+                Chapter = new Chapter { Id = id, },
+            };
+            var mes = mchap.Delete();
+
+            return Json(mes);
+        }
+
         #endregion
 
         #region Content and Media

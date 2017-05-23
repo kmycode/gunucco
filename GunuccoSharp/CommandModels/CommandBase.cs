@@ -32,6 +32,7 @@ namespace GunuccoSharp.CommandModels
         Get,
         Post,
         PostMedia,
+        Put,
         Patch,
         Delete,
     }

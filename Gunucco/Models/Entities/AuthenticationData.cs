@@ -14,6 +14,9 @@ namespace Gunucco.Models.Entities
 
         public User User { get; set; }
 
-        public bool IsAuthed => this.User != null && this.User.Id != 0 && !string.IsNullOrEmpty(this.AuthToken.AccessToken);
+        public bool IsAuthed => this.User != null &&
+            this.User.Id != 0 &&
+            !string.IsNullOrEmpty(this.AuthToken.SessionId) &&
+            !string.IsNullOrEmpty(this.Session.Id);
     }
 }

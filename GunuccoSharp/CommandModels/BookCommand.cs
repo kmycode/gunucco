@@ -34,6 +34,24 @@ namespace GunuccoSharp.CommandModels
             });
         }
 
+        public async Task<IEnumerable<Chapter>> GetChaptersAsync(int bookId)
+        {
+            return await this.Client.Command<IEnumerable<Chapter>>(new CommandInfo
+            {
+                Route = "book/get/" + bookId + "/chapters",
+                Method = HttpMethod.Get,
+            });
+        }
+
+        public async Task<IEnumerable<Chapter>> GetRootChaptersAsync(int bookId)
+        {
+            return await this.Client.Command<IEnumerable<Chapter>>(new CommandInfo
+            {
+                Route = "book/get/" + bookId + "/chapters/root",
+                Method = HttpMethod.Get,
+            });
+        }
+
         public async Task<IEnumerable<Book>> GetUserBooksAsync(int userId)
         {
             return await this.Client.Command<IEnumerable<Book>>(new CommandInfo
@@ -54,6 +72,11 @@ namespace GunuccoSharp.CommandModels
                     { "id", id.ToString() },
                 },
             });
+        }
+
+        public Task DeleteAsync(object id)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -6,6 +6,7 @@ using GunuccoSharp;
 using Gunucco.Entities;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace GunuccoSharp.Test
 {
@@ -99,6 +100,26 @@ namespace GunuccoSharp.Test
                 },
             });
 
+        public static readonly TestDataGenerator<Chapter> Chapters = new TestDataGenerator<Chapter>(
+            async (c, h, args) => await c.Chapter.CreateAsync(h.Name, (int)args[0]),
+            async (c, h) => await c.Chapter.DeleteAsync(h.Id),
+            (a, b) => a.Id == b.Id,
+            new Collection<Chapter>
+            {
+                new Chapter
+                {
+                    Name = "Test Chapter",
+                },
+                new Chapter
+                {
+                    Name = "Part.1 Shooll Kill",
+                },
+                new Chapter
+                {
+                    Name = "Nyontaka",
+                },
+            });
+
         public static GunuccoSharpClient GetClient()
         {
             return new GunuccoSharpClient
@@ -117,8 +138,19 @@ namespace GunuccoSharp.Test
 
         public static async Task CleanupAsync(GunuccoSharpClient client = null)
         {
+            // await Chapters.CleanAsync(client);
             await Books.CleanAsync(client);
             await Users.CleanAsync(client);
+        }
+
+        public static void CheckException(GunuccoErrorException ex, int code, params string[] contains)
+        {
+            Assert.IsNotNull(ex);
+            Assert.AreEqual(ex.StatusCode, code);
+            foreach (var str in contains)
+            {
+                Assert.IsTrue(ex.Message.Contains(str));
+            }
         }
     }
 
@@ -127,11 +159,22 @@ namespace GunuccoSharp.Test
         private IEnumerable<T> defaultTestDataTemplates;
         private Collection<Tuple<GunuccoSharpClient, T>> objs = new Collection<Tuple<GunuccoSharpClient, T>>();
 
-        private Func<GunuccoSharpClient, T, Task<T>> createAction;
+        private Func<GunuccoSharpClient, T, object[], Task<T>> createAction;
         private Func<GunuccoSharpClient, T, Task> deleteAction;
         private Func<T, T, bool> comparator;
 
         public TestDataGenerator(Func<GunuccoSharpClient, T, Task<T>> createAction,
+                                Func<GunuccoSharpClient, T, Task> deleteAction,
+                                Func<T, T, bool> comparator,
+                                IEnumerable<T> templates)
+        {
+            this.createAction = (c, t, o) => createAction(c, t);
+            this.deleteAction = deleteAction;
+            this.defaultTestDataTemplates = templates;
+            this.comparator = comparator;
+        }
+
+        public TestDataGenerator(Func<GunuccoSharpClient, T, object[], Task<T>> createAction,
                                 Func<GunuccoSharpClient, T, Task> deleteAction,
                                 Func<T, T, bool> comparator,
                                 IEnumerable<T> templates)
@@ -144,13 +187,23 @@ namespace GunuccoSharp.Test
 
         public async Task<T> CreateAsync(GunuccoSharpClient client, int dataId = 0)
         {
-            var template = this.defaultTestDataTemplates.ElementAt(dataId);
-            return await this.CreateAsync(client, template);
+            return await this.CreateAsync(client, dataId, null);
         }
 
         public async Task<T> CreateAsync(GunuccoSharpClient client, T template)
         {
-            var obj = await this.createAction(client, template);
+            return await this.CreateAsync(client, template, null);
+        }
+
+        public async Task<T> CreateAsync(GunuccoSharpClient client, int dataId, params object[] args)
+        {
+            var template = this.defaultTestDataTemplates.ElementAt(dataId);
+            return await this.CreateAsync(client, template, args);
+        }
+
+        public async Task<T> CreateAsync(GunuccoSharpClient client, T template, params object[] args)
+        {
+            var obj = await this.createAction(client, template, args);
             this.Add(client, obj);
             return obj;
         }

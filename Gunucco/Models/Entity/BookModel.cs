@@ -15,16 +15,11 @@ namespace Gunucco.Models.Entity
 
         public Book Book { get; set; }
 
+        private bool isLoaded = false;
+
         public void Create()
         {
-            if (string.IsNullOrEmpty(this.Book.Name))
-            {
-                throw new GunuccoException(new ApiMessage
-                {
-                    StatusCode = 400,
-                    Message = "No book name set",
-                });
-            }
+            this.CheckSentData();
 
             // setting object data
             this.Book.Created = DateTime.Now;
@@ -57,6 +52,9 @@ namespace Gunucco.Models.Entity
 
         public void Load(MainContext db)
         {
+            if (this.isLoaded) return;
+            this.isLoaded = true;
+
             var book = db.Book.Find(this.Book.Id);
             if (book == null)
             {
@@ -70,11 +68,39 @@ namespace Gunucco.Models.Entity
             this.Book = book;
         }
 
-        public IQueryable<Book> GetUserBooks(int userId)
+        public IEnumerable<Chapter> GetChapters()
         {
             using (var db = new MainContext())
             {
-                return GetUserBooks(db, userId);
+                return this.GetChapters(db).ToArray();
+            }
+        }
+
+        public IQueryable<Chapter> GetChapters(MainContext db)
+        {
+            this.Load(db);
+            var chapters = db.Chapter.Where(c => c.BookId == this.Book.Id);
+            return chapters;
+        }
+
+        public IEnumerable<Chapter> GetRootChapters()
+        {
+            using (var db = new MainContext())
+            {
+                return this.GetRootChapters(db).ToArray();
+            }
+        }
+
+        public IQueryable<Chapter> GetRootChapters(MainContext db)
+        {
+            return this.GetChapters(db).Where(c => c.ParentId == null);
+        }
+
+        public IEnumerable<Book> GetUserBooks(int userId)
+        {
+            using (var db = new MainContext())
+            {
+                return GetUserBooks(db, userId).ToArray();
             }
         }
 
@@ -103,6 +129,19 @@ namespace Gunucco.Models.Entity
             var permissions = this.GetPermissions(db);
             this.CheckPermission(permissions);
 
+            // remove chapters
+            var chapters = this.GetRootChapters(db);
+            foreach (var c in chapters)
+            {
+                var mchap = new ChapterModel
+                {
+                    AuthData = this.AuthData,
+                    Chapter = c,
+                    Book = this.Book,
+                };
+                mchap.Delete(db, false);
+            }
+
             // remove data
             db.Book.Attach(this.Book);
             db.Book.Remove(this.Book);
@@ -126,6 +165,8 @@ namespace Gunucco.Models.Entity
 
         public void CheckPermission(MainContext db)
         {
+            this.Load(db);
+
             this.CheckPermission(this.GetPermissions(db));
         }
 
@@ -137,6 +178,26 @@ namespace Gunucco.Models.Entity
                 {
                     StatusCode = 403,
                     Message = "No permission to write or delete books.",
+                });
+            }
+        }
+
+        private void CheckSentData()
+        {
+            if (string.IsNullOrEmpty(this.Book.Name))
+            {
+                throw new GunuccoException(new ApiMessage
+                {
+                    StatusCode = 400,
+                    Message = "Book name is too short.",
+                });
+            }
+            if (this.Book.Name.Length > 120)
+            {
+                throw new GunuccoException(new ApiMessage
+                {
+                    StatusCode = 400,
+                    Message = "Book name is too long.",
                 });
             }
         }

@@ -53,6 +53,8 @@ namespace GunuccoSharp
                     return await this.Post<T>(route, data);
                 case CommandModels.HttpMethod.PostMedia:
                     return await this.PostMedia<T>(route, data, command.Media);
+                case CommandModels.HttpMethod.Put:
+                    return await this.Put<T>(route, data);
                 case CommandModels.HttpMethod.Delete:
                     return await this.Delete<T>(route, data);
                 case CommandModels.HttpMethod.Patch:
@@ -89,7 +91,7 @@ namespace GunuccoSharp
             var rp = await this.RequestHttpAsync(route, async (client, url) =>
             {
                 var method = new System.Net.Http.HttpMethod(methodName);
-
+                
                 var content = new FormUrlEncodedContent(data ?? Enumerable.Empty<KeyValuePair<string, string>>());
                 var message = new HttpRequestMessage
                 {
@@ -97,11 +99,6 @@ namespace GunuccoSharp
                     RequestUri = new Uri(url),
                     Content = content,
                 };
-                if (data != null)
-                {
-                    var querystring = "?" + string.Join("&", data.Select(kvp => kvp.Key + "=" + kvp.Value));
-                    url += querystring;
-                }
 
                 return await client.SendAsync(message);
             });
@@ -150,13 +147,19 @@ namespace GunuccoSharp
 
         protected async Task<T> Post<T>(string route, IEnumerable<KeyValuePair<string, string>> data = null)
         {
-            var json = await this.Post(route, data);
+            var json = await this.Post(route, data, "POST");
             return this.JsonDeserialize<T>(json);
         }
 
         protected async Task<T> Patch<T>(string route, IEnumerable<KeyValuePair<string, string>> data = null)
         {
             var json = await this.Post(route, data, "PATCH");
+            return this.JsonDeserialize<T>(json);
+        }
+
+        protected async Task<T> Put<T>(string route, IEnumerable<KeyValuePair<string, string>> data = null)
+        {
+            var json = await this.Post(route, data, "PUT");
             return this.JsonDeserialize<T>(json);
         }
 

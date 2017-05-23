@@ -2,6 +2,7 @@
 using Gunucco.Controllers;
 using Gunucco.Entities;
 using Gunucco.Models;
+using Gunucco.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System;
@@ -13,6 +14,8 @@ namespace Gunucco.Filters
 {
     public class AuthorizeFilterAttribute : ActionFilterAttribute
     {
+        public bool IsCheckAuthorizable { get; set; } = true;
+
         public AuthorizeFilterAttribute()
         {
             this.Order = 1;
@@ -21,26 +24,42 @@ namespace Gunucco.Filters
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             base.OnActionExecuting(context);
+            var authStr = context.HttpContext.Request.Headers["Authorization"];
+            AuthenticationData data = null;
 
-            try
+            if (!this.IsCheckAuthorizable && string.IsNullOrEmpty(authStr))
             {
-                var data = Authentication.Authenticate(context.HttpContext.Request);
-                ((Api1Controller)context.Controller).AuthData = data;
-            }
-            catch (GunuccoException e)
-            {
-                context.HttpContext.Response.StatusCode = e.Error.StatusCode;
-                context.Result = new JsonResult(e.Error);
-            }
-            catch
-            {
-                context.HttpContext.Response.StatusCode = 503;
-                context.Result = new JsonResult(new ApiMessage
+                // no need to authorize
+                data = new AuthenticationData
                 {
-                    StatusCode = 503,
-                    Message = "Service unavailable.",
-                });
+                    AuthToken = new AuthenticationToken(),
+                    Session = new UserSession(),
+                    User = new User(),
+                };
             }
+            else
+            {
+                try
+                {
+                    data = Authentication.Authenticate(authStr);
+                }
+                catch (GunuccoException e)
+                {
+                    context.HttpContext.Response.StatusCode = e.Error.StatusCode;
+                    context.Result = new JsonResult(e.Error);
+                }
+                catch
+                {
+                    context.HttpContext.Response.StatusCode = 503;
+                    context.Result = new JsonResult(new ApiMessage
+                    {
+                        StatusCode = 503,
+                        Message = "Service unavailable.",
+                    });
+                }
+            }
+
+            ((Api1Controller)context.Controller).AuthData = data;
         }
     }
 }

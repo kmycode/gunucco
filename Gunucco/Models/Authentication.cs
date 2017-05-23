@@ -17,14 +17,11 @@ namespace Gunucco.Models
     {
         private static Logger log = LogManager.GetCurrentClassLogger();
 
-        public static AuthenticationData Authenticate(HttpRequest request)
+        public static AuthenticationData Authenticate(string authString)
         {
             AuthenticationToken token = null;
 
-            var req = request;
-            var auth = req.Headers["Authorization"];
-
-            if (string.IsNullOrEmpty(auth))
+            if (string.IsNullOrWhiteSpace(authString))
             {
                 throw new GunuccoException(new BearerApiMessage
                 {
@@ -35,8 +32,8 @@ namespace Gunucco.Models
             }
 
             // get user data from authorization header
-            auth = auth.ToString().Replace("Bearer ", "");
-            token = ParseToken(auth);
+            authString = authString.ToString().Replace("Bearer ", "");
+            token = ParseToken(authString);
 
             // check session been availabled
             User user;
