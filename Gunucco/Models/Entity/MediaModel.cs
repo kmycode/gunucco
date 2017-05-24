@@ -88,9 +88,24 @@ namespace Gunucco.Models.Entity
 
         public void DeleteMediaFile()
         {
-            if (File.Exists("." + this.Media.FilePath))
+            if (this.Media.Source == MediaSource.Self)
             {
-                File.Delete("." + this.Media.FilePath);
+                if (File.Exists("." + this.Media.FilePath))
+                {
+                    File.Delete("." + this.Media.FilePath);
+                }
+            }
+        }
+
+        public void SetMediaUri()
+        {
+            if (this.Media.Source == MediaSource.Self)
+            {
+                this.Media.Uri = Config.ServerPath + "/api/v1/download" + this.Media.FilePath;
+            }
+            else
+            {
+                this.Media.Uri = this.Media.FilePath;
             }
         }
     }

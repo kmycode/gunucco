@@ -16,7 +16,7 @@ namespace GunuccoSharp.Test
         #region Settings
 
         // Is debug mode enabled? (debug = test target server is running on VisualStudio)
-        public const bool IsLocalHost = false;
+        public const bool IsLocalHost = true;
 
         // Is allow invalid SSL cert?
         public const bool IsAllowInvalidSSLCert = true;

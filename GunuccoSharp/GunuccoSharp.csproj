@@ -2,10 +2,17 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp1.1</TargetFramework>
+    <Version>0.1.0</Version>
+    <RepositoryUrl>https://github.com/kmycode/gunucco.git</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/kmycode/gunucco</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/kmycode/gunucco/blob/master/LICENCE.txt</PackageLicenseUrl>
+    <Copyright>(C) KMY 2017</Copyright>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>TRACE;DEBUG;NETCOREAPP1_1;GUNUCCO_SHARP</DefineConstants>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

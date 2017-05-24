@@ -127,6 +127,34 @@ namespace GunuccoSharp.Test
             Assert.IsTrue(cont.Content.LastModified > DateTime.Now.AddMinutes(-3));
         }
 
+        [TestMethod]
+        public async Task CreateImageContent_OutsideUri()
+        {
+            var client = await TestUtil.GetUserClientAsync();
+
+            // create book
+            var book = await TestUtil.Books.CreateAsync(client);
+
+            // create chapter
+            var chap = await TestUtil.Chapters.CreateAsync(client, 0, book.Id);
+
+            // create content
+            var cont = await client.Content.CreateImageAsync(chap.Id, "http://kmycode.net/m.png");
+
+            Assert.IsNotNull(cont);
+            Assert.AreNotEqual(cont.Content.Id, 0);
+            Assert.AreEqual(cont.Content.ChapterId, chap.Id);
+            Assert.AreNotEqual(cont.Media.Id, 0);
+            Assert.AreEqual(cont.Content.Type, ContentType.Image);
+            Assert.AreEqual(cont.Media.Extension, MediaExtension.Outside);
+            Assert.AreEqual(cont.Media.Type, MediaType.Image);
+            Assert.IsFalse(string.IsNullOrEmpty(cont.Media.Uri));
+            Assert.IsTrue(cont.Media.Uri.StartsWith("http"));
+            Assert.AreEqual(cont.Media.Uri, "http://kmycode.net/m.png");
+            Assert.IsTrue(cont.Content.Created > DateTime.Now.AddMinutes(-3));
+            Assert.IsTrue(cont.Content.LastModified > DateTime.Now.AddMinutes(-3));
+        }
+
         [DataTestMethod]
         [DataRow(PublishRange.All)]
         [DataRow(PublishRange.Private)]

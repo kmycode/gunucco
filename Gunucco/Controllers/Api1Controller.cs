@@ -324,14 +324,16 @@ namespace Gunucco.Controllers
         [AuthorizeFilter]
         public IActionResult CreateImageContent(int chapter_id, short source, string extension, IList<IFormFile> data, string data_uri)
         {
-            var stream = data.First().OpenReadStream();
-            var buf = new byte[stream.Length];
-            stream.Seek(0, SeekOrigin.Begin);
-            stream.Read(buf, 0, (int)stream.Length);
-            var base64 = Convert.ToBase64String(buf);
-
             if ((MediaSource)source == MediaSource.Self)
             {
+                // get data from form
+                var stream = data.First().OpenReadStream();
+                var buf = new byte[stream.Length];
+                stream.Seek(0, SeekOrigin.Begin);
+                stream.Read(buf, 0, (int)stream.Length);
+                var base64 = Convert.ToBase64String(buf);
+
+                // save data
                 var mcont = new ContentModel
                 {
                     AuthData = this.AuthData,

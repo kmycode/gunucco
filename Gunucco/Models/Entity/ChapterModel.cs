@@ -2,6 +2,7 @@
 using Gunucco.Entities;
 using Gunucco.Models.Database;
 using Gunucco.Models.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -170,7 +171,22 @@ namespace Gunucco.Models.Entity
         {
             using (var db = new MainContext())
             {
-                return this.GetContentMediaPairsWithPermissionCheck(db).ToArray();
+                var results = this.GetContentMediaPairsWithPermissionCheck(db);
+                results.Select(r => r.Media).Load();
+                results.Select(r => r.Content).Load();
+
+                var array = results.ToArray();
+                foreach (var m in array.Select(r => new MediaModel
+                {
+                    AuthData = this.AuthData,
+                    Content = r.Content,
+                    Media = r.Media,
+                }))
+                {
+                    m.SetMediaUri();
+                }
+
+                return array;
             }
         }
 

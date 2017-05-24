@@ -55,12 +55,11 @@ namespace Gunucco.Models.Entity
                         Content = this.Content,
                         Media = this.Media,
                     };
-                    this.Media.FilePath = "Dummy";
                     db.Media.Add(this.Media);
                     db.SaveChanges();       // get media id
 
                     mmedia.SaveMediaAsFile();
-                    this.SetMediaUri();
+                    mmedia.SetMediaUri();
                     db.SaveChanges();
                 }
             }
@@ -91,6 +90,12 @@ namespace Gunucco.Models.Entity
             this.Content = c;
 
             this.LoadMedia(db);
+            new MediaModel
+            {
+                AuthData = this.AuthData,
+                Content = this.Content,
+                Media = this.Media,
+            }.SetMediaUri();
 
             this.Chapter = this.Chapter ?? new Chapter();
             this.Chapter.Id = c.ChapterId;
@@ -273,7 +278,12 @@ namespace Gunucco.Models.Entity
                 }
 
                 // set download uri
-                this.SetMediaUri();
+                new MediaModel
+                {
+                    AuthData = this.AuthData,
+                    Content = this.Content,
+                    Media = this.Media,
+                }.SetMediaUri();
             }
 
             if (this.Media == null)
@@ -345,6 +355,7 @@ namespace Gunucco.Models.Entity
                             Message = "Media data is not base64 format.",
                         });
                     }
+                    this.Media.FilePath = string.Empty;
                 }
                 else
                 {
@@ -406,18 +417,6 @@ namespace Gunucco.Models.Entity
                     StatusCode = 403,
                     Message = "No permissions to set content to chapter.",
                 });
-            }
-        }
-
-        private void SetMediaUri()
-        {
-            if (this.Media.Source == MediaSource.Self)
-            {
-                this.Media.Uri = Config.ServerPath + "/api/v1/download" + this.Media.FilePath;
-            }
-            else
-            {
-                this.Media.Uri = this.Media.FilePath;
             }
         }
     }
