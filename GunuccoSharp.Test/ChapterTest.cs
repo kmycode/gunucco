@@ -402,32 +402,41 @@ namespace GunuccoSharp.Test
         }
 
         [DataTestMethod]
-        [DataRow(1)]
-        [DataRow(3)]
-        [DataRow(0)]
-        public async Task GetChildChapters(int chapterCount)
+        [DataRow(1, 1)]
+        [DataRow(3, 3)]
+        [DataRow(4, 3)]
+        [DataRow(0, 0)]
+        [DataRow(1, 0)]
+        public async Task GetChildChapters(int chapterCount, int publicChapterCount)
         {
-            var client = await TestUtil.GetUserClientAsync();
+            var client1 = await TestUtil.GetUserClientAsync(0);
+            var client2 = await TestUtil.GetUserClientAsync(1);
 
             // create book
-            var book = await TestUtil.Books.CreateAsync(client);
+            var book = await TestUtil.Books.CreateAsync(client1);
 
             // create root chapter
-            var chap = await TestUtil.Chapters.CreateAsync(client, 0, book.Id);
+            var chap = await TestUtil.Chapters.CreateAsync(client1, 0, book.Id);
+            chap.PublicRange = PublishRange.All;
+            await client1.Chapter.UpdateAsync(chap);
 
             // create chapter
             for (int i = 0; i < chapterCount; i++)
             {
-                var child = await TestUtil.Chapters.CreateAsync(client, 0, book.Id);
+                var child = await TestUtil.Chapters.CreateAsync(client1, 0, book.Id);
                 child.ParentId = chap.Id;
-                await client.Chapter.UpdateAsync(child);
+                if (i < publicChapterCount)
+                {
+                    child.PublicRange = PublishRange.All;
+                }
+                await client1.Chapter.UpdateAsync(child);
             }
 
             // get children chapters
-            var children = await client.Chapter.GetChildrenAsync(chap.Id);
+            var children = await client2.Chapter.GetChildrenAsync(chap.Id);
 
             Assert.IsNotNull(children);
-            Assert.AreEqual(children.Count(), chapterCount);
+            Assert.AreEqual(children.Count(), publicChapterCount);
             Assert.IsTrue(children.All(c => c.ParentId == chap.Id));
         }
 

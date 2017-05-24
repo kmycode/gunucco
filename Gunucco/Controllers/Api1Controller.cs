@@ -95,6 +95,7 @@ namespace Gunucco.Controllers
 
         [HttpGet]
         [Route("book/get/{id}")]
+        [AuthorizeFilter(IsCheckAuthorizable = false)]
         public IActionResult GetBook(int id)
         {
             var mbook = new BookModel
@@ -112,6 +113,7 @@ namespace Gunucco.Controllers
 
         [HttpGet]
         [Route("book/get/{id}/chapters")]
+        [AuthorizeFilter(IsCheckAuthorizable = false)]
         public IActionResult GetChapters(int id)
         {
             var mbook = new BookModel
@@ -122,13 +124,14 @@ namespace Gunucco.Controllers
                     Id = id,
                 },
             };
-            var chapters = mbook.GetChapters();
+            var chapters = mbook.GetChaptersWithPermissionCheck();
 
             return Json(chapters);
         }
 
         [HttpGet]
         [Route("book/get/{id}/chapters/root")]
+        [AuthorizeFilter(IsCheckAuthorizable = false)]
         public IActionResult GetRootChapters(int id)
         {
             var mbook = new BookModel
@@ -139,13 +142,14 @@ namespace Gunucco.Controllers
                     Id = id,
                 },
             };
-            var chapters = mbook.GetRootChapters();
+            var chapters = mbook.GetRootChaptersWithPermissionCheck();
 
             return Json(chapters);
         }
 
         [HttpGet]
         [Route("book/get/user/{id}")]
+        [AuthorizeFilter(IsCheckAuthorizable = false)]
         public IActionResult GetUserBooks(int id)
         {
             var mbook = new BookModel

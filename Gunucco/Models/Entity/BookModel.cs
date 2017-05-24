@@ -83,6 +83,43 @@ namespace Gunucco.Models.Entity
             return chapters;
         }
 
+        public IEnumerable<Chapter> GetChaptersWithPermissionCheck()
+        {
+            using (var db = new MainContext())
+            {
+                return this.GetChaptersWithPermissionCheck(db).ToArray();
+            }
+        }
+
+        public IEnumerable<Chapter> GetChaptersWithPermissionCheck(MainContext db)
+        {
+            var chapters = this.GetChapters(db);
+            foreach (var c in chapters)
+            {
+                var mchap = new ChapterModel
+                {
+                    AuthData = this.AuthData,
+                    Chapter = c,
+                    Book = this.Book,
+                };
+
+                bool isError = false;
+                try
+                {
+                    mchap.CheckLoadPermission(db);
+                }
+                catch
+                {
+                    isError = true;
+                }
+
+                if (!isError)
+                {
+                    yield return c;
+                }
+            }
+        }
+
         public IEnumerable<Chapter> GetRootChapters()
         {
             using (var db = new MainContext())
@@ -94,6 +131,43 @@ namespace Gunucco.Models.Entity
         public IQueryable<Chapter> GetRootChapters(MainContext db)
         {
             return this.GetChapters(db).Where(c => c.ParentId == null);
+        }
+
+        public IEnumerable<Chapter> GetRootChaptersWithPermissionCheck()
+        {
+            using (var db = new MainContext())
+            {
+                return this.GetRootChaptersWithPermissionCheck(db).ToArray();
+            }
+        }
+
+        public IEnumerable<Chapter> GetRootChaptersWithPermissionCheck(MainContext db)
+        {
+            var chapters = this.GetRootChapters(db);
+            foreach (var c in chapters)
+            {
+                var mchap = new ChapterModel
+                {
+                    AuthData = this.AuthData,
+                    Chapter = c,
+                    Book = this.Book,
+                };
+
+                bool isError = false;
+                try
+                {
+                    mchap.CheckLoadPermission(db);
+                }
+                catch
+                {
+                    isError = true;
+                }
+
+                if (!isError)
+                {
+                    yield return c;
+                }
+            }
         }
 
         public IEnumerable<Book> GetUserBooks(int userId)

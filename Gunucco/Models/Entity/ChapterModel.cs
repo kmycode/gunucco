@@ -111,13 +111,35 @@ namespace Gunucco.Models.Entity
             }
         }
 
-        public IQueryable<Chapter> GetChildrenWithPermissionCheck(MainContext db)
+        public IEnumerable<Chapter> GetChildrenWithPermissionCheck(MainContext db)
         {
-            var children = this.GetChildren(db);
-
             this.CheckLoadPermission(db);
 
-            return children;
+            var children = this.GetChildren(db);
+            foreach (var c in children)
+            {
+                var mchap = new ChapterModel
+                {
+                    AuthData = this.AuthData,
+                    Chapter = c,
+                    Book = this.Book,
+                };
+
+                bool isError = false;
+                try
+                {
+                    mchap.CheckLoadPermission(db);
+                }
+                catch
+                {
+                    isError = true;
+                }
+
+                if (!isError)
+                {
+                    yield return c;
+                }
+            }
         }
 
         public ApiMessage Save()
@@ -261,6 +283,8 @@ namespace Gunucco.Models.Entity
 
         public void CheckLoadPermission(MainContext db)
         {
+            this.Load(db);
+
             // except for All, user must login to get chapter
             if (this.Chapter.PublicRange != PublishRange.All)
             {
@@ -278,6 +302,19 @@ namespace Gunucco.Models.Entity
             if (this.Chapter.PublicRange == PublishRange.Private)
             {
                 this.CheckPermission(db);
+            }
+
+            // check parent permission
+            if (this.Chapter.ParentId.HasValue)
+            {
+                var mparent = new ChapterModel
+                {
+                    AuthData = this.AuthData,
+                    Book = this.Book,
+                    Chapter = new Chapter { Id = this.Chapter.ParentId.Value, },
+                };
+                mparent.Load(db);
+                mparent.CheckLoadPermission(db);
             }
         }
 

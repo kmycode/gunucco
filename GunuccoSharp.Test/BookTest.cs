@@ -101,32 +101,46 @@ namespace GunuccoSharp.Test
         }
 
         [DataTestMethod]
-        [DataRow(1)]
-        [DataRow(3)]
-        [DataRow(0)]
-        public async Task GetBookChapters(int chapterCount)
+        [DataRow(1, 1, true, 2)]
+        [DataRow(3, 3, true, 4)]
+        [DataRow(4, 3, true, 4)]
+        [DataRow(0, 0, true, 1)]
+        [DataRow(1, 0, true, 1)]
+        [DataRow(1, 1, false, 0)]
+        [DataRow(3, 3, false, 0)]
+        [DataRow(4, 3, false, 0)]
+        [DataRow(0, 0, false, 0)]
+        [DataRow(1, 0, false, 0)]
+        public async Task GetBookChapters(int chapterCount, int publicChapterCount, bool isRootPublic, int actualPublicChapterCount)
         {
-            var client = await TestUtil.GetUserClientAsync();
+            var client1 = await TestUtil.GetUserClientAsync(0);
+            var client2 = await TestUtil.GetUserClientAsync(1);
 
             // create book
-            var book = await TestUtil.Books.CreateAsync(client);
+            var book = await TestUtil.Books.CreateAsync(client1);
 
             // create root chapter
-            var chap = await TestUtil.Chapters.CreateAsync(client, 0, book.Id);
+            var chap = await TestUtil.Chapters.CreateAsync(client1, 0, book.Id);
+            chap.PublicRange = isRootPublic ? PublishRange.All : PublishRange.Private;
+            await client1.Chapter.UpdateAsync(chap);
 
             // create chapter
             for (int i = 0; i < chapterCount; i++)
             {
-                var child = await TestUtil.Chapters.CreateAsync(client, 0, book.Id);
+                var child = await TestUtil.Chapters.CreateAsync(client1, 0, book.Id);
                 child.ParentId = chap.Id;
-                await client.Chapter.UpdateAsync(child);
+                if (i < publicChapterCount)
+                {
+                    child.PublicRange = PublishRange.All;
+                }
+                await client1.Chapter.UpdateAsync(child);
             }
 
             // get children chapters
-            var chapters = await client.Book.GetChaptersAsync(book.Id);
+            var chapters = await client2.Book.GetChaptersAsync(book.Id);
 
             Assert.IsNotNull(chapters);
-            Assert.AreEqual(chapters.Count(), chapterCount + 1);    // children and parent
+            Assert.AreEqual(chapters.Count(), actualPublicChapterCount);    // children and parent
             Assert.IsTrue(chapters.All(c => c.BookId == book.Id));
         }
 
