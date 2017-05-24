@@ -21,7 +21,7 @@ namespace GunuccoSharp.Test
         [DataRow("Hello!")]
         [DataRow("")]
         [DataRow(null)]
-        [DataRow("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")]
+        [DataRow("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")]
         public async Task CreateChapter(string name)
         {
             var client = await TestUtil.GetUserClientAsync();
@@ -43,7 +43,7 @@ namespace GunuccoSharp.Test
         }
 
         [DataTestMethod]
-        [DataRow("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")]
+        [DataRow("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")]
         public async Task CreateChapter_Failed_InvalidName(string name)
         {
             var client = await TestUtil.GetUserClientAsync();
@@ -204,7 +204,7 @@ namespace GunuccoSharp.Test
         }
 
         [DataTestMethod]
-        [DataRow("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")]
+        [DataRow("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")]
         public async Task UpdateChapter_Failed_InvalidChapterName(string name)
         {
             var client = await TestUtil.GetUserClientAsync();
@@ -325,8 +325,11 @@ namespace GunuccoSharp.Test
             var newChap = await client.Chapter.GetAsync(chap.Id);
         }
 
-        [TestMethod]
-        public async Task GetChapter_Others()
+        [DataTestMethod]
+        [DataRow(PublishRange.All, false)]
+        [DataRow(PublishRange.All, true)]
+        [DataRow(PublishRange.UserOnly, true)]
+        public async Task GetChapter_Others(PublishRange range, bool doLogin)
         {
             var client1 = await TestUtil.GetUserClientAsync(0);
             var client2 = await TestUtil.GetUserClientAsync(1);
@@ -339,12 +342,20 @@ namespace GunuccoSharp.Test
             var chap = await TestUtil.Chapters.CreateAsync(client1, 0, book.Id);
 
             // update chapter
-            chap.PublicRange = PublishRange.All;
+            chap.PublicRange = range;
             await client1.Chapter.UpdateAsync(chap);
 
             // get newest chapter data
-            var newChap_1 = await client2.Chapter.GetAsync(chap.Id);
-            var newChap_2 = await client3.Chapter.GetAsync(chap.Id);
+            var newChap_1 = await client1.Chapter.GetAsync(chap.Id);
+            Chapter newChap_2;
+            if (doLogin)
+            {
+                newChap_2 = await client2.Chapter.GetAsync(chap.Id);
+            }
+            else
+            {
+                newChap_2 = await client3.Chapter.GetAsync(chap.Id);
+            }
 
             Assert.AreEqual(newChap_1.Id, newChap_2.Id);
             Assert.AreEqual(newChap_1.Name, newChap_2.Name);
@@ -505,6 +516,45 @@ namespace GunuccoSharp.Test
             var e = await Assert.ThrowsExceptionAsync<GunuccoErrorException>(async () =>
             {
                 await client.Chapter.GetAsync(chap1.Id);
+            });
+
+            // get exists chapter
+            await client.Chapter.GetAsync(chap2.Id);
+        }
+
+        [DataTestMethod]
+        [DataRow(1)]
+        [DataRow(3)]
+        public async Task DeleteChapter_WithContent(int contentCount)
+        {
+            var client = await TestUtil.GetUserClientAsync();
+
+            // create book
+            var book = await TestUtil.Books.CreateAsync(client);
+
+            // create chapter
+            var chap1 = await TestUtil.Chapters.CreateAsync(client, 0, book.Id);
+            var chap2 = await TestUtil.Chapters.CreateAsync(client, 1, book.Id);
+
+            // create content
+            int checkContentId = 0;
+            for (int i = 0; i < contentCount; i++)
+            {
+                var cont = await TestUtil.TextContents.CreateAsync(client, i, chap1.Id);
+                checkContentId = cont.Content.Id;
+            }
+
+            // delete chapter
+            var mes = await client.Chapter.DeleteAsync(chap1.Id);
+            TestUtil.Chapters.Remove(chap1);
+
+            Assert.AreEqual(mes.StatusCode, 200);
+            Assert.IsTrue(mes.Message.Contains("succeed"));
+
+            // get deleted chapter failed
+            var e = await Assert.ThrowsExceptionAsync<GunuccoErrorException>(async () =>
+            {
+                await client.Content.GetAsync(checkContentId);
             });
 
             // get exists chapter

@@ -14,6 +14,7 @@ using Gunucco.Models.Entities;
 using System.IO;
 using System.Text;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Http;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -186,19 +187,20 @@ namespace Gunucco.Controllers
         [HttpPost]
         [Route("chapter/create")]
         [AuthorizeFilter]
-        public IActionResult CreateChapter(string name, int bookId)
+        public IActionResult CreateChapter(string name, int book_id, int? parent_chapter_id)
         {
             var mchap = new ChapterModel
             {
                 AuthData = this.AuthData,
                 Book = new Book
                 {
-                    Id = bookId,
+                    Id = book_id,
                 },
                 Chapter = new Chapter
                 {
                     Name = name,
-                    BookId = bookId,
+                    BookId = book_id,
+                    ParentId = parent_chapter_id,
                     PublicRange = PublishRange.Private,
                 },
             };
@@ -243,24 +245,30 @@ namespace Gunucco.Controllers
             return Json(children);
         }
 
+        [HttpGet]
+        [Route("chapter/get/{id}/contents")]
+        [AuthorizeFilter(IsCheckAuthorizable = false)]
+        public IActionResult GetChapterContents(int id)
+        {
+            var mchap = new ChapterModel
+            {
+                AuthData = this.AuthData,
+                Chapter = new Chapter
+                {
+                    Id = id,
+                },
+            };
+            var contents = mchap.GetContentMediaPairsWithPermissionCheck();
+
+            return Json(contents);
+        }
+
         [HttpPut]
         [Route("chapter/update")]
         [AuthorizeFilter]
         public IActionResult UpdateChapter(string chapter)
         {
-            Chapter chap = null;
-            try
-            {
-                chap = JsonConvert.DeserializeObject<Chapter>(chapter);
-            }
-            catch
-            {
-                throw new GunuccoException(new ApiMessage
-                {
-                    StatusCode = 400,
-                    Message = "Invalid chapter json string.",
-                });
-            }
+            Chapter chap = this.LoadJson<Chapter>(chapter);
 
             var mchap = new ChapterModel
             {
@@ -283,16 +291,183 @@ namespace Gunucco.Controllers
                 Chapter = new Chapter { Id = id, },
             };
             var mes = mchap.Delete();
-
+            
             return Json(mes);
         }
 
         #endregion
 
         #region Content and Media
+
+        [HttpPost]
+        [Route("content/create/text")]
+        [AuthorizeFilter]
+        public IActionResult CreateTextContent(int chapter_id, string text)
+        {
+            var mcont = new ContentModel
+            {
+                AuthData = this.AuthData,
+                Chapter = new Chapter { Id = chapter_id, },
+                Content = new Content
+                {
+                    Type = ContentType.Text,
+                    Text = text,
+                },
+            };
+            mcont.Create();
+
+            return Json(mcont.Pair);
+        }
+
+        [HttpPost]
+        [Route("content/create/image")]
+        [AuthorizeFilter]
+        public IActionResult CreateImageContent(int chapter_id, short source, string extension, IList<IFormFile> data, string data_uri)
+        {
+            var stream = data.First().OpenReadStream();
+            var buf = new byte[stream.Length];
+            stream.Seek(0, SeekOrigin.Begin);
+            stream.Read(buf, 0, (int)stream.Length);
+            var base64 = Convert.ToBase64String(buf);
+
+            if ((MediaSource)source == MediaSource.Self)
+            {
+                var mcont = new ContentModel
+                {
+                    AuthData = this.AuthData,
+                    Chapter = new Chapter { Id = chapter_id, },
+                    Content = new Content
+                    {
+                        Type = ContentType.Image,
+                    },
+                    Media = new Media
+                    {
+                        Source = MediaSource.Self,
+                        Extension = MediaModel.StringToExtension(extension),
+                        MediaData = base64,
+                    },
+                };
+                mcont.Create();
+
+                return Json(mcont.Pair);
+            }
+            else if ((MediaSource)source == MediaSource.Outside)
+            {
+                var mcont = new ContentModel
+                {
+                    AuthData = this.AuthData,
+                    Chapter = new Chapter { Id = chapter_id, },
+                    Content = new Content
+                    {
+                        Type = ContentType.Image,
+                    },
+                    Media = new Media
+                    {
+                        Source = MediaSource.Outside,
+                        FilePath = data_uri,
+                    },
+                };
+                mcont.Create();
+
+                return Json(mcont.Pair);
+            }
+
+            throw new GunuccoException(new ApiMessage
+            {
+                StatusCode = 400,
+                Message = "Invalid source value.",
+            });
+        }
+
+        [HttpGet]
+        [Route("content/get/{id}")]
+        [AuthorizeFilter(IsCheckAuthorizable = false)]
+        public IActionResult GetContent(int id)
+        {
+            var mcont = new ContentModel
+            {
+                AuthData = this.AuthData,
+                Content = new Content
+                {
+                    Id = id,
+                },
+            };
+            mcont.LoadWithPermissionCheck();
+
+            return Json(mcont.Pair);
+        }
+
+        [HttpPut]
+        [Route("content/update")]
+        [AuthorizeFilter]
+        public IActionResult UpdateContent(string content)
+        {
+            var cont = this.LoadJson<Content>(content);
+
+            var mcont = new ContentModel
+            {
+                AuthData = this.AuthData,
+                Content = cont,
+            };
+            var mes = mcont.Save();
+
+            return Json(mes);
+        }
+
+        [HttpDelete]
+        [Route("content/delete")]
+        [AuthorizeFilter]
+        public IActionResult DeleteContent(int id)
+        {
+            var mcont = new ContentModel
+            {
+                AuthData = this.AuthData,
+                Content = new Content
+                {
+                    Id = id,
+                },
+            };
+            var mes = mcont.Delete();
+
+            return Json(mes);
+        }
+
+        [HttpGet]
+        [Route("download/media/{path}")]
+        [AuthorizeFilter(IsCheckAuthorizable = false)]
+        public IActionResult DownloadMedia(string path)
+        {
+            var pair = ContentModel.GetPairFromMediaPath(this.AuthData, path);
+            var mmedia = new MediaModel
+            {
+                AuthData = this.AuthData,
+                Content = pair.Content,
+                Media = pair.Media,
+            };
+            //mmedia.LoadMediaFromFile();
+            
+            return File(pair.Media.MediaDataRow, "image/" + pair.Media.Extension.ToString().ToLower());
+        }
+
         #endregion
 
         #region BookPermission
         #endregion
+
+        private T LoadJson<T>(string json)
+        {
+            try
+            {
+                return JsonConvert.DeserializeObject<T>(json);
+            }
+            catch
+            {
+                throw new GunuccoException(new ApiMessage
+                {
+                    StatusCode = 400,
+                    Message = "Invalid json string.",
+                });
+            }
+        }
     }
 }

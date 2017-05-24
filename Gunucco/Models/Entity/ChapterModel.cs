@@ -71,6 +71,9 @@ namespace Gunucco.Models.Entity
                 });
             }
 
+            this.Book = this.Book ?? new Book();
+            if (this.Book.Id == default(int)) this.Book.Id = c.BookId;
+
             this.Chapter = c;
         }
 
@@ -140,6 +143,41 @@ namespace Gunucco.Models.Entity
                     yield return c;
                 }
             }
+        }
+
+        public IEnumerable<Content> GetContents()
+        {
+            using (var db = new MainContext())
+            {
+                return this.GetContents(db).ToArray();
+            }
+        }
+
+        public IQueryable<Content> GetContents(MainContext db)
+        {
+            this.Load(db);
+            return db.Content.Where(c => c.ChapterId == this.Chapter.Id).OrderBy(c => c.Order);
+        }
+
+        public IQueryable<ContentMediaPair> GetContentMediaPairs(MainContext db)
+        {
+            this.Load(db);
+            return db.Content.Where(c => c.ChapterId == this.Chapter.Id).OrderBy(c => c.Order)
+                    .GroupJoin(db.Media, c => c.Id, m => m.ContentId, (c, ms) => new ContentMediaPair { Content = c, Media = ms.FirstOrDefault(), });
+        }
+
+        public IEnumerable<ContentMediaPair> GetContentMediaPairsWithPermissionCheck()
+        {
+            using (var db = new MainContext())
+            {
+                return this.GetContentMediaPairsWithPermissionCheck(db).ToArray();
+            }
+        }
+
+        public IQueryable<ContentMediaPair> GetContentMediaPairsWithPermissionCheck(MainContext db)
+        {
+            this.CheckLoadPermission(db);
+            return this.GetContentMediaPairs(db);
         }
 
         public ApiMessage Save()
@@ -246,6 +284,19 @@ namespace Gunucco.Models.Entity
 
             db.SaveChanges();
 
+            // remove contents
+            var contents = this.GetContents(db);
+            foreach (var c in contents)
+            {
+                var mcont = new ContentModel
+                {
+                    AuthData = this.AuthData,
+                    Chapter = this.Chapter,
+                    Content = c,
+                };
+                mcont.Delete(db, false);
+            }
+
             return new ApiMessage
             {
                 StatusCode = 200,
@@ -268,17 +319,36 @@ namespace Gunucco.Models.Entity
             this.CheckPermission(db, permissions);
         }
 
-        public void CheckPermission(MainContext db, IQueryable<BookPermission> permissions)
+        private void CheckPermission(MainContext db, IQueryable<BookPermission> permissions)
         {
             if (!permissions.Any())
             {
-                var mbook = new BookModel
+                // check parent permission
+                if (this.Chapter.ParentId.HasValue)
                 {
-                    AuthData = this.AuthData,
-                    Book = new Book { Id = this.Chapter.BookId, },
-                };
-                mbook.CheckPermission(db);
+                    var mparent = new ChapterModel
+                    {
+                        AuthData = this.AuthData,
+                        Chapter = new Chapter { Id = this.Chapter.ParentId.Value, },
+                        Book = this.Book,
+                    };
+
+                    // if parent has permissions, this method do nothing
+                    mparent.CheckPermission(db);
+                }
+
+                else
+                {
+                    // check book permission if parent permissions not passed
+                    var mbook = new BookModel
+                    {
+                        AuthData = this.AuthData,
+                        Book = new Book { Id = this.Chapter.BookId, },
+                    };
+                    mbook.CheckPermission(db);
+                }
             }
+            // if user has permissions, this method do nothing
         }
 
         public void CheckLoadPermission(MainContext db)
@@ -329,7 +399,7 @@ namespace Gunucco.Models.Entity
                 //});
                 this.Chapter.Name = string.Empty;
             }
-            if (this.Chapter.Name.Length > 120)
+            if (this.Chapter.Name.Length > 120 / 3)     // utf8
             {
                 throw new GunuccoException(new ApiMessage
                 {

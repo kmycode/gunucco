@@ -58,7 +58,7 @@ namespace Gunucco.Entities
 
     public enum ContentType : short
     {
-        Composition = 101,
+        Text = 101,
         Image = 102,
     }
 }

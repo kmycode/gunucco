@@ -7,6 +7,7 @@ using Gunucco.Entities;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.IO;
 
 namespace GunuccoSharp.Test
 {
@@ -15,7 +16,7 @@ namespace GunuccoSharp.Test
         #region Settings
 
         // Is debug mode enabled? (debug = test target server is running on VisualStudio)
-        public const bool IsLocalHost = true;
+        public const bool IsLocalHost = false;
 
         // Is allow invalid SSL cert?
         public const bool IsAllowInvalidSSLCert = true;
@@ -120,6 +121,79 @@ namespace GunuccoSharp.Test
                 },
             });
 
+        public static readonly TestDataGenerator<ContentMediaPair> TextContents = new TestDataGenerator<ContentMediaPair>(
+            async (c, n, args) => await c.Content.CreateTextAsync((int)args[0], n.Content.Text),
+            async (c, n) => await c.Content.DeleteAsync(n.Content.Id),
+            (a, b) => a.Media?.ContentId == b.Content.Id,
+            new Collection<ContentMediaPair>
+            {
+                new ContentMediaPair
+                {
+                    Content = new Content
+                    {
+                        Text = "Wagahai ha neko de aru.",
+                    },
+                },
+                new ContentMediaPair
+                {
+                    Content = new Content
+                    {
+                        Text = "Let's war!",
+                    },
+                },
+                new ContentMediaPair
+                {
+                    Content = new Content
+                    {
+                        Text = "American legs are too long.",
+                    },
+                },
+            });
+
+        public static readonly TestDataGenerator<ContentMediaPair> ImageContents = new TestDataGenerator<ContentMediaPair>(
+            async (c, n, args) =>
+            {
+                var uri = n.Content.Text;
+                n.Content.Text = string.Empty;
+                var result = await CreateImageContentAsync(c, (int)args[0], uri);
+                n.Content.Text = uri;
+                return result;
+            },
+            async (c, n) => await c.Content.DeleteAsync(n.Content.Id),
+            (a, b) => a.Media.Id == b.Content.Id,
+            new Collection<ContentMediaPair>
+            {
+                new ContentMediaPair
+                {
+                    Content = new Content
+                    {
+                        Text = "..\\..\\..\\TestFiles\\1.png",
+                    },
+                },
+                new ContentMediaPair
+                {
+                    Content = new Content
+                    {
+                        Text = "..\\..\\..\\TestFiles\\2.png",
+                    },
+                },
+                new ContentMediaPair
+                {
+                    Content = new Content
+                    {
+                        Text = "..\\..\\..\\TestFiles\\3.png",
+                    },
+                },
+            });
+
+        public static async Task<ContentMediaPair> CreateImageContentAsync(GunuccoSharpClient client, int chapterId, string fileName, MediaExtension ex = MediaExtension.Png)
+        {
+            using (var stream = new FileStream(fileName, FileMode.Open))
+            {
+                return await client.Content.CreateImageAsync(chapterId, ex, stream);
+            }
+        }
+
         public static GunuccoSharpClient GetClient()
         {
             return new GunuccoSharpClient
@@ -138,6 +212,8 @@ namespace GunuccoSharp.Test
 
         public static async Task CleanupAsync(GunuccoSharpClient client = null)
         {
+            // await TextContents.CleanAsync(client);
+            // await ImageContents.CleanAsync(client);
             // await Chapters.CleanAsync(client);
             await Books.CleanAsync(client);
             await Users.CleanAsync(client);
@@ -149,8 +225,13 @@ namespace GunuccoSharp.Test
             Assert.AreEqual(ex.StatusCode, code);
             foreach (var str in contains)
             {
-                Assert.IsTrue(ex.Message.Contains(str));
+                Assert.IsTrue(ex.Error.Message.Contains(str));
             }
+        }
+
+        public static void CheckException(ApiMessage ex, int code, params string[] contains)
+        {
+            CheckException(new GunuccoErrorException(ex) { StatusCode = ex.StatusCode, }, code, contains);
         }
     }
 

@@ -14,6 +14,21 @@ namespace Gunucco.Entities
         public int ContentId { get; set; }
 
         /// <summary>
+        /// Uploading media data with base64 encoded
+        /// (Upload api only, not save in database)
+        /// </summary>
+        [DBIgnore]
+        [JsonProperty("media_data")]
+        internal string MediaData { get; set; }
+
+        /// <summary>
+        /// Media data row (Converted media data to byte array)
+        /// </summary>
+        [DBIgnore]
+        [JsonIgnore]
+        internal byte[] MediaDataRow { get; set; }
+
+        /// <summary>
         /// 16bit integer of media type
         /// </summary>
         [JsonProperty("type")]
@@ -28,6 +43,23 @@ namespace Gunucco.Entities
         {
             get => (MediaType)this.TypeValue;
             set => this.TypeValue = (short)value;
+        }
+
+        /// <summary>
+        /// 16bit integer of media extension
+        /// </summary>
+        [JsonProperty("extension")]
+        internal short ExtensionValue { get; set; }
+
+        /// <summary>
+        /// Media extension. If source is outside, this property is ignored.
+        /// </summary>
+        [JsonIgnore]
+        [DBIgnore]
+        public MediaExtension Extension
+        {
+            get => (MediaExtension)this.ExtensionValue;
+            set => this.ExtensionValue = (short)value;
         }
 
         /// <summary>
@@ -66,5 +98,13 @@ namespace Gunucco.Entities
     public enum MediaType : short
     {
         Image = 101,
+    }
+
+    public enum MediaExtension : short
+    {
+        Outside = 100,      // If MediaSource is outside
+        Png = 101,
+        Jpeg = 102,
+        Gif = 103,
     }
 }

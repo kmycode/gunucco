@@ -266,7 +266,7 @@ namespace Gunucco.Models.Entity
                     Message = "Book name is too short.",
                 });
             }
-            if (this.Book.Name.Length > 120)
+            if (this.Book.Name.Length > 120 / 3)        // utf8
             {
                 throw new GunuccoException(new ApiMessage
                 {

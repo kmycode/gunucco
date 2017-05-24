@@ -21,5 +21,10 @@ namespace GunuccoSharp
         /// Get chapter commands
         /// </summary>
         public ChapterCommand Chapter => new ChapterCommand(this);
+
+        /// <summary>
+        /// Get content commands
+        /// </summary>
+        public ContentCommand Content => new ContentCommand(this);
     }
 }

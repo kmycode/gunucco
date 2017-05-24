@@ -89,6 +89,12 @@ namespace Gunucco
             }
             log.Info("==== Database Migration End ====");
 
+            // get application configs
+            {
+                var config = this.Configuration.GetSection("GunuccoConfigs");
+                Config.ServerPath = config.GetValue<string>("ServerPath", "http://localhost");
+            }
+
             // Add framework services.
             services.AddMvc();
 

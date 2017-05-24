@@ -20,7 +20,7 @@ namespace GunuccoSharp.Test
 
         [DataTestMethod]
         [DataRow("Test book")]
-        [DataRow("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")]
+        [DataRow("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")]
         public async Task CreateBook(string name)
         {
             var client = await TestUtil.GetUserClientAsync();
@@ -40,7 +40,7 @@ namespace GunuccoSharp.Test
         [DataTestMethod]
         [DataRow("")]
         [DataRow(null)]
-        [DataRow("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")]
+        [DataRow("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")]
         public async Task CreateBook_Failed_InvalidBookName(string bookName)
         {
             var client = await TestUtil.GetUserClientAsync();

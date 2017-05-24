@@ -93,7 +93,7 @@ namespace Gunucco.Models.Database
                     .IsRequired();
                 entity.Property(e => e.TypeValue)
                     .IsRequired()
-                    .HasDefaultValue((short)ContentType.Composition);
+                    .HasDefaultValue((short)ContentType.Text);
                 entity.Property(e => e.Text)
                     .HasColumnType("text");
                 entity.Property(e => e.Order)
@@ -120,6 +120,9 @@ namespace Gunucco.Models.Database
                 entity.Property(e => e.SourceValue)
                     .IsRequired()
                     .HasDefaultValue((short)MediaSource.Self);
+                entity.Property(e => e.ExtensionValue)
+                    .IsRequired()
+                    .HasDefaultValue((short)MediaExtension.Outside);
             });
 
             builder.Entity<BookPermission>(entity =>

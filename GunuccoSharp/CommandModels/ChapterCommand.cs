@@ -22,7 +22,7 @@ namespace GunuccoSharp.CommandModels
                 Data =
                 {
                     { "name", name },
-                    { "bookId", bookId.ToString() },
+                    { "book_id", bookId.ToString() },
                 },
             });
         }
@@ -41,6 +41,15 @@ namespace GunuccoSharp.CommandModels
             return await this.Client.Command<IEnumerable<Chapter>>(new CommandInfo
             {
                 Route = "chapter/get/" + id + "/children",
+                Method = HttpMethod.Get,
+            });
+        }
+
+        public async Task<IEnumerable<ContentMediaPair>> GetContentsAsync(int id)
+        {
+            return await this.Client.Command<IEnumerable<ContentMediaPair>>(new CommandInfo
+            {
+                Route = "chapter/get/" + id + "/contents",
                 Method = HttpMethod.Get,
             });
         }

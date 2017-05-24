@@ -25,6 +25,8 @@ namespace GunuccoSharp.CommandModels
         internal Collection<Tuple<string, Stream, string>> Media { get; set; } = new Collection<Tuple<string, Stream, string>>();
 
         internal HttpMethod Method { get; set; } = HttpMethod.Get;
+
+        internal bool IsSendAsJson { get; set; } = false;
     }
 
     internal enum HttpMethod

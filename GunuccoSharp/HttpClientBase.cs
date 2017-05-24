@@ -45,20 +45,21 @@ namespace GunuccoSharp
         {
             var route = command.Route;
             var data = command.Data;
+            var isJson = command.IsSendAsJson;
             switch (command.Method)
             {
                 case CommandModels.HttpMethod.Get:
                     return await this.Get<T>(route, data);
                 case CommandModels.HttpMethod.Post:
-                    return await this.Post<T>(route, data);
+                    return await this.Post<T>(route, data, isJson);
                 case CommandModels.HttpMethod.PostMedia:
                     return await this.PostMedia<T>(route, data, command.Media);
                 case CommandModels.HttpMethod.Put:
-                    return await this.Put<T>(route, data);
+                    return await this.Put<T>(route, data, isJson);
                 case CommandModels.HttpMethod.Delete:
-                    return await this.Delete<T>(route, data);
+                    return await this.Delete<T>(route, data, isJson);
                 case CommandModels.HttpMethod.Patch:
-                    return await this.Patch<T>(route, data);
+                    return await this.Patch<T>(route, data, isJson);
             }
 
             throw new Exception();
@@ -86,13 +87,14 @@ namespace GunuccoSharp
             return this.JsonDeserialize<T>(json);
         }
 
-        private async Task<string> Post(string route, IEnumerable<KeyValuePair<string, string>> data = null, string methodName = "POST")
+        private async Task<string> Post(string route, IEnumerable<KeyValuePair<string, string>> data = null, string methodName = "POST", bool isSendAsJson = false)
         {
             var rp = await this.RequestHttpAsync(route, async (client, url) =>
             {
                 var method = new System.Net.Http.HttpMethod(methodName);
                 
-                var content = new FormUrlEncodedContent(data ?? Enumerable.Empty<KeyValuePair<string, string>>());
+                var content = !isSendAsJson ? (HttpContent)new FormUrlEncodedContent(data ?? Enumerable.Empty<KeyValuePair<string, string>>()) :
+                                              (HttpContent)new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
                 var message = new HttpRequestMessage
                 {
                     Method = method,
@@ -145,27 +147,27 @@ namespace GunuccoSharp
             return this.JsonDeserialize<T>(json);
         }
 
-        protected async Task<T> Post<T>(string route, IEnumerable<KeyValuePair<string, string>> data = null)
+        protected async Task<T> Post<T>(string route, IEnumerable<KeyValuePair<string, string>> data = null, bool isSendAsJson = false)
         {
-            var json = await this.Post(route, data, "POST");
+            var json = await this.Post(route, data, "POST", isSendAsJson);
             return this.JsonDeserialize<T>(json);
         }
 
-        protected async Task<T> Patch<T>(string route, IEnumerable<KeyValuePair<string, string>> data = null)
+        protected async Task<T> Patch<T>(string route, IEnumerable<KeyValuePair<string, string>> data = null, bool isSendAsJson = false)
         {
-            var json = await this.Post(route, data, "PATCH");
+            var json = await this.Post(route, data, "PATCH", isSendAsJson);
             return this.JsonDeserialize<T>(json);
         }
 
-        protected async Task<T> Put<T>(string route, IEnumerable<KeyValuePair<string, string>> data = null)
+        protected async Task<T> Put<T>(string route, IEnumerable<KeyValuePair<string, string>> data = null, bool isSendAsJson = false)
         {
-            var json = await this.Post(route, data, "PUT");
+            var json = await this.Post(route, data, "PUT", isSendAsJson);
             return this.JsonDeserialize<T>(json);
         }
 
-        protected async Task<T> Delete<T>(string route, IEnumerable<KeyValuePair<string, string>> data = null)
+        protected async Task<T> Delete<T>(string route, IEnumerable<KeyValuePair<string, string>> data = null, bool isSendAsJson = false)
         {
-            var json = await this.Post(route, data, "DELETE");
+            var json = await this.Post(route, data, "DELETE", isSendAsJson);
             return this.JsonDeserialize<T>(json);
         }
 

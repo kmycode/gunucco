@@ -33,11 +33,11 @@ namespace Gunucco.Entities
         /// <summary>
         /// Media file is under self server
         /// </summary>
-        Self,
+        Self = 101,
 
         /// <summary>
         /// Media file is outside internet
         /// </summary>
-        Outside,
+        Outside = 102,
     }
 }
