@@ -97,7 +97,9 @@ namespace Gunucco.Models.Entity
         {
             using (var db = new MainContext())
             {
-                return this.GetChildren(db).ToArray();
+                var children = this.GetChildren(db);
+                children.Load();
+                return children.ToArray();
             }
         }
 
@@ -150,7 +152,9 @@ namespace Gunucco.Models.Entity
         {
             using (var db = new MainContext())
             {
-                return this.GetContents(db).ToArray();
+                var contents = this.GetContents(db);
+                contents.Load();
+                return contents.ToArray();
             }
         }
 
@@ -176,7 +180,8 @@ namespace Gunucco.Models.Entity
                 results.Select(r => r.Content).Load();
 
                 var array = results.ToArray();
-                foreach (var m in array.Select(r => new MediaModel
+                foreach (var m in array.Where(r => r.Content.Type != ContentType.Text)
+                                       .Select(r => new MediaModel
                 {
                     AuthData = this.AuthData,
                     Content = r.Content,

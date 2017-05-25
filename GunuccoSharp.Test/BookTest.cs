@@ -212,7 +212,7 @@ namespace GunuccoSharp.Test
             var book3 = await TestUtil.Books.CreateAsync(client2, 2);
 
             // get book data
-            var books = await client3.Book.GetUserBooksAsync(client1.AuthToken.UserId);
+            var books = await client3.User.GetBooksAsync(client1.AuthToken.UserId);
 
             Assert.AreEqual(books.Count(), 2);
             Assert.IsTrue(books.All(b => b.Id == book1.Id || b.Id == book2.Id));

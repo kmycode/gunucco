@@ -2,6 +2,7 @@
 using Gunucco.Entities;
 using Gunucco.Models.Database;
 using Gunucco.Models.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -72,7 +73,9 @@ namespace Gunucco.Models.Entity
         {
             using (var db = new MainContext())
             {
-                return this.GetChapters(db).ToArray();
+                var chapters = this.GetChapters(db);
+                chapters.Load();
+                return chapters.ToArray();
             }
         }
 
@@ -87,7 +90,8 @@ namespace Gunucco.Models.Entity
         {
             using (var db = new MainContext())
             {
-                return this.GetChaptersWithPermissionCheck(db).ToArray();
+                var chapters = this.GetChaptersWithPermissionCheck(db);
+                return chapters.ToArray();
             }
         }
 
@@ -174,15 +178,17 @@ namespace Gunucco.Models.Entity
         {
             using (var db = new MainContext())
             {
-                return GetUserBooks(db, userId).ToArray();
+                var books = GetUserBooks(db, userId);
+                books.Load();
+                return books.ToArray();
             }
         }
 
         public static IQueryable<Book> GetUserBooks(MainContext db, int userId)
         {
             // get books
-            var permissions = db.BookPermission.Where(p => p.UserId == userId).Where(p => p.TargetTypeValue == (short)TargetType.Book);
-            var books = db.Book.Where(b => permissions.Any(p => p.TargetId == b.Id && p.TargetTypeValue == (short)TargetType.Book));
+            var books = db.BookPermission.Where(p => p.UserId == userId && p.TargetType == TargetType.Book)
+                                         .Join(db.Book, p => p.TargetId, b => b.Id, (p, b) => b);
             return books;
         }
 
