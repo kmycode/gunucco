@@ -72,6 +72,20 @@ namespace Gunucco.Controllers
             return Json(data.AuthToken);
         }
 
+        [HttpGet]
+        [Route("user/{id}/book")]
+        [AuthorizeFilter(IsCheckAuthorizable = false)]
+        public IActionResult GetUserBooks(int id)
+        {
+            var mbook = new BookModel
+            {
+                AuthData = this.AuthData,
+            };
+            var books = mbook.GetUserBooks(id);
+
+            return Json(books);
+        }
+
         #endregion
 
         #region Book
@@ -95,7 +109,7 @@ namespace Gunucco.Controllers
         }
 
         [HttpGet]
-        [Route("book/get/{id}")]
+        [Route("book/{id}")]
         [AuthorizeFilter(IsCheckAuthorizable = false)]
         public IActionResult GetBook(int id)
         {
@@ -113,7 +127,7 @@ namespace Gunucco.Controllers
         }
 
         [HttpGet]
-        [Route("book/get/{id}/chapters")]
+        [Route("book/{id}/chapters")]
         [AuthorizeFilter(IsCheckAuthorizable = false)]
         public IActionResult GetChapters(int id)
         {
@@ -131,7 +145,7 @@ namespace Gunucco.Controllers
         }
 
         [HttpGet]
-        [Route("book/get/{id}/chapters/root")]
+        [Route("book/{id}/chapters/root")]
         [AuthorizeFilter(IsCheckAuthorizable = false)]
         public IActionResult GetRootChapters(int id)
         {
@@ -146,20 +160,6 @@ namespace Gunucco.Controllers
             var chapters = mbook.GetRootChaptersWithPermissionCheck();
 
             return Json(chapters);
-        }
-
-        [HttpGet]
-        [Route("book/get/user/{id}")]
-        [AuthorizeFilter(IsCheckAuthorizable = false)]
-        public IActionResult GetUserBooks(int id)
-        {
-            var mbook = new BookModel
-            {
-                AuthData = this.AuthData,
-            };
-            var books = mbook.GetUserBooks(id);
-
-            return Json(books);
         }
 
         [HttpDelete]
@@ -210,7 +210,7 @@ namespace Gunucco.Controllers
         }
 
         [HttpGet]
-        [Route("chapter/get/{id}")]
+        [Route("chapter/{id}")]
         [AuthorizeFilter(IsCheckAuthorizable = false)]
         public IActionResult GetChapter(int id)
         {
@@ -228,7 +228,7 @@ namespace Gunucco.Controllers
         }
 
         [HttpGet]
-        [Route("chapter/get/{id}/children")]
+        [Route("chapter/{id}/children")]
         [AuthorizeFilter(IsCheckAuthorizable = false)]
         public IActionResult GetChildrenChapters(int id)
         {
@@ -246,7 +246,7 @@ namespace Gunucco.Controllers
         }
 
         [HttpGet]
-        [Route("chapter/get/{id}/contents")]
+        [Route("chapter/{id}/contents")]
         [AuthorizeFilter(IsCheckAuthorizable = false)]
         public IActionResult GetChapterContents(int id)
         {
@@ -382,7 +382,7 @@ namespace Gunucco.Controllers
         }
 
         [HttpGet]
-        [Route("content/get/{id}")]
+        [Route("content/{id}")]
         [AuthorizeFilter(IsCheckAuthorizable = false)]
         public IActionResult GetContent(int id)
         {

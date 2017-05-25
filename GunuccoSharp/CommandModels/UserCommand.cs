@@ -49,5 +49,19 @@ namespace GunuccoSharp.CommandModels
                 Method = HttpMethod.Delete,
             });
         }
+
+        /// <summary>
+        /// Get user all books
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<Book>> GetBooksAsync(int userId)
+        {
+            return await this.Client.Command<IEnumerable<Book>>(new CommandInfo
+            {
+                Route = "user/" + userId + "/book",
+                Method = HttpMethod.Get,
+            });
+        }
     }
 }

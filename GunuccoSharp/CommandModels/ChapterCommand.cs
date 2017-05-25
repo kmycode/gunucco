@@ -31,7 +31,7 @@ namespace GunuccoSharp.CommandModels
         {
             return await this.Client.Command<Chapter>(new CommandInfo
             {
-                Route = "chapter/get/" + id,
+                Route = "chapter/" + id,
                 Method = HttpMethod.Get,
             });
         }
@@ -40,7 +40,7 @@ namespace GunuccoSharp.CommandModels
         {
             return await this.Client.Command<IEnumerable<Chapter>>(new CommandInfo
             {
-                Route = "chapter/get/" + id + "/children",
+                Route = "chapter/" + id + "/children",
                 Method = HttpMethod.Get,
             });
         }
@@ -49,7 +49,7 @@ namespace GunuccoSharp.CommandModels
         {
             return await this.Client.Command<IEnumerable<ContentMediaPair>>(new CommandInfo
             {
-                Route = "chapter/get/" + id + "/contents",
+                Route = "chapter/" + id + "/contents",
                 Method = HttpMethod.Get,
             });
         }

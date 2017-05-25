@@ -29,7 +29,7 @@ namespace GunuccoSharp.CommandModels
         {
             return await this.Client.Command<Book>(new CommandInfo
             {
-                Route = "book/get/" + bookId,
+                Route = "book/" + bookId,
                 Method = HttpMethod.Get,
             });
         }
@@ -38,7 +38,7 @@ namespace GunuccoSharp.CommandModels
         {
             return await this.Client.Command<IEnumerable<Chapter>>(new CommandInfo
             {
-                Route = "book/get/" + bookId + "/chapters",
+                Route = "book/" + bookId + "/chapters",
                 Method = HttpMethod.Get,
             });
         }
@@ -47,16 +47,7 @@ namespace GunuccoSharp.CommandModels
         {
             return await this.Client.Command<IEnumerable<Chapter>>(new CommandInfo
             {
-                Route = "book/get/" + bookId + "/chapters/root",
-                Method = HttpMethod.Get,
-            });
-        }
-
-        public async Task<IEnumerable<Book>> GetUserBooksAsync(int userId)
-        {
-            return await this.Client.Command<IEnumerable<Book>>(new CommandInfo
-            {
-                Route = "book/get/user/" + userId,
+                Route = "book/" + bookId + "/chapters/root",
                 Method = HttpMethod.Get,
             });
         }

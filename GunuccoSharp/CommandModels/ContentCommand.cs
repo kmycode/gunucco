@@ -67,7 +67,7 @@ namespace GunuccoSharp.CommandModels
         {
             return await this.Client.Command<ContentMediaPair>(new CommandInfo
             {
-                Route = "content/get/" + id,
+                Route = "content/" + id,
                 Method = HttpMethod.Get,
             });
         }
