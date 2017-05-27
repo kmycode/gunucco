@@ -82,7 +82,7 @@ namespace Gunucco.Models.Entity
         public IQueryable<Chapter> GetChapters(MainContext db)
         {
             this.Load(db);
-            var chapters = db.Chapter.Where(c => c.BookId == this.Book.Id);
+            var chapters = db.Chapter.Where(c => c.BookId == this.Book.Id).OrderBy(c => c.Order);
             return chapters;
         }
 

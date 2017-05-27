@@ -303,6 +303,45 @@ namespace GunuccoSharp.Test
             Assert.IsTrue(ex.Error.Message.Contains("different"));
         }
 
+        [TestMethod]
+        public async Task UpdateChapter_WithChangeOrder()
+        {
+            var client = await TestUtil.GetUserClientAsync();
+
+            // create book
+            var book = await TestUtil.Books.CreateAsync(client);
+
+            // create chapter
+            var chap1 = await TestUtil.Chapters.CreateAsync(client, 0, book.Id);
+            chap1.Order = 5;
+            await client.Chapter.UpdateAsync(chap1);
+            var chap2 = await TestUtil.Chapters.CreateAsync(client, 1, book.Id);
+            chap2.Order = 2;
+            await client.Chapter.UpdateAsync(chap2);
+            var chap3 = await TestUtil.Chapters.CreateAsync(client, 2, book.Id);
+            chap3.Order = 3;
+            chap3.ParentId = chap2.Id;
+            await client.Chapter.UpdateAsync(chap3);
+
+            // get chapters
+            var chapters = await client.Book.GetChaptersAsync(book.Id);
+            var chapters_root = await client.Book.GetRootChaptersAsync(book.Id);
+
+            Assert.AreEqual(chapters.Count(), 3);
+            Assert.AreEqual(chapters.First().Order, 2);
+            Assert.AreEqual(chapters.First().Id, chap2.Id);
+            Assert.AreEqual(chapters.ElementAt(1).Order, 3);
+            Assert.AreEqual(chapters.ElementAt(1).Id, chap3.Id);
+            Assert.AreEqual(chapters.ElementAt(2).Order, 5);
+            Assert.AreEqual(chapters.ElementAt(2).Id, chap1.Id);
+
+            Assert.AreEqual(chapters_root.Count(), 2);
+            Assert.AreEqual(chapters_root.First().Order, 2);
+            Assert.AreEqual(chapters_root.First().Id, chap2.Id);
+            Assert.AreEqual(chapters_root.ElementAt(1).Order, 5);
+            Assert.AreEqual(chapters_root.ElementAt(1).Id, chap1.Id);
+        }
+
         [DataTestMethod]
         [DataRow(PublishRange.Private)]
         [DataRow(PublishRange.UserOnly)]

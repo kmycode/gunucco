@@ -246,6 +246,7 @@ namespace Gunucco.Models.Entity
             c.Name = this.Chapter.Name;
             c.ParentId = this.Chapter.ParentId;
             c.PublicRange = this.Chapter.PublicRange;
+            c.Order = this.Chapter.Order;
             db.SaveChanges();
 
             return new ApiMessage
