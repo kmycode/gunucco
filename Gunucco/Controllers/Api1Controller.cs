@@ -41,6 +41,7 @@ namespace Gunucco.Controllers
 
         [HttpPost]
         [Route("user/create")]
+        [DebugModeOnlyFilter]
         public IActionResult CreateUser(string id, string password)
         {
             var muser = new UserModel();
