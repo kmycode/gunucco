@@ -1,0 +1,10 @@
+﻿@{
+    ViewData["Title"] = "Message";
+}
+
+<!-- message -->
+<div id="@(ViewBag.IsError as bool? == false ? "page-message-container" : "page-error-container")">
+    <div id="page-message">
+        @ViewBag.Message
+    </div>
+</div>

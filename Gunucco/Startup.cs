@@ -13,6 +13,7 @@ using NLog;
 using NLog.Targets;
 using System.IO;
 using System.Reflection;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace Gunucco
 {
@@ -100,6 +101,9 @@ namespace Gunucco
 
             // Add framework services.
             services.AddMvc();
+
+            // enable cookie
+            services.AddSingleton<ITempDataProvider, CookieTempDataProvider>();
 
             log.Info("==== ConfigureServices End ====");
         }

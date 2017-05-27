@@ -68,6 +68,74 @@ div#footer #footer-projectlink {
 div#footer #footer-projectlink:hover {
   text-decoration: underline;
 }
+#conpact-form-container {
+  width: 560px;
+  margin: 48px auto 0px;
+  border: 1px solid #8ec1de;
+  border-radius: 32px;
+  padding: 24px 24px 36px;
+}
+#conpact-form-container h1 {
+  margin: 0px 0px 24px 0px;
+}
+#conpact-form-container div.form-label {
+  font-weight: bold;
+  font-size: 16px;
+}
+#conpact-form-container input[type=text] {
+  display: block;
+  margin: 4px 0px 20px 0px;
+  font-size: 24px;
+  width: 80%;
+}
+#conpact-form-container input[type=password] {
+  display: block;
+  margin: 4px 0px 20px 0px;
+  font-size: 24px;
+  width: 80%;
+}
+#conpact-form-container input[type=submit] {
+  margin: 16px 0px 0px;
+  background-color: #dfecf2;
+  border: 1px solid #bebebe;
+  padding: 8px 20px;
+  font-size: 22px;
+  cursor: pointer;
+}
+#conpact-form-container input[type=submit]:hover {
+  background-color: #086ed1;
+  color: white;
+}
+#page-message-container {
+  background-color: #e2f7f0;
+  color: #34a43d;
+  margin: 32px auto 0px;
+  width: 500px;
+  max-width: 90%;
+  border-radius: 12px;
+}
+#page-message-container #page-message {
+  padding: 24px 48px;
+}
+#page-error-container {
+  background-color: #e2f7f0;
+  color: #34a43d;
+  margin: 32px auto 0px;
+  width: 500px;
+  max-width: 90%;
+  border-radius: 12px;
+  background-color: #ffe3e0;
+  color: #ce332e;
+}
+#page-error-container #page-message {
+  padding: 24px 48px;
+}
+#page-error-container #page-message:before {
+  content: "Error";
+  display: block;
+  margin: 0px 0px 8px 0px;
+  font-weight: bold;
+}
 #top-container {
   text-align: center;
   filter: alpha(opacity=0);
@@ -105,42 +173,4 @@ div#footer #footer-projectlink:hover {
 }
 #top-container #top-server-path code {
   padding-left: 16px;
-}
-#sign-up-form-container {
-  width: 560px;
-  margin: 48px auto 0px;
-  border: 1px solid #8ec1de;
-  border-radius: 32px;
-  padding: 24px 24px 36px;
-}
-#sign-up-form-container h1 {
-  margin: 0px 0px 24px 0px;
-}
-#sign-up-form-container div.form-label {
-  font-weight: bold;
-  font-size: 16px;
-}
-#sign-up-form-container input[type=text] {
-  display: block;
-  margin: 4px 0px 20px 0px;
-  font-size: 24px;
-  width: 80%;
-}
-#sign-up-form-container input[type=password] {
-  display: block;
-  margin: 4px 0px 20px 0px;
-  font-size: 24px;
-  width: 80%;
-}
-#sign-up-form-container input[type=submit] {
-  margin: 16px 0px 0px;
-  background-color: #dfecf2;
-  border: 1px solid #bebebe;
-  padding: 8px 20px;
-  font-size: 22px;
-  cursor: pointer;
-}
-#sign-up-form-container input[type=submit]:hover {
-  background-color: #086ed1;
-  color: white;
 }
