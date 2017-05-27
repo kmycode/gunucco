@@ -1,22 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <TargetFramework>netstandard1.4</TargetFramework>
     <Version>0.1.0</Version>
-    <RepositoryUrl>https://github.com/kmycode/gunucco.git</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/kmycode/gunucco</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/kmycode/gunucco/blob/master/LICENCE.txt</PackageLicenseUrl>
+    <Company>Gunucco</Company>
+    <Product>GunuccoSharp</Product>
+    <Authors>KMY</Authors>
+    <Description>A C# wrapper of Gunucco REST API.</Description>
     <Copyright>(C) KMY 2017</Copyright>
+    <PackageLicenseUrl>https://github.com/kmycode/gunucco/blob/master/LICENCE.txt</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/kmycode/gunucco</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/kmycode/gunucco.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DefineConstants>TRACE;DEBUG;NETCOREAPP1_1;GUNUCCO_SHARP</DefineConstants>
-    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DefineConstants>TRACE;RELEASE;NETCOREAPP1_1;GUNUCCO_SHARP</DefineConstants>
   </PropertyGroup>
 
   <Import Project="..\Gunucco.Entities\Gunucco.Entities.projitems" Label="Shared" />

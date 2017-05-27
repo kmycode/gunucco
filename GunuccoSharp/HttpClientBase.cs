@@ -30,7 +30,7 @@ namespace GunuccoSharp
         /// <summary>
         /// allow self-signed SSL certificate
         /// </summary>
-        [Obsolete("This property is for debug or test. NOT for production.")]
+        [Obsolete("This property is for debug or test. NOT for production. And NotImplementedException will be thrown in Xamarin.")]
         public bool IsAllowInvalidSSLCert { get; set; } = false;
 
         private void AddAuthenticationHeader(HttpClient client)
@@ -196,35 +196,6 @@ namespace GunuccoSharp
             {
                 response = await action(client, url);
             }
-            catch (WebException e)
-            {
-                try
-                {
-                    var stream = e.Response.GetResponseStream();
-                    var result = new byte[stream.Length];
-                    stream.Seek(0, SeekOrigin.Begin);
-                    await stream.ReadAsync(result, 0, (int)stream.Length);
-                    var content = Encoding.UTF8.GetString(result);
-                    ApiMessage error = null;
-                    try
-                    {
-                        error = this.JsonDeserialize<ApiMessage>(content);
-                    }
-                    catch { }
-                    if (!string.IsNullOrEmpty(error?.Message))
-                    {
-                        throw new GunuccoErrorException("Api failed. message: '" + error.Message + "'", error, (int?)((e.Response as HttpWebResponse)?.StatusCode) ?? -1);
-                    }
-                    else
-                    {
-                        throw new GunuccoException("http connection failed.", e);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw new GunuccoException("http connection and get error detail failed.", ex);
-                }
-            }
             catch (Exception e)
             {
                 throw new GunuccoException("http connection failed.", e);
@@ -233,7 +204,7 @@ namespace GunuccoSharp
             var contents = await response.Content.ReadAsStringAsync();
             if (string.IsNullOrEmpty(contents))
             {
-                throw new GunuccoException("server returns empty result.");
+                throw new GunuccoException("server returns empty result. Status code: " + (int)response.StatusCode);
             }
 
             if (!response.IsSuccessStatusCode && response.StatusCode != HttpStatusCode.NotModified && contents[0] == '{')
