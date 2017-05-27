@@ -22,8 +22,8 @@
                 <div id="gunucco-mini-logo">Gunucco</div>
 
                 <ul id="navigation-right-menu">
-                    <li>Sign in</li>
-                    <li>Sign up</li>
+                    <li><a href="/web/signin">Sign in</a></li>
+                    <li><a href="/web/signup">Sign up</a></li>
                 </ul>
             </div>
         </div>
@@ -62,7 +62,7 @@
             {
                 foreach (var script in extraScript.Split(' '))
                 {
-                    @:<script src="./js/@(script).js"></script>
+                    @:<script src="/js/@(script).js"></script>
                 }
             }
         }
