@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using NLog;
 using NLog.Targets;
 using System.IO;
+using System.Reflection;
 
 namespace Gunucco
 {
@@ -92,6 +93,7 @@ namespace Gunucco
             // get application configs
             {
                 var config = this.Configuration.GetSection("GunuccoConfigs");
+                Config.ServerVersion = Assembly.GetEntryAssembly().GetName().Version.ToString();
                 Config.ServerPath = config.GetValue<string>("ServerPath", "http://localhost");
                 Config.IsDebugMode = config.GetValue<bool>("IsDebugMode", false);
             }

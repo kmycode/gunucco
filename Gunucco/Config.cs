@@ -12,6 +12,11 @@ namespace Gunucco
     public static class Config
     {
         /// <summary>
+        /// Gunucco version to grasp api or function set server provides.
+        /// </summary>
+        public static string ServerVersion { get; set; }
+
+        /// <summary>
         /// Server path starts with 'http://' or 'https://' and not ends with '/'
         /// </summary>
         public static string ServerPath { get; set; }

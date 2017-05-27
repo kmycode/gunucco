@@ -37,6 +37,21 @@ namespace Gunucco.Controllers
             });
         }
 
+        #region Server
+
+        [HttpGet]
+        [Route("server/version")]
+        public IActionResult GetServerVersion()
+        {
+            return Json(new ApiMessage
+            {
+                StatusCode = 200,
+                Message = Config.ServerVersion,
+            });
+        }
+
+        #endregion
+
         #region User
 
         [HttpPost]

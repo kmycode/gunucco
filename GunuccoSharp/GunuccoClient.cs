@@ -8,6 +8,11 @@ namespace GunuccoSharp
     public class GunuccoSharpClient : HttpClientBase
     {
         /// <summary>
+        /// Get server commands
+        /// </summary>
+        public ServerCommand Server => new ServerCommand(this);
+
+        /// <summary>
         /// Get user commands
         /// </summary>
         public UserCommand User => new UserCommand(this);

@@ -7,6 +7,16 @@
   <PropertyGroup>
     <PackageTargetFallback>$(PackageTargetFallback);portable-net45+win8+wp8+wpa81;</PackageTargetFallback>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+    <Version>0.1.0</Version>
+    <Authors>KMY</Authors>
+    <Description>A kit of common apis and web client for creators.</Description>
+    <Copyright>(C) KMY 2017</Copyright>
+    <PackageLicenseUrl>https://github.com/kmycode/gunucco/blob/master/LICENCE.txt</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/kmycode/gunucco/</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/kmycode/gunucco.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <AssemblyVersion>0.1.0.0</AssemblyVersion>
+    <FileVersion>0.1.0.0</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
