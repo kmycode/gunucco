@@ -26,6 +26,12 @@ namespace Gunucco.Entities
         public string Name { get; set; }
 
         /// <summary>
+        /// Chapter order
+        /// </summary>
+        [JsonProperty("order")]
+        public int Order { get; set; }
+
+        /// <summary>
         /// Chapter publish range
         /// </summary>
         [JsonProperty("public_range")]

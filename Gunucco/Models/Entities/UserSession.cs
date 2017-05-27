@@ -17,7 +17,16 @@ namespace Gunucco.Models.Entities
 
         public DateTime ExpireDateTime { get; set; }
 
-        public static UserSession Create(User user)
+        internal int ScopeValue { get; set; }
+
+        [DBIgnore]
+        public Scope Scope
+        {
+            get => (Scope)this.ScopeValue;
+            set => this.ScopeValue = (int)value;
+        }
+
+        public static UserSession Create(User user, Scope scope)
         {
             return new UserSession
             {
@@ -25,6 +34,7 @@ namespace Gunucco.Models.Entities
                 UserId = user.Id,
                 UserTextId = user.TextId,
                 ExpireDateTime = DateTime.Now.AddHours(24),
+                Scope = scope,
             };
         }
 

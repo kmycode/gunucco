@@ -20,5 +20,15 @@ namespace Gunucco.Entities
 
         [JsonProperty("token")]
         public string AccessToken { get; set; }
+
+        [JsonProperty("scope")]
+        internal int ScopeValue { get; set; }
+
+        [JsonIgnore]
+        public Scope Scope
+        {
+            get => (Scope)this.ScopeValue;
+            set => this.ScopeValue = (int)value;
+        }
     }
 }

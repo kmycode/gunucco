@@ -16,6 +16,8 @@ namespace Gunucco.Filters
     {
         public bool IsCheckAuthorizable { get; set; } = true;
 
+        public Scope Scope { get; set; } = Scope.None;
+
         public AuthorizeFilterAttribute()
         {
             this.Order = 1;
@@ -56,6 +58,30 @@ namespace Gunucco.Filters
                         StatusCode = 503,
                         Message = "Service unavailable.",
                     });
+                }
+
+                // scope check
+                if (data?.Session == null || !data.Session.Scope.HasFlag(this.Scope))
+                {
+                    if (this.IsCheckAuthorizable)
+                    {
+                        context.HttpContext.Response.StatusCode = 403;
+                        context.Result = new JsonResult(new ApiMessage
+                        {
+                            StatusCode = 403,
+                            Message = "You don't have scope to action.",
+                        });
+                    }
+                    else
+                    {
+                        // make situation no auth
+                        data = new AuthenticationData
+                        {
+                            AuthToken = new AuthenticationToken(),
+                            Session = new UserSession(),
+                            User = new User(),
+                        };
+                    }
                 }
             }
 

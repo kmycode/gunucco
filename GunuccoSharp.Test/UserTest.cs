@@ -204,7 +204,7 @@ namespace GunuccoSharp.Test
             {
                 await client.User.DeleteAsync();
             });
-            Assert.IsTrue(ex.Error.Message.Contains("Login failed"));
+            Assert.IsTrue(ex.Error.Message.Contains("scope"));
         }
 
         [TestMethod]

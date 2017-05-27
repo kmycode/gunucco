@@ -61,6 +61,9 @@ namespace Gunucco.Models.Database
                 entity.Property(e => e.ExpireDateTime)
                     .IsRequired()
                     .HasDefaultValue(DateTime.MinValue);
+                entity.Property(e => e.ScopeValue)
+                    .IsRequired()
+                    .HasDefaultValue((int)Scope.None);
             });
 
             builder.Entity<Book>(entity =>
@@ -85,6 +88,8 @@ namespace Gunucco.Models.Database
                 entity.Property(e => e.PublicRangeValue)
                     .IsRequired()
                     .HasDefaultValue((short)PublishRange.All);
+                entity.Property(e => e.Order)
+                    .IsRequired();
             });
 
             builder.Entity<Content>(entity =>

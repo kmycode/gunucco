@@ -67,7 +67,11 @@ namespace Gunucco.Controllers
 
         [HttpDelete]
         [Route("user/delete")]
-        [AuthorizeFilter]
+#if !DEBUG && !UNITTEST
+        [AuthorizeFilter(Scope = Scope.WriteUserDangerousIdentity)]
+#else
+        [AuthorizeFilter(Scope = Scope.WriteUserIdentity)]
+#endif
         public IActionResult DeleteUser()
         {
             var muser = new UserModel
@@ -90,7 +94,7 @@ namespace Gunucco.Controllers
 
         [HttpGet]
         [Route("user/{id}/books")]
-        [AuthorizeFilter(IsCheckAuthorizable = false)]
+        [AuthorizeFilter(IsCheckAuthorizable = false, Scope = Scope.Read)]
         public IActionResult GetUserBooks(int id)
         {
             var mbook = new BookModel
@@ -108,7 +112,7 @@ namespace Gunucco.Controllers
 
         [HttpPost]
         [Route("book/create")]
-        [AuthorizeFilter]
+        [AuthorizeFilter(Scope = Scope.Write)]
         public IActionResult CreateBook(string name)
         {
             var mbook = new BookModel
@@ -126,7 +130,7 @@ namespace Gunucco.Controllers
 
         [HttpGet]
         [Route("book/{id}")]
-        [AuthorizeFilter(IsCheckAuthorizable = false)]
+        [AuthorizeFilter(IsCheckAuthorizable = false, Scope = Scope.Read)]
         public IActionResult GetBook(int id)
         {
             var mbook = new BookModel
@@ -144,7 +148,7 @@ namespace Gunucco.Controllers
 
         [HttpGet]
         [Route("book/{id}/chapters")]
-        [AuthorizeFilter(IsCheckAuthorizable = false)]
+        [AuthorizeFilter(IsCheckAuthorizable = false, Scope = Scope.Read)]
         public IActionResult GetChapters(int id)
         {
             var mbook = new BookModel
@@ -162,7 +166,7 @@ namespace Gunucco.Controllers
 
         [HttpGet]
         [Route("book/{id}/chapters/root")]
-        [AuthorizeFilter(IsCheckAuthorizable = false)]
+        [AuthorizeFilter(IsCheckAuthorizable = false, Scope = Scope.Read)]
         public IActionResult GetRootChapters(int id)
         {
             var mbook = new BookModel
@@ -180,7 +184,7 @@ namespace Gunucco.Controllers
 
         [HttpDelete]
         [Route("book/delete")]
-        [AuthorizeFilter]
+        [AuthorizeFilter(Scope = Scope.Write)]
         public IActionResult DeleteBook(int id)
         {
             var mbook = new BookModel
@@ -202,7 +206,7 @@ namespace Gunucco.Controllers
 
         [HttpPost]
         [Route("chapter/create")]
-        [AuthorizeFilter]
+        [AuthorizeFilter(Scope = Scope.Write)]
         public IActionResult CreateChapter(string name, int book_id, int? parent_chapter_id)
         {
             var mchap = new ChapterModel
@@ -227,7 +231,7 @@ namespace Gunucco.Controllers
 
         [HttpGet]
         [Route("chapter/{id}")]
-        [AuthorizeFilter(IsCheckAuthorizable = false)]
+        [AuthorizeFilter(IsCheckAuthorizable = false, Scope = Scope.Read)]
         public IActionResult GetChapter(int id)
         {
             var mchap = new ChapterModel
@@ -245,7 +249,7 @@ namespace Gunucco.Controllers
 
         [HttpGet]
         [Route("chapter/{id}/children")]
-        [AuthorizeFilter(IsCheckAuthorizable = false)]
+        [AuthorizeFilter(IsCheckAuthorizable = false, Scope = Scope.Read)]
         public IActionResult GetChildrenChapters(int id)
         {
             var mchap = new ChapterModel
@@ -263,7 +267,7 @@ namespace Gunucco.Controllers
 
         [HttpGet]
         [Route("chapter/{id}/contents")]
-        [AuthorizeFilter(IsCheckAuthorizable = false)]
+        [AuthorizeFilter(IsCheckAuthorizable = false, Scope = Scope.Read)]
         public IActionResult GetChapterContents(int id)
         {
             var mchap = new ChapterModel
@@ -281,7 +285,7 @@ namespace Gunucco.Controllers
 
         [HttpPut]
         [Route("chapter/update")]
-        [AuthorizeFilter]
+        [AuthorizeFilter(Scope = Scope.Write)]
         public IActionResult UpdateChapter(string chapter)
         {
             Chapter chap = this.LoadJson<Chapter>(chapter);
@@ -298,7 +302,7 @@ namespace Gunucco.Controllers
 
         [HttpDelete]
         [Route("chapter/delete")]
-        [AuthorizeFilter]
+        [AuthorizeFilter(Scope = Scope.Write)]
         public IActionResult DeleteChapter(int id)
         {
             var mchap = new ChapterModel
@@ -317,7 +321,7 @@ namespace Gunucco.Controllers
 
         [HttpPost]
         [Route("content/create/text")]
-        [AuthorizeFilter]
+        [AuthorizeFilter(Scope = Scope.Write)]
         public IActionResult CreateTextContent(int chapter_id, string text)
         {
             var mcont = new ContentModel
@@ -337,7 +341,7 @@ namespace Gunucco.Controllers
 
         [HttpPost]
         [Route("content/create/image")]
-        [AuthorizeFilter]
+        [AuthorizeFilter(Scope = Scope.Write)]
         public IActionResult CreateImageContent(int chapter_id, short source, string extension, IList<IFormFile> data, string data_uri)
         {
             if ((MediaSource)source == MediaSource.Self)
@@ -399,7 +403,7 @@ namespace Gunucco.Controllers
 
         [HttpGet]
         [Route("content/{id}")]
-        [AuthorizeFilter(IsCheckAuthorizable = false)]
+        [AuthorizeFilter(IsCheckAuthorizable = false, Scope = Scope.Read)]
         public IActionResult GetContent(int id)
         {
             var mcont = new ContentModel
@@ -417,7 +421,7 @@ namespace Gunucco.Controllers
 
         [HttpPut]
         [Route("content/update")]
-        [AuthorizeFilter]
+        [AuthorizeFilter(Scope = Scope.Write)]
         public IActionResult UpdateContent(string content)
         {
             var cont = this.LoadJson<Content>(content);
@@ -434,7 +438,7 @@ namespace Gunucco.Controllers
 
         [HttpDelete]
         [Route("content/delete")]
-        [AuthorizeFilter]
+        [AuthorizeFilter(Scope = Scope.Write)]
         public IActionResult DeleteContent(int id)
         {
             var mcont = new ContentModel
@@ -452,7 +456,7 @@ namespace Gunucco.Controllers
 
         [HttpGet]
         [Route("download/media/{path}")]
-        [AuthorizeFilter(IsCheckAuthorizable = false)]
+        [AuthorizeFilter(IsCheckAuthorizable = false, Scope = Scope.Read)]
         public IActionResult DownloadMedia(string path)
         {
             var pair = ContentModel.GetPairFromMediaPath(this.AuthData, path);

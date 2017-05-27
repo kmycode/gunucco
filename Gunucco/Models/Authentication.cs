@@ -61,6 +61,7 @@ namespace Gunucco.Models
                     WWWAuthenticateMessage = "Bearer error=\"invalid_token\"",
                 });
             }
+            token.Scope = session.Scope;
 
             return new AuthenticationData
             {
@@ -70,7 +71,7 @@ namespace Gunucco.Models
             };
         }
 
-        public static AuthenticationData Authenticate(string id, string password)
+        public static AuthenticationData Authenticate(string id, string password, Scope scope = Scope.LegacyFull)
         {
             var token = new AuthenticationToken
             {
@@ -93,7 +94,7 @@ namespace Gunucco.Models
             {
                 // create new session
                 user = CheckLoginable(db, token, password);
-                session = UserSession.Create(user);
+                session = UserSession.Create(user, scope);
 
                 db.UserSession.Add(session);
                 db.SaveChanges();
