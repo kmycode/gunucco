@@ -73,7 +73,7 @@ namespace Gunucco.Controllers
         }
 
         [HttpGet]
-        [Route("user/{id}/book")]
+        [Route("user/{id}/books")]
         [AuthorizeFilter(IsCheckAuthorizable = false)]
         public IActionResult GetUserBooks(int id)
         {

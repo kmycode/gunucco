@@ -59,7 +59,7 @@ namespace GunuccoSharp.CommandModels
         {
             return await this.Client.Command<IEnumerable<Book>>(new CommandInfo
             {
-                Route = "user/" + userId + "/book",
+                Route = "user/" + userId + "/books",
                 Method = HttpMethod.Get,
             });
         }
