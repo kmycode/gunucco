@@ -93,6 +93,7 @@ namespace Gunucco
             {
                 var config = this.Configuration.GetSection("GunuccoConfigs");
                 Config.ServerPath = config.GetValue<string>("ServerPath", "http://localhost");
+                Config.IsDebugMode = config.GetValue<bool>("IsDebugMode", false);
             }
 
             // Add framework services.

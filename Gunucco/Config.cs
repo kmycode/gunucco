@@ -15,5 +15,10 @@ namespace Gunucco
         /// Server path starts with 'http://' or 'https://' and not ends with '/'
         /// </summary>
         public static string ServerPath { get; set; }
+
+        /// <summary>
+        /// Server is in debug mode or not.
+        /// </summary>
+        public static bool IsDebugMode { get; set; }
     }
 }
