@@ -26,7 +26,7 @@ namespace Gunucco.Controllers
     [RouteTraceFilter]
     public class Api1Controller : Controller
     {
-        public AuthenticationData AuthData { get; set; }
+        public AuthorizationData AuthData { get; set; }
 
         public IActionResult Index()
         {
@@ -87,7 +87,7 @@ namespace Gunucco.Controllers
         [Route("user/login/idandpassword")]
         public IActionResult LoginWithIdAndPassword(string id, string password)
         {
-            var data = Authentication.Authenticate(id, password);
+            var data = Authentication.Authorize(id, password);
 
             return Json(data.AuthToken);
         }

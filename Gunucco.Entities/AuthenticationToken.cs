@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Gunucco.Entities
 {
-    public class AuthenticationToken
+    public class AuthorizationToken
     {
         [JsonProperty("id")]
         public int UserId { get; set; }

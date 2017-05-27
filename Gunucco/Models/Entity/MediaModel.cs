@@ -14,7 +14,7 @@ namespace Gunucco.Models.Entity
     {
         private const string MediaDirPath = "/media/";
 
-        public AuthenticationData AuthData { get; set; }
+        public AuthorizationData AuthData { get; set; }
 
         public Content Content { get; set; }
 

@@ -27,14 +27,14 @@ namespace Gunucco.Filters
         {
             base.OnActionExecuting(context);
             var authStr = context.HttpContext.Request.Headers["Authorization"];
-            AuthenticationData data = null;
+            AuthorizationData data = null;
 
             if (!this.IsCheckAuthorizable && string.IsNullOrEmpty(authStr))
             {
                 // no need to authorize
-                data = new AuthenticationData
+                data = new AuthorizationData
                 {
-                    AuthToken = new AuthenticationToken(),
+                    AuthToken = new AuthorizationToken(),
                     Session = new UserSession(),
                     User = new User(),
                 };
@@ -43,7 +43,7 @@ namespace Gunucco.Filters
             {
                 try
                 {
-                    data = Authentication.Authenticate(authStr);
+                    data = Authentication.Authorize(authStr);
                 }
                 catch (GunuccoException e)
                 {
@@ -75,9 +75,9 @@ namespace Gunucco.Filters
                     else
                     {
                         // make situation no auth
-                        data = new AuthenticationData
+                        data = new AuthorizationData
                         {
-                            AuthToken = new AuthenticationToken(),
+                            AuthToken = new AuthorizationToken(),
                             Session = new UserSession(),
                             User = new User(),
                         };

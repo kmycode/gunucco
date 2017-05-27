@@ -17,9 +17,9 @@ namespace Gunucco.Models
     {
         private static Logger log = LogManager.GetCurrentClassLogger();
 
-        public static AuthenticationData Authenticate(string authString)
+        public static AuthorizationData Authorize(string authString)
         {
-            AuthenticationToken token = null;
+            AuthorizationToken token = null;
 
             if (string.IsNullOrWhiteSpace(authString))
             {
@@ -63,7 +63,7 @@ namespace Gunucco.Models
             }
             token.Scope = session.Scope;
 
-            return new AuthenticationData
+            return new AuthorizationData
             {
                 User = user,
                 Session = session,
@@ -71,9 +71,9 @@ namespace Gunucco.Models
             };
         }
 
-        public static AuthenticationData Authenticate(string id, string password, Scope scope = Scope.LegacyFull)
+        public static AuthorizationData Authorize(string id, string password, Scope scope = Scope.LegacyFull)
         {
-            var token = new AuthenticationToken
+            var token = new AuthorizationToken
             {
                 UserTextId = id,
             };
@@ -105,7 +105,7 @@ namespace Gunucco.Models
             // cleaning expired sessions per 1 hour
             CleanExpiredSessions();
 
-            return new AuthenticationData
+            return new AuthorizationData
             {
                 User = user,
                 Session = session,
@@ -113,7 +113,7 @@ namespace Gunucco.Models
             };
         }
 
-        private static User CheckLoginable(MainContext db, AuthenticationToken token, string password = null)
+        private static User CheckLoginable(MainContext db, AuthorizationToken token, string password = null)
         {
             User user;
             
@@ -155,7 +155,7 @@ namespace Gunucco.Models
             return Convert.ToBase64String(Encoding.ASCII.GetBytes(session.UserId + ":" + session.UserTextId + ":" + session.Id));
         }
 
-        private static AuthenticationToken ParseToken(string bearerToken)
+        private static AuthorizationToken ParseToken(string bearerToken)
         {
             string str = null;
             try
@@ -185,7 +185,7 @@ namespace Gunucco.Models
 
             var id = int.Parse(cred[0]);
 
-            return new AuthenticationToken
+            return new AuthorizationToken
             {
                 UserId = id,
                 UserTextId = cred[1],

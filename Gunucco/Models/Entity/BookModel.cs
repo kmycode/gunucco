@@ -12,7 +12,7 @@ namespace Gunucco.Models.Entity
 {
     public class BookModel
     {
-        public AuthenticationData AuthData { get; set; }
+        public AuthorizationData AuthData { get; set; }
 
         public Book Book { get; set; }
 

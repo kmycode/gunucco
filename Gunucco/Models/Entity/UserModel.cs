@@ -12,13 +12,13 @@ namespace Gunucco.Models.Entity
 {
     public class UserModel
     {
-        public AuthenticationData AuthData { get; set; }
+        public AuthorizationData AuthData { get; set; }
 
         public void Create(string id, string password)
         {
             this.CheckPasswordSafety(password);
 
-            var token = new AuthenticationToken
+            var token = new AuthorizationToken
             {
                 UserTextId = id,
             };
@@ -62,7 +62,7 @@ namespace Gunucco.Models.Entity
                 db.SaveChanges();
             }
 
-            this.AuthData = new AuthenticationData
+            this.AuthData = new AuthorizationData
             {
                 User = user,
                 AuthToken = token,

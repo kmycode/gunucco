@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Gunucco.Models.Entities
 {
-    public class AuthenticationData
+    public class AuthorizationData
     {
-        public AuthenticationToken AuthToken { get; set; }
+        public AuthorizationToken AuthToken { get; set; }
 
         public UserSession Session { get; set; }
 

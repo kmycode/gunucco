@@ -25,7 +25,7 @@ namespace GunuccoSharp
         /// <summary>
         /// Authentication token
         /// </summary>
-        public AuthenticationToken AuthToken { get; set; }
+        public AuthorizationToken AuthToken { get; set; }
 
         /// <summary>
         /// allow self-signed SSL certificate

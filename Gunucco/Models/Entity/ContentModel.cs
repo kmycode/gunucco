@@ -13,7 +13,7 @@ namespace Gunucco.Models.Entity
     {
         private const string MediaDirPath = "/media/";
 
-        public AuthenticationData AuthData { get; set; }
+        public AuthorizationData AuthData { get; set; }
 
         public Chapter Chapter { get; set; }
 
@@ -121,7 +121,7 @@ namespace Gunucco.Models.Entity
             cchap.CheckLoadPermission(db);
         }
 
-        public static ContentMediaPair GetPairFromMediaPath(AuthenticationData data, string path)
+        public static ContentMediaPair GetPairFromMediaPath(AuthorizationData data, string path)
         {
             using (var db = new MainContext())
             {
