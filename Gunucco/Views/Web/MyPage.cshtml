@@ -1,0 +1,52 @@
+﻿@model Gunucco.ViewModels.MyPageTopViewModel
+@{
+    ViewData["Title"] = "My page";
+}
+
+<!-- message -->
+@if (this.Model.Message.HasMessage)
+{
+    <div id="@(this.Model.Message.IsError == false ? "page-message-container" : "page-error-container")">
+        <div id="page-message">
+            @this.Model.Message.Message
+        </div>
+    </div>
+}
+
+<!-- my page -->
+<div id="mypage-container" class="@(this.Model.Message.HasMessage ? "under-page-message" : "")">
+    <h1>My page</h1>
+
+    <div class="mypage-block-container my-profile">
+        <h2>My profile</h2>
+        <div class="header-user-name">@this.Model.AuthData.User.Name</div>
+        <div class="header-user-text-id">@@@this.Model.AuthData.User.TextId</div>
+    </div>
+
+    <div class="mypage-block-container my-books">
+        <h2>My books</h2>
+        <ul>
+            @foreach (var book in this.Model.Books)
+            {
+                <li>
+                    <form action="/web/mypage/book" method="post">
+                        <input type="hidden" name="auth_token" value="@this.Model.AuthData.AuthToken" />
+                        <input type="hidden" name="book_id" value="@book.Id" />
+                        <input type="submit" class="link-like" value="Edit" />
+                    </form>
+                    <span class="item-name">@book.Name</span>
+                </li>
+            }
+        </ul>
+    </div>
+
+    <div class="mypage-block-container my-books">
+        <h2>New book</h2>
+        <form action="/web/mypage/book/new" method="post">
+            <input type="hidden" name="auth_token" value="@this.Model.AuthData.AuthToken" />
+            <div class="form-label">Book name</div>
+            <input type="text" name="book_name" value="" />
+            <input type="submit" value="Create" />
+        </form>
+    </div>
+</div>

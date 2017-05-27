@@ -103,23 +103,13 @@ div#footer {
 }
 
 // -----------------------------
-// [common] conpact form
-#conpact-form-container {
-    width: 560px;
-    margin: 48px auto 0px;
-    border: 1px solid #8ec1de;
-    border-radius: 32px;
-    padding: 24px 24px 36px;
-
+// [common] form style
+form {
     .input-form() {
         display: block;
         margin: 4px 0px 20px 0px;
         font-size: 24px;
         width: 80%;
-    }
-
-    h1 {
-        margin: 0px 0px 24px 0px;
     }
 
     div.form-label {
@@ -136,17 +126,49 @@ div#footer {
     }
 
     input[type=submit] {
-        margin: 16px 0px 0px;
+        margin: 12px 0px 0px;
         background-color: #dfecf2;
         border: 1px solid #bebebe;
         padding: 8px 20px;
-        font-size: 22px;
+        font-size: 18px;
         cursor: pointer;
 
         &:hover {
             background-color: #086ed1;
             color: white;
         }
+    }
+}
+
+// -----------------------------
+// [common] conpact form
+#conpact-form-container {
+    width: 560px;
+    margin: 48px auto 0px;
+    border: 1px solid #8ec1de;
+    border-radius: 32px;
+    padding: 24px 24px 36px;
+
+    h1 {
+        margin: 0px 0px 24px 0px;
+    }
+}
+
+// -----------------------------
+// [common] conpact submit button
+input[type=submit].link-like {
+    color: #185ff2;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    font-size: 16px;
+
+    &:hover {
+        background-color: transparent;
+        color: #185ff2;
+        text-decoration: underline;
     }
 }
 
@@ -220,6 +242,73 @@ div#footer {
 
         code {
             padding-left: 16px;
+        }
+    }
+}
+
+// -----------------------------
+// my page
+#mypage-container {
+    width: 800px;
+    max-width: 96%;
+    margin: 48px auto 72px;
+
+    &.under-page-message {
+        margin: 24px auto 72px;
+    }
+
+    h1 {
+        margin: 0px 0px 40px 8px;
+    }
+
+    .mypage-block-container {
+        border: 1px solid #8ec1de;
+        border-radius: 32px;
+        padding: 24px 24px 36px;
+        margin: 0px 0px 24px;
+
+        h2 {
+            margin: 0px 0px 24px 0px;
+        }
+    }
+
+    .my-profile {
+        .header-user-name {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .header-user-text-id {
+            font-size: 20px;
+            color: gray;
+            margin-top: 4px;
+        }
+    }
+
+    .my-books {
+        ul {
+            margin: 24px 8px 12px;
+            padding: 0;
+
+            li {
+                list-style: none;
+                padding: 4px 12px;
+                border: 1px dashed #b5bbc2;
+                border-width: 0px 0px 1px 0px;
+
+                form {
+                    display: inline;
+                }
+
+                .item-name {
+                    font-size: 20px;
+                    padding-left: 8px;
+                }
+
+                &:hover {
+                    background-color: #d6ebf7;
+                }
+            }
         }
     }
 }

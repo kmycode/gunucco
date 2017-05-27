@@ -68,6 +68,34 @@ div#footer #footer-projectlink {
 div#footer #footer-projectlink:hover {
   text-decoration: underline;
 }
+form div.form-label {
+  font-weight: bold;
+  font-size: 16px;
+}
+form input[type=text] {
+  display: block;
+  margin: 4px 0px 20px 0px;
+  font-size: 24px;
+  width: 80%;
+}
+form input[type=password] {
+  display: block;
+  margin: 4px 0px 20px 0px;
+  font-size: 24px;
+  width: 80%;
+}
+form input[type=submit] {
+  margin: 12px 0px 0px;
+  background-color: #dfecf2;
+  border: 1px solid #bebebe;
+  padding: 8px 20px;
+  font-size: 18px;
+  cursor: pointer;
+}
+form input[type=submit]:hover {
+  background-color: #086ed1;
+  color: white;
+}
 #conpact-form-container {
   width: 560px;
   margin: 48px auto 0px;
@@ -78,33 +106,19 @@ div#footer #footer-projectlink:hover {
 #conpact-form-container h1 {
   margin: 0px 0px 24px 0px;
 }
-#conpact-form-container div.form-label {
-  font-weight: bold;
+input[type=submit].link-like {
+  color: #185ff2;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
   font-size: 16px;
 }
-#conpact-form-container input[type=text] {
-  display: block;
-  margin: 4px 0px 20px 0px;
-  font-size: 24px;
-  width: 80%;
-}
-#conpact-form-container input[type=password] {
-  display: block;
-  margin: 4px 0px 20px 0px;
-  font-size: 24px;
-  width: 80%;
-}
-#conpact-form-container input[type=submit] {
-  margin: 16px 0px 0px;
-  background-color: #dfecf2;
-  border: 1px solid #bebebe;
-  padding: 8px 20px;
-  font-size: 22px;
-  cursor: pointer;
-}
-#conpact-form-container input[type=submit]:hover {
-  background-color: #086ed1;
-  color: white;
+input[type=submit].link-like:hover {
+  background-color: transparent;
+  color: #185ff2;
+  text-decoration: underline;
 }
 #page-message-container {
   background-color: #e2f7f0;
@@ -173,4 +187,53 @@ div#footer #footer-projectlink:hover {
 }
 #top-container #top-server-path code {
   padding-left: 16px;
+}
+#mypage-container {
+  width: 800px;
+  max-width: 96%;
+  margin: 48px auto 72px;
+}
+#mypage-container.under-page-message {
+  margin: 24px auto 72px;
+}
+#mypage-container h1 {
+  margin: 0px 0px 40px 8px;
+}
+#mypage-container .mypage-block-container {
+  border: 1px solid #8ec1de;
+  border-radius: 32px;
+  padding: 24px 24px 36px;
+  margin: 0px 0px 24px;
+}
+#mypage-container .mypage-block-container h2 {
+  margin: 0px 0px 24px 0px;
+}
+#mypage-container .my-profile .header-user-name {
+  font-size: 32px;
+  font-weight: bold;
+}
+#mypage-container .my-profile .header-user-text-id {
+  font-size: 20px;
+  color: gray;
+  margin-top: 4px;
+}
+#mypage-container .my-books ul {
+  margin: 24px 8px 12px;
+  padding: 0;
+}
+#mypage-container .my-books ul li {
+  list-style: none;
+  padding: 4px 12px;
+  border: 1px dashed #b5bbc2;
+  border-width: 0px 0px 1px 0px;
+}
+#mypage-container .my-books ul li form {
+  display: inline;
+}
+#mypage-container .my-books ul li .item-name {
+  font-size: 20px;
+  padding-left: 8px;
+}
+#mypage-container .my-books ul li:hover {
+  background-color: #d6ebf7;
 }
