@@ -90,6 +90,30 @@ form input[type=password] {
   font-size: 24px;
   width: 80%;
 }
+form input[type=file] {
+  display: block;
+  margin: 4px 0px 20px 0px;
+  font-size: 24px;
+  width: 80%;
+  font-size: 16px;
+}
+form textarea {
+  display: block;
+  margin: 4px 0px 20px 0px;
+  font-size: 24px;
+  width: 80%;
+  font-size: 18px;
+}
+form .checkbox-container {
+  display: block;
+  margin: 4px 0px 20px 0px;
+  font-size: 24px;
+  width: 80%;
+}
+form .checkbox-container input[type=checkbox] {
+  display: inline-block;
+  padding-right: 24px;
+}
 form input[type=submit] {
   margin: 12px 0px 0px;
   background-color: #dfecf2;
@@ -272,4 +296,18 @@ input[type=submit].link-like:hover {
 }
 #mypage-container .my-chapters ul li:hover {
   background-color: #fce8d2;
+}
+#mypage-container .my-contents img {
+  max-width: 80%;
+}
+#mypage-container .my-contents .content-container {
+  padding: 0px 0px 24px 0px;
+  margin: 0px 0px 36px 0px;
+  border-bottom: 1px solid #ccd;
+}
+#mypage-container .my-contents .content-container .checkbox-container span {
+  font-size: 16px;
+}
+#mypage-container .chapter-content-image {
+  text-align: center;
 }

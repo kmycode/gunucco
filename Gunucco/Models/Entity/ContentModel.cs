@@ -31,7 +31,7 @@ namespace Gunucco.Models.Entity
         
         public void Create()
         {
-            this.CheckSentData();
+            this.CheckSentData(false);
 
             using (var db = new MainContext())
             {
@@ -314,7 +314,7 @@ namespace Gunucco.Models.Entity
             mchap.CheckLoadPermission(db);
         }
 
-        private void CheckSentData()
+        private void CheckSentData(bool isUpdate = true)
         {
             if (this.Content.Type == ContentType.Text)
             {
@@ -335,27 +335,30 @@ namespace Gunucco.Models.Entity
             {
                 if (this.Media.Source == MediaSource.Self)
                 {
-                    if (this.Media.MediaData == null)
+                    if (!isUpdate)
                     {
-                        throw new GunuccoException(new ApiMessage
+                        if (this.Media.MediaData == null)
                         {
-                            StatusCode = 400,
-                            Message = "Media data is not set.",
-                        });
-                    }
-                    try
-                    {
-                        this.Media.MediaDataRow = Convert.FromBase64String(this.Media.MediaData);
-                    }
-                    catch
-                    {
-                        throw new GunuccoException(new ApiMessage
+                            throw new GunuccoException(new ApiMessage
+                            {
+                                StatusCode = 400,
+                                Message = "Media data is not set.",
+                            });
+                        }
+                        try
                         {
-                            StatusCode = 400,
-                            Message = "Media data is not base64 format.",
-                        });
+                            this.Media.MediaDataRow = Convert.FromBase64String(this.Media.MediaData);
+                        }
+                        catch
+                        {
+                            throw new GunuccoException(new ApiMessage
+                            {
+                                StatusCode = 400,
+                                Message = "Media data is not base64 format.",
+                            });
+                        }
                     }
-                    this.Media.FilePath = string.Empty;
+                    this.Media.FilePath = this.Media.FilePath ?? string.Empty;
                 }
                 else
                 {

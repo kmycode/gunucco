@@ -15,6 +15,7 @@ using System.IO;
 using System.Text;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Http;
+using Gunucco.Models.Utils;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -347,11 +348,7 @@ namespace Gunucco.Controllers
             if ((MediaSource)source == MediaSource.Self)
             {
                 // get data from form
-                var stream = data.First().OpenReadStream();
-                var buf = new byte[stream.Length];
-                stream.Seek(0, SeekOrigin.Begin);
-                stream.Read(buf, 0, (int)stream.Length);
-                var base64 = Convert.ToBase64String(buf);
+                var base64 = data.First().ToBase64();
 
                 // save data
                 var mcont = new ContentModel

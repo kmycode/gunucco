@@ -1,0 +1,109 @@
+﻿@model Gunucco.ViewModels.MyPageChapterViewModel
+@{
+    ViewData["Title"] = "My page";
+}
+
+<!-- message -->
+@if (this.Model.Message.HasMessage)
+{
+    <div id="@(this.Model.Message.IsError == false ? "page-message-container" : "page-error-container")">
+        <div id="page-message">
+            @this.Model.Message.Message
+        </div>
+    </div>
+}
+
+<!-- my page -->
+<div id="mypage-container" class="@(this.Model.Message.HasMessage ? "under-page-message" : "")">
+    <h1>@this.Model.Chapter.Name</h1>
+    <div class="mypage-subtitle">
+        <form action="/web/mypage" style="display:inline" method="post">
+            <input type="hidden" name="auth_token" value="@this.Model.AuthData.AuthToken" />
+            <input type="submit" class="link-like" value="My page" />
+        </form>
+        &gt;
+        <form action="/web/mypage/book" style="display:inline" method="post">
+            <input type="hidden" name="auth_token" value="@this.Model.AuthData.AuthToken" />
+            <input type="hidden" name="book_id" value="@this.Model.Book.Id" />
+            <input type="submit" class="link-like" value="@this.Model.Book.Name" />
+        </form>
+        &gt;
+        @this.Model.Chapter.Name
+    </div>
+
+    <div class="mypage-block-container my-contents">
+        <h2>Contents</h2>
+        @foreach (var content in this.Model.Contents)
+        {
+            <div class="content-container">
+                <form action="/web/mypage/content/reorder" style="float:right" method="post">
+                    <input type="hidden" name="auth_token" value="@this.Model.AuthData.AuthToken" />
+                    <input type="hidden" name="book_id" value="@this.Model.Book.Id" />
+                    <input type="hidden" name="chapter_id" value="@content.Content.ChapterId" />
+                    <input type="hidden" name="content_id" value="@content.Content.Id" />
+                    <input type="text" class="mini" name="content_order" value="@content.Content.Order" />
+                    <input type="submit" class="link-like" value="Set order" />
+                </form>
+                @if (content.Content.Type == Gunucco.Entities.ContentType.Text)
+                {
+                    <form action="/web/mypage/content/text/edit" method="post">
+                        <input type="hidden" name="auth_token" value="@this.Model.AuthData.AuthToken" />
+                        <input type="hidden" name="book_id" value="@this.Model.Book.Id" />
+                        <input type="hidden" name="chapter_id" value="@content.Content.ChapterId" />
+                        <input type="hidden" name="content_id" value="@content.Content.Id" />
+                        <div class="form-label">Text</div>
+                        <textarea name="content_text" class="dynamic-height">@content.Content.Text</textarea>
+                        <div class="checkbox-container">
+                            <label>
+                                <input type="checkbox" name="is_delete" />
+                                <span style="color:red">Delete</span>
+                            </label>
+                        </div>
+                        <input type="submit" value="Update" />
+                    </form>
+                }
+                else
+                {
+                    <div class="chapter-content-image">
+                        <img src="@content.Media.Uri" />
+                    </div>
+                    <form action="/web/mypage/content/text/edit" method="post">
+                        <input type="hidden" name="auth_token" value="@this.Model.AuthData.AuthToken" />
+                        <input type="hidden" name="book_id" value="@this.Model.Book.Id" />
+                        <input type="hidden" name="chapter_id" value="@content.Content.ChapterId" />
+                        <input type="hidden" name="content_id" value="@content.Content.Id" />
+                        <div class="checkbox-container">
+                            <label>
+                                <input type="checkbox" name="is_delete" />
+                                <span style="color:red">Delete</span>
+                            </label>
+                        </div>
+                        <input type="submit" value="Update" />
+                    </form>
+                }
+            </div>
+        }
+    </div>
+
+    <div class="mypage-block-container my-contents">
+        <h2>New images</h2>
+        <form action="/web/mypage/content/image/new" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="auth_token" value="@this.Model.AuthData.AuthToken" />
+            <input type="hidden" name="book_id" value="@this.Model.Book.Id" />
+            <input type="hidden" name="chapter_id" value="@this.Model.Chapter.Id" />
+            <div class="form-label">Images</div>
+            <input type="file" name="content_images" multiple="multiple" accept=".jpg,.gif,.png,image/gif,image/jpeg,image/png" />
+            <input type="submit" value="Create" />
+        </form>
+    </div>
+
+    <div class="mypage-block-container my-contents">
+        <h2>New text</h2>
+        <form action="/web/mypage/content/text/new">
+            <input type="hidden" name="auth_token" value="@this.Model.AuthData.AuthToken" />
+            <input type="hidden" name="book_id" value="@this.Model.Book.Id" />
+            <input type="hidden" name="chapter_id" value="@this.Model.Chapter.Id" />
+            <input type="submit" value="Create" />
+        </form>
+    </div>
+</div>

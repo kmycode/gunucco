@@ -26,4 +26,13 @@ namespace Gunucco.ViewModels
 
         public IEnumerable<TreeEntity<Chapter>> Chapters { get; set; }
     }
+
+    public class MyPageChapterViewModel : MyPageViewModelBase
+    {
+        public Book Book { get; set; }
+
+        public Chapter Chapter { get; set; }
+
+        public IEnumerable<ContentMediaPair> Contents { get; set; }
+    }
 }
