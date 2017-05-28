@@ -106,4 +106,22 @@
             <input type="submit" value="Create" />
         </form>
     </div>
+
+    <div class="mypage-block-container my-contents">
+        <h2>Edit chapter</h2>
+        <form action="/web/mypage/chapter/edit">
+            <input type="hidden" name="auth_token" value="@this.Model.AuthData.AuthToken" />
+            <input type="hidden" name="book_id" value="@this.Model.Book.Id" />
+            <input type="hidden" name="chapter_id" value="@this.Model.Chapter.Id" />
+            <div class="form-label">Name</div>
+            <input type="text" name="chapter_name" value="@this.Model.Chapter.Name" />
+            <div class="checkbox-container">
+                <label>
+                    <input type="checkbox" name="is_delete" />
+                    <span style="color:red">Delete</span>
+                </label>
+            </div>
+            <input type="submit" value="Update" />
+        </form>
+    </div>
 </div>

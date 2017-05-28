@@ -397,6 +397,23 @@ namespace Gunucco.Controllers
             });
         }
 
+        [Route("mypage/chapter/edit")]
+        public IActionResult MyChapter_Edit(string auth_token, int book_id, int chapter_id, string chapter_name, string is_delete)
+        {
+            return this.MyChapter_Common(auth_token, book_id, chapter_id, cm =>
+            {
+                if (string.IsNullOrEmpty(is_delete))
+                {
+                    cm.Chapter.Name = chapter_name;
+                    cm.Save();
+                }
+                else
+                {
+                    cm.Delete();
+                }
+            });
+        }
+
         private IActionResult MyChapter_Common(string auth_token, int book_id, int chapter_id, Action<ChapterModel> action = null, bool isHeaderMessage = true)
         {
             // TODO: stub
