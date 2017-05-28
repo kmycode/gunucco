@@ -35,7 +35,7 @@ namespace Gunucco.Controllers
 
         [HttpPost]
         [Route("signup")]
-        public IActionResult SignUp_Post(string text_id, string password, string password_again)
+        public IActionResult SignUp_Post(string text_id, string password, string password_again, string email)
         {
             if (string.IsNullOrEmpty(text_id) || string.IsNullOrEmpty(password))
             {
@@ -47,10 +47,27 @@ namespace Gunucco.Controllers
                 return this.ShowMessage("Re-typed password is different.");
             }
 
+            if (Config.IsEmailValidationNeed)
+            {
+                if (string.IsNullOrWhiteSpace(email) || !email.Contains('@') || email.First() == '@' || email.Last() == '@')
+                {
+                    return this.ShowMessage("Invalid e-mail address.");
+                }
+            }
+
             try
             {
                 var muser = new UserModel();
-                muser.Create(text_id, password);
+
+                if (Config.IsEmailValidationNeed)
+                {
+                    muser.Create(text_id, password, email, false);
+                    muser.SendValidationEmail(email);
+                }
+                else
+                {
+                    muser.Create(text_id, password, email);
+                }
             }
             catch (GunuccoException ex)
             {
@@ -58,7 +75,37 @@ namespace Gunucco.Controllers
                 return this.ShowMessage(ex.Error.Message);
             }
 
-            return this.ShowMessage("Sign in succeed. Welcome to Gunucco!", false);
+            if (Config.IsEmailValidationNeed)
+            {
+                return this.ShowMessage("Email sent. Please check and activate email to complete sign up.", false);
+            }
+            else
+            {
+                return this.ShowMessage("Sign up completed. Welcome to Gunucco. Sign in to go MyPage and write books!", false);
+            }
+        }
+
+        [HttpGet]
+        [Route("signup/activate")]
+        public IActionResult SignUp(int user_id, string key)
+        {
+            var muser = new UserModel
+            {
+                User = new User
+                {
+                    Id = user_id,
+                },
+            };
+            try
+            {
+                muser.CheckActivateKeyValidation(key);
+            }
+            catch (GunuccoException ex)
+            {
+                return this.ShowMessage(ex.Error.Message);
+            }
+
+            return this.ShowMessage("Email validation completed. Welcome to Gunucco. Sign in to go MyPage and write books!", false);
         }
 
         [HttpGet]

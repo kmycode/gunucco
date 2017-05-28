@@ -14,6 +14,8 @@ namespace Gunucco.Models.Database
 
         public DbSet<User> User { get; set; }
 
+        public DbSet<UserEmailValidation> UserEmailValidation { get; set; }
+
         public DbSet<UserSession> UserSession { get; set; }
 
         public DbSet<Book> Book { get; set; }
@@ -45,8 +47,20 @@ namespace Gunucco.Models.Database
                     .HasColumnType("varchar(128)");
                 entity.Property(e => e.Description)
                     .HasColumnType("varchar(1024)");
+                entity.Property(e => e.EmailHash)
+                    .HasColumnType("varchar(128)");
             });
             builder.Entity<User>().HasIndex(u => u.TextId).IsUnique();
+
+            builder.Entity<UserEmailValidation>(entity =>
+            {
+                entity.Property(e => e.Id)
+                    .IsRequired()
+                    .ValueGeneratedOnAdd();
+                entity.Property(e => e.ValidateKey)
+                    .IsRequired()
+                    .HasColumnType("varchar(128)");
+            });
 
             builder.Entity<UserSession>(entity =>
             {

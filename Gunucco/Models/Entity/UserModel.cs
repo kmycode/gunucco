@@ -2,6 +2,7 @@
 using Gunucco.Entities;
 using Gunucco.Models.Database;
 using Gunucco.Models.Entities;
+using Gunucco.Models.Utils;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,7 @@ namespace Gunucco.Models.Entity
 
         private bool isLoaded = false;
 
-        public void Create(string id, string password)
+        public void Create(string id, string password, string email = "unset", bool isEmailValidated = true)
         {
             this.CheckPasswordSafety(password);
 
@@ -48,8 +49,10 @@ namespace Gunucco.Models.Entity
             {
                 TextId = id,
                 Name = id,
+                IsEmailValidated = isEmailValidated,
             };
             user.SetPassword(password);
+            user.SetEmail(email);
 
             using (var db = new MainContext())
             {
@@ -62,6 +65,18 @@ namespace Gunucco.Models.Entity
                     });
                 }
 
+                if (Config.IsEmailValidationNeed)
+                {
+                    if (db.User.Any(u => u.EmailHash == user.EmailHash))
+                    {
+                        throw new GunuccoException(new ApiMessage
+                        {
+                            StatusCode = 400,
+                            Message = "Create user failed. Existing email.",
+                        });
+                    }
+                }
+
                 db.User.Add(user);
                 db.SaveChanges();
             }
@@ -71,6 +86,75 @@ namespace Gunucco.Models.Entity
                 User = user,
                 AuthToken = token,
             };
+            this.User = user;
+        }
+
+        public void SendValidationEmail(string email)
+        {
+            var key = CryptUtil.CreateKey(64);
+
+            using (var db = new MainContext())
+            {
+                db.UserEmailValidation.Add(new UserEmailValidation
+                {
+                    UserId = this.User.Id,
+                    ValidateKey = key,
+                });
+                db.SaveChanges();
+            }
+
+            try
+            {
+                var mail = MailSender.Create();
+                mail.Subject = "Activate your Gunucco account";
+                mail.To = email;
+                mail.Text = $@"Dear {this.User.Name},
+
+Thank you for sign up {Config.ServerPath}, a Gunucco server.
+Click following link, you can activate your account.
+
+{Config.ServerPath}/web/signup/activate?user_id={this.User.Id}&key={Uri.EscapeDataString(key)}
+
+== NOTICE ==
+If you don't know about this email, please ignore.
+
+Thanks.
+";
+                mail.Send();
+            }
+            catch
+            {
+                this.Delete();
+
+                throw new GunuccoException(new ApiMessage
+                {
+                    StatusCode = 500,
+                    Message = "Email cannot send because can't connect SMTP server. Please contact server administrator.",
+                });
+            }
+        }
+
+        public void CheckActivateKeyValidation(string key)
+        {
+            using (var db = new MainContext())
+            {
+                var validation = db.UserEmailValidation.FirstOrDefault(v => v.ValidateKey == key);
+                if (validation == null)
+                {
+                    throw new GunuccoException(new ApiMessage
+                    {
+                        StatusCode = 404,
+                        Message = "No such validation key found.",
+                    });
+                }
+
+                db.UserEmailValidation.Remove(validation);
+
+                this.Load(db);
+                db.User.Attach(this.User);
+                this.User.IsEmailValidated = true;
+                db.SaveChanges();
+            }
         }
 
         public void Load()

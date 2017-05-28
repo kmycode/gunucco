@@ -14,6 +14,7 @@ using NLog.Targets;
 using System.IO;
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using MailKit.Security;
 
 namespace Gunucco
 {
@@ -99,6 +100,20 @@ namespace Gunucco
                 Config.AdministratorUri = config.GetValue<string>("AdministratorUri", "https://www.google.com/");
                 Config.ServerPath = config.GetValue<string>("ServerPath", "http://localhost");
                 Config.IsDebugMode = config.GetValue<bool>("IsDebugMode", false);
+
+                Config.IsEmailValidationNeed = config.GetValue<bool>("IsEmailValidationNeed", true);
+                Config.SmtpServer = config.GetValue<string>("SmtpServer", "");
+                Config.SmtpPort = config.GetValue<int>("SmtpPort", 25);
+                {
+                    var smtpSecureOptions = config.GetValue<string>("SmtpSecureSocketOptions", "None");
+                    SecureSocketOptions opt = SecureSocketOptions.None;
+                    Enum.TryParse(smtpSecureOptions, out opt);
+                    Config.SmtpSecureSocketOptions = opt;
+                }
+                Config.SmtpAccountId = config.GetValue<string>("SmtpAccountId", "");
+                Config.SmtpPassword = config.GetValue<string>("SmtpPassword", "");
+                Config.MailFrom = config.GetValue<string>("MailFrom", "");
+                Config.MailFromName = config.GetValue<string>("MailFromName", "Gunucco System");
             }
 
             // Add framework services.

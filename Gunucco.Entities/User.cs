@@ -21,6 +21,18 @@ namespace Gunucco.Entities
         public string PasswordHash { get; set; }
 
         /// <summary>
+        /// E-mail address hash string (MD5)
+        /// </summary>
+        [JsonIgnore]
+        public string EmailHash { get; set; }
+
+        /// <summary>
+        /// Which e-mail validated or not
+        /// </summary>
+        [JsonProperty("is_email_validated")]
+        public bool IsEmailValidated { get; set; }
+
+        /// <summary>
         /// User display name
         /// </summary>
         [JsonProperty("name")]
@@ -55,6 +67,15 @@ namespace Gunucco.Entities
             {
                 var result = md5.ComputeHash(Encoding.ASCII.GetBytes(password));
                 this.PasswordHash = Encoding.ASCII.GetString(result);
+            }
+        }
+
+        internal void SetEmail(string email)
+        {
+            using (var md5 = MD5.Create())
+            {
+                var result = md5.ComputeHash(Encoding.ASCII.GetBytes(email));
+                this.EmailHash = Encoding.ASCII.GetString(result);
             }
         }
     }

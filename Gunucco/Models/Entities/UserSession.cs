@@ -1,4 +1,5 @@
 ﻿using Gunucco.Entities;
+using Gunucco.Models.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,28 +31,12 @@ namespace Gunucco.Models.Entities
         {
             return new UserSession
             {
-                Id = CreateKey(64),
+                Id = CryptUtil.CreateKey(64),
                 UserId = user.Id,
                 UserTextId = user.TextId,
                 ExpireDateTime = DateTime.Now.AddHours(24),
                 Scope = scope,
             };
-        }
-
-        private static readonly string passwordChars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@[];,./^-!#$%&'()=~`{}+*<>?_";
-        private static string CreateKey(int length)
-        {
-            var sb = new StringBuilder(length);
-            var r = new Random();
-
-            for (int i = 0; i < length; i++)
-            {
-                int pos = r.Next(passwordChars.Length);
-                char c = passwordChars[pos];
-                sb.Append(c);
-            }
-
-            return sb.ToString();
         }
     }
 }

@@ -136,13 +136,21 @@ namespace Gunucco.Models
                     WWWAuthenticateMessage = "Bearer error=\"invalid_request\"",
                 });
             }
-            else if (user.TextId != token.UserTextId || (password != null && !user.IsMatchPassword(password)))
+            if (user.TextId != token.UserTextId || (password != null && !user.IsMatchPassword(password)))
             {
                 throw new GunuccoException(new BearerApiMessage
                 {
                     StatusCode = 400,
                     Message = "Login failed. Invalid id or password.",
                     WWWAuthenticateMessage = "Bearer error=\"invalid_request\"",
+                });
+            }
+            if (Config.IsEmailValidationNeed && !user.IsEmailValidated)
+            {
+                throw new GunuccoException(new ApiMessage
+                {
+                    StatusCode = 400,
+                    Message = "Login failed. This user email isn't activated.",
                 });
             }
 
