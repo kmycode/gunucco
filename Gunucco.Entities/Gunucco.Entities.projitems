@@ -20,5 +20,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Media.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Content.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)User.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\TreeEntity.cs" />
   </ItemGroup>
 </Project>

@@ -78,6 +78,12 @@ form input[type=text] {
   font-size: 24px;
   width: 80%;
 }
+form input[type=text].mini {
+  font-size: 16px;
+  width: 40px;
+  display: inline;
+  margin: 0;
+}
 form input[type=password] {
   display: block;
   margin: 4px 0px 20px 0px;
@@ -199,6 +205,10 @@ input[type=submit].link-like:hover {
 #mypage-container h1 {
   margin: 0px 0px 40px 8px;
 }
+#mypage-container .mypage-subtitle {
+  margin: 0px 0px 16px 16px;
+  font-size: 18px;
+}
 #mypage-container .mypage-block-container {
   border: 1px solid #8ec1de;
   border-radius: 32px;
@@ -222,6 +232,9 @@ input[type=submit].link-like:hover {
   padding: 0;
 }
 #mypage-container .my-books ul li {
+  content: " ";
+  display: block;
+  clear: both;
   list-style: none;
   padding: 4px 12px;
   border: 1px dashed #b5bbc2;
@@ -236,4 +249,27 @@ input[type=submit].link-like:hover {
 }
 #mypage-container .my-books ul li:hover {
   background-color: #d6ebf7;
+}
+#mypage-container .my-chapters ul {
+  margin: 24px 8px 12px;
+  padding: 0;
+}
+#mypage-container .my-chapters ul li {
+  content: " ";
+  display: block;
+  clear: both;
+  list-style: none;
+  padding: 4px 12px;
+  border: 1px dashed #b5bbc2;
+  border-width: 0px 0px 1px 0px;
+}
+#mypage-container .my-chapters ul li form {
+  display: inline;
+}
+#mypage-container .my-chapters ul li .item-name {
+  font-size: 20px;
+  padding-left: 8px;
+}
+#mypage-container .my-chapters ul li:hover {
+  background-color: #fce8d2;
 }

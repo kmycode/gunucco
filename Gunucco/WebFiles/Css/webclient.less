@@ -119,6 +119,13 @@ form {
 
     input[type=text] {
         .input-form();
+
+        &.mini {
+            font-size: 16px;
+            width: 40px;
+            display: inline;
+            margin: 0;
+        }
     }
 
     input[type=password] {
@@ -169,6 +176,38 @@ input[type=submit].link-like {
         background-color: transparent;
         color: #185ff2;
         text-decoration: underline;
+    }
+}
+
+// -----------------------------
+// [common] mypage item list
+.mypage-item-list(@hover) {
+
+    ul {
+        margin: 24px 8px 12px;
+        padding: 0;
+
+        li {
+            .clearfix();
+            clear: both;
+            list-style: none;
+            padding: 4px 12px;
+            border: 1px dashed #b5bbc2;
+            border-width: 0px 0px 1px 0px;
+
+            form {
+                display: inline;
+            }
+
+            .item-name {
+                font-size: 20px;
+                padding-left: 8px;
+            }
+
+            &:hover {
+                background-color: @hover;
+            }
+        }
     }
 }
 
@@ -261,6 +300,11 @@ input[type=submit].link-like {
         margin: 0px 0px 40px 8px;
     }
 
+    .mypage-subtitle {
+        margin: 0px 0px 16px 16px;
+        font-size: 18px;
+    }
+
     .mypage-block-container {
         border: 1px solid #8ec1de;
         border-radius: 32px;
@@ -286,29 +330,10 @@ input[type=submit].link-like {
     }
 
     .my-books {
-        ul {
-            margin: 24px 8px 12px;
-            padding: 0;
+        .mypage-item-list(#d6ebf7);
+    }
 
-            li {
-                list-style: none;
-                padding: 4px 12px;
-                border: 1px dashed #b5bbc2;
-                border-width: 0px 0px 1px 0px;
-
-                form {
-                    display: inline;
-                }
-
-                .item-name {
-                    font-size: 20px;
-                    padding-left: 8px;
-                }
-
-                &:hover {
-                    background-color: #d6ebf7;
-                }
-            }
-        }
+    .my-chapters {
+        .mypage-item-list(#fce8d2);
     }
 }

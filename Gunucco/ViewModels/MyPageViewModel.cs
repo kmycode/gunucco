@@ -1,4 +1,5 @@
 ﻿using Gunucco.Entities;
+using Gunucco.Entities.Helpers;
 using Gunucco.Models.Entities;
 using System;
 using System.Collections.Generic;
@@ -17,5 +18,12 @@ namespace Gunucco.ViewModels
     public class MyPageTopViewModel : MyPageViewModelBase
     {
         public IEnumerable<Book> Books { get; set; }
+    }
+
+    public class MyPageBookViewModel : MyPageViewModelBase
+    {
+        public Book Book { get; set; }
+
+        public IEnumerable<TreeEntity<Chapter>> Chapters { get; set; }
     }
 }

@@ -1,7 +1,8 @@
 ﻿using Gunucco.Common;
 using Gunucco.Entities;
+using Gunucco.Entities.Helpers;
 using Gunucco.Models;
-using Gunucco.Models.Entities;
+using Gunucco.Models.Database;
 using Gunucco.Models.Entity;
 using Gunucco.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -118,6 +119,102 @@ namespace Gunucco.Controllers
             };
 
             return View("MyPage", vm);
+        }
+
+        // [HttpPost]
+        [Route("mypage/book")]
+        public IActionResult MyBook(string auth_token, int book_id)
+        {
+            return this.MyBook_Common(auth_token, book_id);
+        }
+
+        [HttpPost]
+        [Route("mypage/chapter/new")]
+        public IActionResult MyBook_CreateChapter(string auth_token, int book_id, string chapter_name)
+        {
+            return this.MyBook_Common(auth_token, book_id, bm =>
+            {
+                var mchap = new ChapterModel
+                {
+                    AuthData = bm.AuthData,
+                    Book = bm.Book,
+                    Chapter = new Chapter { Name = chapter_name, },
+                };
+                mchap.Create();
+            });
+        }
+
+        [HttpPost]
+        [Route("mypage/chapter/reorder")]
+        public IActionResult MyBook_Reorder(string auth_token, int book_id, int chapter_id, int chapter_order)
+        {
+            return this.MyBook_Common(auth_token, book_id, bm =>
+            {
+                var mchap = new ChapterModel
+                {
+                    AuthData = bm.AuthData,
+                    Book = bm.Book,
+                    Chapter = new Chapter { Id = chapter_id, },
+                };
+                using (var db = new MainContext())
+                {
+                    mchap.Load(db);
+                    mchap.Chapter.Order = chapter_order;
+                    mchap.Save(db);
+                }
+            });
+        }
+
+        private IActionResult MyBook_Common(string auth_token, int book_id, Action<BookModel> action = null)
+        {
+            // TODO: stub
+            var authData = Authentication.Authorize("kmys", "takaki", Scope.WebClient);
+
+            var mbook = new BookModel
+            {
+                AuthData = authData,
+                Book = new Book
+                {
+                    Id = book_id,
+                },
+            };
+            
+            // do custom action
+            try
+            {
+                mbook.Load();
+                action?.Invoke(mbook);
+            }
+            catch (GunuccoException ex)
+            {
+                return this.ShowMessage(ex.Error.Message);
+            }
+
+            // load chapters
+            MessageViewModel mes = new MessageViewModel();
+            IEnumerable<TreeEntity<Chapter>> chapters = null;
+            try
+            {
+                var raw = mbook.GetChaptersWithPermissionCheck();
+                chapters = TreeEntity<Chapter>.FromEntities(raw, c => c.ParentId);
+            }
+            catch (GunuccoException ex)
+            {
+                mes.HasMessage = true;
+                mes.IsError = true;
+                mes.Message = ex.Error.Message;
+                chapters = Enumerable.Empty<TreeEntity<Chapter>>();
+            }
+
+            var vm = new MyPageBookViewModel
+            {
+                AuthData = authData,
+                Message = mes,
+                Book = mbook.Book,
+                Chapters = chapters,
+            };
+
+            return View("MyPage_book", vm);
         }
 
         private IActionResult ShowMessage(string mes, bool isError = true)

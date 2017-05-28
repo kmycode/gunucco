@@ -429,6 +429,8 @@ namespace Gunucco.Models.Entity
                     Message = "Book name is too long.",
                 });
             }
+
+            this.Chapter.BookId = this.Book.Id;
         }
 
         private void CheckSetParent(MainContext db, int parentId)

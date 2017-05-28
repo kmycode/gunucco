@@ -7,7 +7,7 @@
     <title>@(ViewData["Title"]?.ToString() + (string.IsNullOrEmpty(ViewData["Title"]?.ToString()) ? "" : " - "))Gunucco, a common api for creators</title>
 
     <environment names="Development">
-        <link rel="stylesheet" href="~/css/webclient.css" />
+        <link rel="stylesheet" href="~/css/webclient.css" asp-append-version="true" />
     </environment>
     <environment names="Staging,Production">
         <link rel="stylesheet" href="~/css/webclient.css" asp-append-version="true" />
