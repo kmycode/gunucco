@@ -145,7 +145,7 @@ namespace Gunucco.Models
                     WWWAuthenticateMessage = "Bearer error=\"invalid_request\"",
                 });
             }
-            if (Config.IsEmailValidationNeed && !user.IsEmailValidated)
+            if ((Config.IsEmailValidationNeed && !Config.IsDebugMode) && !user.IsEmailValidated)
             {
                 throw new GunuccoException(new ApiMessage
                 {
