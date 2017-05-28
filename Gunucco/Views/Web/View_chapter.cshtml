@@ -1,0 +1,70 @@
+﻿@model Gunucco.ViewModels.ChapterViewViewModel
+@{
+    ViewData["Title"] = this.Model.Chapter.Name;
+}
+
+<!-- message -->
+@if (this.Model.Message.HasMessage)
+{
+    <div id="@(this.Model.Message.IsError == false ? "page-message-container" : "page-error-container")">
+        <div id="page-message">
+            @this.Model.Message.Message
+        </div>
+    </div>
+}
+
+<!-- view -->
+<div id="view-container" class="@(this.Model.Message.HasMessage ? "under-page-message" : "")">
+    <div id="chapter-view-container-header">
+        <h1>@this.Model.Chapter.Name</h1>
+    </div>
+
+    <div class="breadcrumb">
+        <a href="/web/book/@this.Model.Book.Id">@this.Model.Book.Name</a>
+        &gt;
+        @this.Model.Chapter.Name;
+    </div>
+
+    <div class="view-block-container view-contents">
+        @foreach (var content in this.Model.Contents)
+        {
+            if (content.Content.Type == Gunucco.Entities.ContentType.Text)
+            {
+                <div class="text-content">
+                    @content.Content.HtmlText
+                </div>
+            }
+            else if (content.Content.Type == Gunucco.Entities.ContentType.Image)
+            {
+                <div class="image-content">
+                    <img src="@content.Media.Uri" />
+                </div>
+
+            }
+        }
+    </div>
+
+    <div class="chapter-navigation">
+        <div style="float:left">
+            @if (this.Model.PrevChapter != null)
+            {
+                <span><a href="/web/book/@this.Model.Book.Id/chapter/@this.Model.PrevChapter.Id">@this.Model.PrevChapter.Name</a> &lt;</span>
+            }
+            else
+            {
+                <span>Prev &lt;</span>
+            }
+        </div>
+        <div style="float:right">
+            @if (this.Model.NextChapter != null)
+            {
+                <span>&gt; <a href="/web/book/@this.Model.Book.Id/chapter/@this.Model.NextChapter.Id">@this.Model.NextChapter.Name</a></span>
+            }
+            else
+            {
+                <span>&gt; Next</span>
+            }
+        </div>
+    </div>
+    <div style="clear:both"></div>
+</div>

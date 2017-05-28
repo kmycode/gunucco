@@ -32,6 +32,13 @@ namespace Gunucco.Entities
         [JsonProperty("description")]
         public string Description { get; set; }
 
+        /// <summary>
+        /// Is this user anonymous. Usually false, but rarely true is set.
+        /// </summary>
+        [DBIgnore]
+        [JsonProperty("is_anonymous")]
+        public bool IsAnonymous { get; set; }
+
         internal bool IsMatchPassword(string password)
         {
             using (var md5 = MD5.Create())

@@ -1,0 +1,34 @@
+﻿@model Gunucco.ViewModels.UserViewViewModel
+@{
+    ViewData["Title"] = this.Model.User.Name;
+}
+
+<!-- message -->
+@if (this.Model.Message.HasMessage)
+{
+    <div id="@(this.Model.Message.IsError == false ? "page-message-container" : "page-error-container")">
+        <div id="page-message">
+            @this.Model.Message.Message
+        </div>
+    </div>
+}
+
+<!-- view -->
+<div id="view-container" class="@(this.Model.Message.HasMessage ? "under-page-message" : "")">
+    <div id="user-view-container-header">
+        <h1>@this.Model.User.Name</h1>
+        <div class="header-user-text-id">@@@this.Model.User.TextId</div>
+    </div>
+
+    <div class="view-block-container view-books">
+        <h2>Books</h2>
+        <ul>
+            @foreach (var book in this.Model.Books)
+            {
+                <li>
+                    <a href="/web/book/@book.Id"><span class="item-name">@book.Name</span></a>
+                </li>
+            }
+        </ul>
+    </div>
+</div>

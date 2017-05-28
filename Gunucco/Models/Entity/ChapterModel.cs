@@ -164,6 +164,16 @@ namespace Gunucco.Models.Entity
             return db.Content.Where(c => c.ChapterId == this.Chapter.Id).OrderBy(c => c.Order);
         }
 
+        public IEnumerable<ContentMediaPair> GetContentMediaPairs()
+        {
+            using (var db = new MainContext())
+            {
+                var pairs = this.GetContentMediaPairs(db);
+                pairs.Load();
+                return pairs.ToArray();
+            }
+        }
+
         public IQueryable<ContentMediaPair> GetContentMediaPairs(MainContext db)
         {
             this.Load(db);

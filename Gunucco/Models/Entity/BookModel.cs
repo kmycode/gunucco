@@ -236,6 +236,17 @@ namespace Gunucco.Models.Entity
             };
         }
 
+        public IEnumerable<BookPermission> GetOwners()
+        {
+            using (var db = new MainContext())
+            {
+                var permissions = db.BookPermission.Where(p => p.TargetId == this.Book.Id &&
+                                                               p.TargetTypeValue == (short)TargetType.Book);
+                permissions.Load();
+                return permissions.ToArray();
+            }
+        }
+
         public IQueryable<BookPermission> GetPermissions(MainContext db)
         {
             return db.BookPermission.Where(p => p.UserId == this.AuthData.User.Id)

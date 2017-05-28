@@ -14,6 +14,10 @@ namespace Gunucco.Models.Entity
     {
         public AuthorizationData AuthData { get; set; }
 
+        public User User { get; set; }
+
+        private bool isLoaded = false;
+
         public void Create(string id, string password)
         {
             this.CheckPasswordSafety(password);
@@ -67,6 +71,53 @@ namespace Gunucco.Models.Entity
                 User = user,
                 AuthToken = token,
             };
+        }
+
+        public void Load()
+        {
+            using (var db = new MainContext())
+            {
+                this.Load(db);
+            }
+        }
+
+        public void Load(MainContext db)
+        {
+            if (this.isLoaded) return;
+            this.isLoaded = true;
+
+            var user = db.User.Find(this.User.Id);
+            if (user == null)
+            {
+                throw new GunuccoException(new ApiMessage
+                {
+                    StatusCode = 404,
+                    Message = "No such user id found.",
+                });
+            }
+
+            this.User = user;
+        }
+
+        public static UserModel FromIdOrAnonymous(int? id)
+        {
+            var muser = new UserModel
+            {
+                User = new User(),
+            };
+
+            try
+            {
+                muser.User.Id = id.Value;
+                muser.Load();
+            }
+            catch
+            {
+                muser.User.Name = "Anonymous";
+                muser.User.IsAnonymous = true;
+            }
+
+            return muser;
         }
 
         public ApiMessage Delete()

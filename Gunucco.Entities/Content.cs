@@ -44,6 +44,13 @@ namespace Gunucco.Entities
         public string Text { get; set; }
 
         /// <summary>
+        /// Content to show HTML format
+        /// </summary>
+        [JsonIgnore]
+        [DBIgnore]
+        public string HtmlText => this.Text.Replace("\n", "<br />");
+
+        /// <summary>
         /// Created date time
         /// </summary>
         [JsonProperty("created")]

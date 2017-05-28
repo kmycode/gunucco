@@ -93,6 +93,138 @@ namespace Gunucco.Controllers
 
         #endregion
 
+        #region View
+
+        [HttpGet]
+        [Route("user/{id}")]
+        public IActionResult ViewUser(int id)
+        {
+            var muser = new UserModel
+            {
+                User = new User { Id = id, },
+            };
+            var mbook = new BookModel();
+
+            IEnumerable<Book> books = null;
+
+            try
+            {
+                muser.Load();
+                books = mbook.GetUserBooks(id);
+            }
+            catch (GunuccoException ex)
+            {
+                return this.ShowMessage(ex.Error.Message);
+            }
+
+            var vm = new UserViewViewModel
+            {
+                User = muser.User,
+                Books = books,
+            };
+
+            return View("View_user", vm);
+        }
+
+        [HttpGet]
+        [Route("book/{id}")]
+        public IActionResult ViewBook(int id)
+        {
+            var mbook = new BookModel
+            {
+                Book = new Book
+                {
+                    Id = id,
+                },
+            };
+            var muser = new UserModel();
+
+            IEnumerable<Chapter> chapters = null;
+
+            try
+            {
+                mbook.Load();
+                var owners = mbook.GetOwners();
+
+                muser.User = UserModel.FromIdOrAnonymous(owners.FirstOrDefault().UserId).User;
+                muser.Load();
+
+                chapters = mbook.GetChaptersWithPermissionCheck();
+            }
+            catch (GunuccoException ex)
+            {
+                return this.ShowMessage(ex.Error.Message);
+            }
+
+            var vm = new BookViewViewModel
+            {
+                User = muser.User,
+                Book = mbook.Book,
+                Chapters = chapters,
+            };
+
+            return View("View_book", vm);
+        }
+
+        [HttpGet]
+        [Route("book/{book_id}/chapter/{id}")]
+        public IActionResult ViewChapter(int book_id, int id)
+        {
+            var mbook = new BookModel
+            {
+                Book = new Book
+                {
+                    Id = book_id,
+                },
+            };
+            var mchap = new ChapterModel
+            {
+                Chapter = new Chapter
+                {
+                    Id = id,
+                },
+            };
+
+            IList<Chapter> chapters = null;
+            IEnumerable<ContentMediaPair> contents = null;
+            Chapter chapter = null;
+
+            try
+            {
+                mbook.Load();
+
+                chapters = TreeEntity<Chapter>.FromEntities(mbook.GetChapters(), c => c.ParentId).Select(c => c.Item).ToList();
+                chapter = chapters.SingleOrDefault(c => c.Id == id);
+                if (chapter == null)
+                {
+                    throw new GunuccoException(new ApiMessage
+                    {
+                        StatusCode = 404,
+                        Message = "No chapter id found.",
+                    });
+                }
+
+                contents = mchap.GetContentMediaPairsWithPermissionCheck();
+            }
+            catch (GunuccoException ex)
+            {
+                return this.ShowMessage(ex.Error.Message);
+            }
+
+            var vm = new ChapterViewViewModel
+            {
+                Book = mbook.Book,
+                Chapter = chapter,
+                Contents = contents,
+                PrevChapter = chapters.FindPrev(c => c.Id == chapter.Id),
+                NextChapter = chapters.FindNext(c => c.Id == chapter.Id),
+            };
+
+            return View("View_chapter", vm);
+        }
+
+        #endregion
+
         #region MyPage
 
         [HttpPost]
