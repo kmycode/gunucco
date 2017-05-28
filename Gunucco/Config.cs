@@ -17,6 +17,16 @@ namespace Gunucco
         public static string ServerVersion { get; set; }
 
         /// <summary>
+        /// Server administrator name.
+        /// </summary>
+        public static string AdministratorName { get; set; }
+
+        /// <summary>
+        /// Server administrator HP Uri.
+        /// </summary>
+        public static string AdministratorUri { get; set; }
+
+        /// <summary>
         /// Server path starts with 'http://' or 'https://' and not ends with '/'
         /// </summary>
         public static string ServerPath { get; set; }

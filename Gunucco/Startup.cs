@@ -95,6 +95,8 @@ namespace Gunucco
             {
                 var config = this.Configuration.GetSection("GunuccoConfigs");
                 Config.ServerVersion = Assembly.GetEntryAssembly().GetName().Version.ToString();
+                Config.AdministratorName = config.GetValue<string>("AdministratorName", "Do not look at me");
+                Config.AdministratorUri = config.GetValue<string>("AdministratorUri", "https://www.google.com/");
                 Config.ServerPath = config.GetValue<string>("ServerPath", "http://localhost");
                 Config.IsDebugMode = config.GetValue<bool>("IsDebugMode", false);
             }
