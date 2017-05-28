@@ -1,4 +1,5 @@
 ﻿using Gunucco.Entities;
+using Gunucco.Entities.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +25,7 @@ namespace Gunucco.ViewModels
 
         public Book Book { get; set; }
 
-        public IEnumerable<Chapter> Chapters { get; set; }
+        public IEnumerable<TreeEntity<Chapter>> Chapters { get; set; }
     }
 
     public class ChapterViewViewModel : ViewViewModelBase

@@ -188,7 +188,7 @@ namespace Gunucco.Controllers
             };
             var muser = new UserModel();
 
-            IEnumerable<Chapter> chapters = null;
+            IEnumerable<TreeEntity<Chapter>> chapters = null;
 
             try
             {
@@ -198,7 +198,7 @@ namespace Gunucco.Controllers
                 muser.User = UserModel.FromIdOrAnonymous(owners.FirstOrDefault().UserId).User;
                 muser.Load();
 
-                chapters = mbook.GetChaptersWithPermissionCheck();
+                chapters = TreeEntity<Chapter>.FromEntities(mbook.GetChaptersWithPermissionCheck(), c => c.ParentId);
             }
             catch (GunuccoException ex)
             {
