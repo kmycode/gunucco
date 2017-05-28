@@ -35,11 +35,16 @@ namespace Gunucco.Controllers
 
         [HttpPost]
         [Route("signup")]
-        public IActionResult SignUp_Post(string text_id, string password)
+        public IActionResult SignUp_Post(string text_id, string password, string password_again)
         {
             if (string.IsNullOrEmpty(text_id) || string.IsNullOrEmpty(password))
             {
                 return this.ShowMessage("Text id or password isn't set.");
+            }
+
+            if (password != password_again)
+            {
+                return this.ShowMessage("Re-typed password is different.");
             }
 
             try
