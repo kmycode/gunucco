@@ -143,20 +143,22 @@ namespace Gunucco.Controllers
         #region View
 
         [HttpGet]
-        [Route("user/{id}")]
-        public IActionResult ViewUser(int id)
+        [Route("user/{text_id}")]
+        public IActionResult ViewUser(string text_id)
         {
             var muser = new UserModel
             {
-                User = new User { Id = id, },
+                User = new User { TextId = text_id, },
             };
             var mbook = new BookModel();
 
             IEnumerable<Book> books = null;
 
+            int id = 0;
             try
             {
-                muser.Load();
+                muser.LoadWithTextId();
+                id = muser.User.Id;
                 books = mbook.GetUserBooks(id);
             }
             catch (GunuccoException ex)

@@ -183,6 +183,32 @@ Thanks.
             this.User = user;
         }
 
+        public void LoadWithTextId()
+        {
+            using (var db = new MainContext())
+            {
+                this.LoadWithTextId(db);
+            }
+        }
+
+        public void LoadWithTextId(MainContext db)
+        {
+            if (this.isLoaded) return;
+            this.isLoaded = true;
+
+            var user = db.User.SingleOrDefault(u => u.TextId == this.User.TextId);
+            if (user == null)
+            {
+                throw new GunuccoException(new ApiMessage
+                {
+                    StatusCode = 404,
+                    Message = "No such user id found.",
+                });
+            }
+
+            this.User = user;
+        }
+
         public static UserModel FromIdOrAnonymous(int? id)
         {
             var muser = new UserModel
