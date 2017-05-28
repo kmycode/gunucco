@@ -3,6 +3,7 @@ using Gunucco.Entities;
 using Gunucco.Entities.Helpers;
 using Gunucco.Models;
 using Gunucco.Models.Database;
+using Gunucco.Models.Entities;
 using Gunucco.Models.Entity;
 using Gunucco.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -60,55 +61,49 @@ namespace Gunucco.Controllers
         [Route("mypage")]
         public IActionResult MyPage(string auth_token)
         {
-            // TODO: stub
-            var authData = Authentication.Authorize("kmys", "takaki", Scope.WebClient);
-
-            var mbook = new BookModel
-            {
-                AuthData = authData,
-            };
-            var books = mbook.GetUserBooks(authData.User.Id);
-
-            var vm = new MyPageTopViewModel
-            {
-                AuthData = authData,
-                Books = books,
-            };
-
-            return View(vm);
+            return this.MyPage_Common(auth_token);
         }
 
         [HttpPost]
         [Route("mypage/book/new")]
-        public IActionResult CreateNewBook(string auth_token, string book_name)
+        public IActionResult MyPage_CreateNewBook(string auth_token, string book_name)
+        {
+            return this.MyPage_Common(auth_token, authData =>
+            {
+                var mbook = new BookModel
+                {
+                    AuthData = authData,
+                    Book = new Book
+                    {
+                        Name = book_name,
+                    },
+                };
+
+                mbook.Create();
+            });
+        }
+        
+        private IActionResult MyPage_Common(string auth_token, Action<AuthorizationData> action = null)
         {
             // TODO: stub
             var authData = Authentication.Authorize("kmys", "takaki", Scope.WebClient);
 
-            var mbook = new BookModel
-            {
-                AuthData = authData,
-                Book = new Book
-                {
-                    Name = book_name,
-                },
-            };
-
             MessageViewModel mes = new MessageViewModel();
             try
             {
-                mbook.Create();
-
-                mes.HasMessage = true;
-                mes.IsError = false;
-                mes.Message = "Creating new book succeed.";
+                action?.Invoke(authData);
             }
             catch (GunuccoException ex)
             {
                 mes.HasMessage = true;
                 mes.IsError = true;
-                mes.Message = ex.Error.Message;
+                mes.AddMessage(ex.Error.Message);
             }
+
+            var mbook = new BookModel
+            {
+                AuthData = authData,
+            };
             var books = mbook.GetUserBooks(authData.User.Id);
 
             var vm = new MyPageTopViewModel
@@ -165,7 +160,7 @@ namespace Gunucco.Controllers
             });
         }
 
-        private IActionResult MyBook_Common(string auth_token, int book_id, Action<BookModel> action = null)
+        private IActionResult MyBook_Common(string auth_token, int book_id, Action<BookModel> action = null, bool isHeaderMessage = true)
         {
             // TODO: stub
             var authData = Authentication.Authorize("kmys", "takaki", Scope.WebClient);
@@ -178,20 +173,36 @@ namespace Gunucco.Controllers
                     Id = book_id,
                 },
             };
-            
-            // do custom action
             try
             {
                 mbook.Load();
-                action?.Invoke(mbook);
             }
             catch (GunuccoException ex)
             {
                 return this.ShowMessage(ex.Error.Message);
             }
 
-            // load chapters
+            // do custom action
             MessageViewModel mes = new MessageViewModel();
+            try
+            {
+                action?.Invoke(mbook);
+            }
+            catch (GunuccoException ex)
+            {
+                if (isHeaderMessage)
+                {
+                    mes.HasMessage = true;
+                    mes.IsError = true;
+                    mes.AddMessage(ex.Error.Message);
+                }
+                else
+                {
+                    return this.ShowMessage(ex.Error.Message);
+                }
+            }
+
+            // load chapters
             IEnumerable<TreeEntity<Chapter>> chapters = null;
             try
             {
@@ -202,7 +213,7 @@ namespace Gunucco.Controllers
             {
                 mes.HasMessage = true;
                 mes.IsError = true;
-                mes.Message = ex.Error.Message;
+                mes.AddMessage(ex.Error.Message);
                 chapters = Enumerable.Empty<TreeEntity<Chapter>>();
             }
 

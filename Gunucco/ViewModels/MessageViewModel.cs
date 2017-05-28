@@ -12,5 +12,17 @@ namespace Gunucco.ViewModels
         public bool IsError { get; set; } = true;
 
         public string Message { get; set; }
+
+        public void AddMessage(string mes)
+        {
+            if (string.IsNullOrEmpty(this.Message))
+            {
+                this.Message = mes;
+            }
+            else
+            {
+                this.Message += "<br />" + mes;
+            }
+        }
     }
 }
