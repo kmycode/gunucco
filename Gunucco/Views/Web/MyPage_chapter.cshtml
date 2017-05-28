@@ -65,7 +65,7 @@
                 else
                 {
                     <div class="chapter-content-image">
-                        <img src="@(content.Media.Source == Gunucco.Entities.MediaSource.Self ? content.Media.Uri + "/token?token=" + @Uri.EscapeDataString(this.Model.AuthData.AuthToken.AccessToken) : content.Media.Uri)" />
+                        <img src="@content.Media.Uri" />
                     </div>
                     <form action="/web/mypage/content/text/edit" method="post">
                         <input type="hidden" name="auth_token" value="@this.Model.AuthData.AuthToken.AccessToken" />

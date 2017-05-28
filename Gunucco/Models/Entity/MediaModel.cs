@@ -101,7 +101,7 @@ namespace Gunucco.Models.Entity
         {
             if (this.Media.Source == MediaSource.Self)
             {
-                this.Media.Uri = Config.ServerPath + "/api/v1/download" + this.Media.FilePath;
+                this.Media.Uri = Config.ServerPath + "/api/v1/download" + this.Media.FilePath + "/token?token=" + Uri.EscapeDataString(this.AuthData.AuthToken.AccessToken);
             }
             else
             {
