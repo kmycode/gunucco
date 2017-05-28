@@ -46,6 +46,8 @@ namespace GunuccoSharp.Test
         [DataRow("")]
         [DataRow(null)]
         [DataRow("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")]
+        [DataRow("ŽR“cŒN‚ª‰j‚¢‚Å‚¢‚é")]
+        [DataRow("a:;bcz7")]
         public async Task CreateUser_Failed_InvalidId(string id)
         {
             var client = TestUtil.GetClient();
@@ -58,7 +60,7 @@ namespace GunuccoSharp.Test
                     Password = "aaaeee",
                 });
             });
-            Assert.IsTrue(ex.Error.Message.Contains("too"));
+            Assert.IsTrue(ex.Error.Message.Contains("too") || ex.Error.Message.Contains("only numbers or"));
         }
 
         [DataTestMethod]

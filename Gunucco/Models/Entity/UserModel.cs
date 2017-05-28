@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Gunucco.Models.Entity
@@ -42,6 +43,14 @@ namespace Gunucco.Models.Entity
                 {
                     StatusCode = 400,
                     Message = "Create user failed. Id is too long.",
+                });
+            }
+            if (!Regex.IsMatch(id, "^[0-9a-zA-Z]+$"))
+            {
+                throw new GunuccoException(new ApiMessage
+                {
+                    StatusCode = 400,
+                    Message = "Create user failed. Id must be only numbers or alphabets.",
                 });
             }
 
