@@ -253,6 +253,41 @@ namespace GunuccoSharp.Test
             Assert.AreEqual(chap1Children.First().Id, chap2.Id);
         }
 
+        [DataTestMethod]
+        [DataRow(0)]
+        [DataRow(1)]
+        [DataRow(2)]
+        [DataRow(4)]
+        [DataRow(10)]
+        public async Task UpdateChapter_Failed_ParentLoop(int loopCount)
+        {
+            var client = await TestUtil.GetUserClientAsync();
+
+            // create book
+            var book = await TestUtil.Books.CreateAsync(client);
+
+            // create chapter
+            var chap = await TestUtil.Chapters.CreateAsync(client, 0, book.Id);
+
+            int lastId = chap.Id;
+            for (int i = 0; i < loopCount - 1; i++)
+            {
+                var c = await TestUtil.Chapters.CreateAsync(client, 1, book.Id);
+                c.ParentId = lastId;
+                await client.Chapter.UpdateAsync(c);
+                lastId = c.Id;
+            }
+
+            // set loop parent id
+            chap.ParentId = lastId;
+            var ex = await Assert.ThrowsExceptionAsync<GunuccoErrorException>(async () =>
+            {
+                await client.Chapter.UpdateAsync(chap);
+            });
+
+            TestUtil.CheckException(ex, 400, "parent");
+        }
+
         [TestMethod]
         public async Task UpdateChapter_Failed_ParentNotFound()
         {

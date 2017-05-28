@@ -440,7 +440,10 @@ namespace Gunucco.Models.Entity
                 });
             }
 
-            this.Chapter.BookId = this.Book.Id;
+            if (this.Book != null)
+            {
+                this.Chapter.BookId = this.Book.Id;
+            }
         }
 
         private void CheckSetParent(MainContext db, int parentId)
@@ -451,6 +454,15 @@ namespace Gunucco.Models.Entity
                 AuthData = this.AuthData,
                 Chapter = new Chapter { Id = parentId, },
             };
+
+            if (parentId == this.Chapter.Id)
+            {
+                throw new GunuccoException(new ApiMessage
+                {
+                    StatusCode = 400,
+                    Message = "Cannot set self as parent chapter.",
+                });
+            }
 
             try
             {
@@ -487,6 +499,36 @@ namespace Gunucco.Models.Entity
                     StatusCode = 403,
                     Message = "No permissions to set parent chapter.",
                 });
+            }
+
+            // check parent loop
+            if (parent.ParentId == this.Chapter.Id)
+            {
+                throw new GunuccoException(new ApiMessage
+                {
+                    StatusCode = 400,
+                    Message = "Chapter parent is looping.",
+                });
+            }
+            var currentChap = parent;
+            while (currentChap.ParentId != null)
+            {
+                var pchap = new ChapterModel
+                {
+                    AuthData = this.AuthData,
+                    Book = this.Book,
+                    Chapter = new Chapter { Id = currentChap.ParentId.Value, },
+                };
+                pchap.Load(db);
+                if (pchap.Chapter.ParentId == this.Chapter.Id)
+                {
+                    throw new GunuccoException(new ApiMessage
+                    {
+                        StatusCode = 400,
+                        Message = "Chapter parent is looping.",
+                    });
+                }
+                currentChap = pchap.Chapter;
             }
         }
     }
