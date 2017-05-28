@@ -468,14 +468,30 @@ namespace Gunucco.Controllers
 
         [HttpPost]
         [Route("mypage/chapter/edit")]
-        public IActionResult MyChapter_Edit(string auth_token, int book_id, int chapter_id, string chapter_name, string is_delete)
+        public IActionResult MyChapter_Edit(string auth_token, int book_id, int chapter_id, string chapter_name, string chapter_publish_range, string is_delete)
         {
             AuthorizationData authData = null;
             var result = this.MyChapter_Common(auth_token, book_id, chapter_id, cm =>
             {
+                PublishRange range = PublishRange.All;
+                if (chapter_publish_range == "all") { }
+                else if (chapter_publish_range == "private")
+                {
+                    range = PublishRange.Private;
+                }
+                else
+                {
+                    throw new GunuccoException(new ApiMessage
+                    {
+                        StatusCode = 400,
+                        Message = "Publish range isn't set.",
+                    });
+                }
+
                 if (string.IsNullOrEmpty(is_delete))
                 {
                     cm.Chapter.Name = chapter_name;
+                    cm.Chapter.PublicRange = range;
                     cm.Save();
                 }
                 else

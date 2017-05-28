@@ -468,6 +468,23 @@ namespace Gunucco.Controllers
             return File(pair.Media.MediaDataRow, "image/" + pair.Media.Extension.ToString().ToLower());
         }
 
+        [HttpGet]
+        [Route("download/media/{path}/token")]
+        public IActionResult DownloadMediaWithToken(string path, string token)
+        {
+            this.AuthData = Authentication.Authorize(token);
+            if (!this.AuthData.AuthToken.Scope.HasFlag(Scope.Read))
+            {
+                throw new GunuccoException(new ApiMessage
+                {
+                    StatusCode = 403,
+                    Message = "No scope to load this media.",
+                });
+            }
+
+            return this.DownloadMedia(path);
+        }
+
         #endregion
 
         #region BookPermission

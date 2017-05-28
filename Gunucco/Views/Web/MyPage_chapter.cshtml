@@ -65,7 +65,7 @@
                 else
                 {
                     <div class="chapter-content-image">
-                        <img src="@content.Media.Uri" />
+                        <img src="@(content.Media.Source == Gunucco.Entities.MediaSource.Self ? content.Media.Uri + "/token?token=" + @Uri.EscapeDataString(this.Model.AuthData.AuthToken.AccessToken) : content.Media.Uri)" />
                     </div>
                     <form action="/web/mypage/content/text/edit" method="post">
                         <input type="hidden" name="auth_token" value="@this.Model.AuthData.AuthToken.AccessToken" />
@@ -115,6 +115,12 @@
             <input type="hidden" name="chapter_id" value="@this.Model.Chapter.Id" />
             <div class="form-label">Name</div>
             <input type="text" name="chapter_name" value="@this.Model.Chapter.Name" />
+            <div class="form-label">Publish Range</div>
+            <select name="chapter_publish_range">
+                <option value="@this.Model.Chapter.PublicRange.ToString().ToLower()">Current (@this.Model.Chapter.PublicRange.ToString())</option>
+                <option value="all">All</option>
+                <option value="private">Private</option>
+            </select>
             <div class="checkbox-container">
                 <label>
                     <input type="checkbox" name="is_delete" />
