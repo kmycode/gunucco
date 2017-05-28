@@ -24,6 +24,8 @@ namespace Gunucco.Controllers
             return View();
         }
 
+        #region Sign up / in
+
         [HttpGet]
         [Route("signup")]
         public IActionResult SignUp()
@@ -54,16 +56,51 @@ namespace Gunucco.Controllers
             return this.ShowMessage("Sign in succeed. Welcome to Gunucco!", false);
         }
 
+        [HttpGet]
+        [Route("signin")]
         public IActionResult SignIn()
         {
             return View();
         }
 
-        // [HttpPost]
+        [HttpPost]
+        [Route("signin")]
+        public IActionResult SignIn_Post(string text_id, string password)
+        {
+            if (string.IsNullOrEmpty(text_id) || string.IsNullOrEmpty(password))
+            {
+                return this.ShowMessage("Text id or password isn't set.");
+            }
+
+            AuthorizationData authData = null;
+            try
+            {
+                authData = Authentication.Authorize(text_id, password, Scope.WebClient);
+            }
+            catch (GunuccoException ex)
+            {
+                this.HttpContext.Response.StatusCode = ex.Error.StatusCode;
+                return this.ShowMessage(ex.Error.Message);
+            }
+
+            return this.MyPage(authData);
+        }
+
+        #endregion
+
+        #region MyPage
+
+        [HttpPost]
         [Route("mypage")]
         public IActionResult MyPage(string auth_token)
         {
             return this.MyPage_Common(auth_token);
+        }
+
+        [HttpPost]
+        private IActionResult MyPage(AuthorizationData authData)
+        {
+            return this.MyPage_Common(authData);
         }
 
         [HttpPost]
@@ -87,9 +124,20 @@ namespace Gunucco.Controllers
         
         private IActionResult MyPage_Common(string auth_token, Action<AuthorizationData> action = null)
         {
-            // TODO: stub
-            var authData = Authentication.Authorize("kmys", "takaki", Scope.WebClient);
+            AuthorizationData authData = null;
+            try
+            {
+                authData = Authentication.Authorize(auth_token);
+            }
+            catch (GunuccoException ex)
+            {
+                return this.ShowMessage(ex.Error.Message);
+            }
+            return this.MyPage_Common(authData, action);
+        }
 
+        private IActionResult MyPage_Common(AuthorizationData authData, Action<AuthorizationData> action = null)
+        {
             MessageViewModel mes = new MessageViewModel();
             try
             {
@@ -118,11 +166,16 @@ namespace Gunucco.Controllers
             return View("MyPage", vm);
         }
 
-        // [HttpPost]
+        [HttpPost]
         [Route("mypage/book")]
         public IActionResult MyBook(string auth_token, int book_id)
         {
             return this.MyBook_Common(auth_token, book_id);
+        }
+
+        private IActionResult MyBook(AuthorizationData authData, int book_id)
+        {
+            return this.MyBook_Common(authData, book_id);
         }
 
         [HttpPost]
@@ -173,9 +226,21 @@ namespace Gunucco.Controllers
 
         private IActionResult MyBook_Common(string auth_token, int book_id, Action<BookModel> action = null, bool isHeaderMessage = true)
         {
-            // TODO: stub
-            var authData = Authentication.Authorize("kmys", "takaki", Scope.WebClient);
+            AuthorizationData authData = null;
+            try
+            {
+                authData = Authentication.Authorize(auth_token);
+            }
+            catch (GunuccoException ex)
+            {
+                return this.ShowMessage(ex.Error.Message);
+            }
 
+            return this.MyBook_Common(authData, book_id, action, isHeaderMessage);
+        }
+
+        private IActionResult MyBook_Common(AuthorizationData authData, int book_id, Action<BookModel> action = null, bool isHeaderMessage = true)
+        {
             var mbook = new BookModel
             {
                 AuthData = authData,
@@ -239,13 +304,14 @@ namespace Gunucco.Controllers
             return View("MyPage_book", vm);
         }
 
-        // [HttpPost]
+        [HttpPost]
         [Route("mypage/chapter")]
         public IActionResult MyChapter(string auth_token, int book_id, int chapter_id)
         {
             return this.MyChapter_Common(auth_token, book_id, chapter_id);
         }
 
+        [HttpPost]
         [Route("mypage/content/text/new")]
         public IActionResult MyChapter_CreateTextContent(string auth_token, int book_id, int chapter_id)
         {
@@ -266,6 +332,7 @@ namespace Gunucco.Controllers
             });
         }
 
+        [HttpPost]
         [Route("mypage/content/image/new")]
         public IActionResult MyChapter_CreateImageContent(string auth_token, int book_id, int chapter_id, IList<IFormFile> content_images)
         {
@@ -335,6 +402,7 @@ namespace Gunucco.Controllers
             });
         }
 
+        [HttpPost]
         [Route("mypage/content/reorder")]
         public IActionResult MyChapter_Reorder(string auth_token, int book_id, int chapter_id, int content_id, int? content_order)
         {
@@ -367,6 +435,7 @@ namespace Gunucco.Controllers
             });
         }
 
+        [HttpPost]
         [Route("mypage/content/text/edit")]
         public IActionResult MyChapter_EditTextContent(string auth_token, int book_id, int chapter_id, int content_id, string content_text, string is_delete)
         {
@@ -397,10 +466,12 @@ namespace Gunucco.Controllers
             });
         }
 
+        [HttpPost]
         [Route("mypage/chapter/edit")]
         public IActionResult MyChapter_Edit(string auth_token, int book_id, int chapter_id, string chapter_name, string is_delete)
         {
-            return this.MyChapter_Common(auth_token, book_id, chapter_id, cm =>
+            AuthorizationData authData = null;
+            var result = this.MyChapter_Common(auth_token, book_id, chapter_id, cm =>
             {
                 if (string.IsNullOrEmpty(is_delete))
                 {
@@ -411,13 +482,31 @@ namespace Gunucco.Controllers
                 {
                     cm.Delete();
                 }
+
+                authData = cm.AuthData;
             });
+
+            if (string.IsNullOrEmpty(is_delete))
+            {
+                return result;
+            }
+            else
+            {
+                return this.MyBook(authData, book_id);
+            }
         }
 
         private IActionResult MyChapter_Common(string auth_token, int book_id, int chapter_id, Action<ChapterModel> action = null, bool isHeaderMessage = true)
         {
-            // TODO: stub
-            var authData = Authentication.Authorize("kmys", "takaki", Scope.WebClient);
+            AuthorizationData authData = null;
+            try
+            {
+                authData = Authentication.Authorize(auth_token);
+            }
+            catch (GunuccoException ex)
+            {
+                return this.ShowMessage(ex.Error.Message);
+            }
 
             var mbook = new BookModel
             {
@@ -495,6 +584,8 @@ namespace Gunucco.Controllers
 
             return View("MyPage_chapter", vm);
         }
+
+        #endregion
 
         private IActionResult ShowMessage(string mes, bool isError = true)
         {

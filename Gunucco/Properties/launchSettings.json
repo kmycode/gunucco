@@ -11,7 +11,7 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "http://localhost:51238/web/mypage/chapter?book_id=1214&chapter_id=1548",
+      "launchUrl": "http://localhost:51238/",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

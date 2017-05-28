@@ -62,6 +62,7 @@ namespace Gunucco.Models
                 });
             }
             token.Scope = session.Scope;
+            token.AccessToken = authString;
 
             return new AuthorizationData
             {

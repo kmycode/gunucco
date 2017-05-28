@@ -18,7 +18,7 @@
     <h1>@this.Model.Book.Name</h1>
     <div class="mypage-subtitle">
         <form action="/web/mypage" style="display:inline" method="post">
-            <input type="hidden" name="auth_token" value="@this.Model.AuthData.AuthToken" />
+            <input type="hidden" name="auth_token" value="@this.Model.AuthData.AuthToken.AccessToken" />
             <input type="submit" class="link-like" value="My page" />
         </form>
         &gt;
@@ -32,13 +32,13 @@
             {
                 <li style="margin-left:@(chapter.Depth * 12)px">
                     <form action="/web/mypage/chapter" style="display:inline" method="post">
-                        <input type="hidden" name="auth_token" value="@this.Model.AuthData.AuthToken" />
+                        <input type="hidden" name="auth_token" value="@this.Model.AuthData.AuthToken.AccessToken" />
                         <input type="hidden" name="book_id" value="@chapter.Item.BookId" />
                         <input type="hidden" name="chapter_id" value="@chapter.Item.Id" />
                         <input type="submit" class="link-like" value="Edit" />
                     </form>
                     <form action="/web/mypage/chapter/reorder" style="float:right" method="post">
-                        <input type="hidden" name="auth_token" value="@this.Model.AuthData.AuthToken" />
+                        <input type="hidden" name="auth_token" value="@this.Model.AuthData.AuthToken.AccessToken" />
                         <input type="hidden" name="book_id" value="@chapter.Item.BookId" />
                         <input type="hidden" name="chapter_id" value="@chapter.Item.Id" />
                         <input type="text" class="mini" name="chapter_order" value="@chapter.Item.Order" />
@@ -53,7 +53,7 @@
     <div class="mypage-block-container my-chapters">
         <h2>New chapter</h2>
         <form action="/web/mypage/chapter/new" method="post">
-            <input type="hidden" name="auth_token" value="@this.Model.AuthData.AuthToken" />
+            <input type="hidden" name="auth_token" value="@this.Model.AuthData.AuthToken.AccessToken" />
             <input type="hidden" name="book_id" value="@this.Model.Book.Id" />
             <div class="form-label">Chapter name</div>
             <input type="text" name="chapter_name" value="" />
