@@ -66,6 +66,42 @@ namespace Gunucco.Controllers
             return Json(muser.AuthData.User);
         }
 
+        [HttpGet]
+        [Route("user/{id}")]
+        [AuthorizeFilter(IsCheckAuthorizable = false, Scope = Scope.Read)]
+        public IActionResult GetUser(int id)
+        {
+            var muser = new UserModel
+            {
+                AuthData = this.AuthData,
+                User = new User
+                {
+                    Id = id,
+                },
+            };
+            muser.Load();
+
+            return Json(muser.User);
+        }
+
+        [HttpGet]
+        [Route("user/{id}/text")]
+        [AuthorizeFilter(IsCheckAuthorizable = false, Scope = Scope.Read)]
+        public IActionResult GetUserWithTextId(string id)
+        {
+            var muser = new UserModel
+            {
+                AuthData = this.AuthData,
+                User = new User
+                {
+                    TextId = id,
+                },
+            };
+            muser.LoadWithTextId();
+
+            return Json(muser.User);
+        }
+
         [HttpDelete]
         [Route("user/delete")]
 #if !DEBUG && !UNITTEST

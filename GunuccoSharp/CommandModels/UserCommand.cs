@@ -38,6 +38,34 @@ namespace GunuccoSharp.CommandModels
         }
 
         /// <summary>
+        /// Get user data
+        /// </summary>
+        /// <param name="id">user id</param>
+        /// <returns>User object</returns>
+        public async Task<User> GetAsync(int id)
+        {
+            return await this.Client.Command<User>(new CommandInfo
+            {
+                Route = "user/" + id,
+                Method = HttpMethod.Get,
+            });
+        }
+
+        /// <summary>
+        /// Get user data with text id
+        /// </summary>
+        /// <param name="id">user text id</param>
+        /// <returns>User object</returns>
+        public async Task<User> GetAsync(string textId)
+        {
+            return await this.Client.Command<User>(new CommandInfo
+            {
+                Route = "user/" + textId + "/text",
+                Method = HttpMethod.Get,
+            });
+        }
+
+        /// <summary>
         /// Delete current user
         /// </summary>
         /// <returns>Api result</returns>

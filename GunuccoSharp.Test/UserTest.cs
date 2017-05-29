@@ -181,6 +181,44 @@ namespace GunuccoSharp.Test
         }
 
         [TestMethod]
+        public async Task GetUser()
+        {
+            var client1 = await TestUtil.GetUserClientAsync(0);
+            var client2 = await TestUtil.GetUserClientAsync(1);
+            var client3 = TestUtil.GetClient();
+
+            // get
+            var user1 = await client2.User.GetAsync(client1.AuthToken.UserId);
+            var user2 = await client3.User.GetAsync(client1.AuthToken.UserId);
+
+            Assert.IsNotNull(user1);
+            Assert.IsNotNull(user2);
+            Assert.AreEqual(user1.TextId, client1.AuthToken.UserTextId);
+            Assert.AreEqual(user2.TextId, client1.AuthToken.UserTextId);
+            Assert.AreEqual(user1.Name, client1.AuthToken.UserTextId.ToLower());
+            Assert.AreEqual(user2.Name, client1.AuthToken.UserTextId.ToLower());
+        }
+
+        [TestMethod]
+        public async Task GetUserWithTextId()
+        {
+            var client1 = await TestUtil.GetUserClientAsync(0);
+            var client2 = await TestUtil.GetUserClientAsync(1);
+            var client3 = TestUtil.GetClient();
+
+            // get
+            var user1 = await client2.User.GetAsync(client1.AuthToken.UserTextId);
+            var user2 = await client3.User.GetAsync(client1.AuthToken.UserTextId);
+
+            Assert.IsNotNull(user1);
+            Assert.IsNotNull(user2);
+            Assert.AreEqual(user1.Id, client1.AuthToken.UserId);
+            Assert.AreEqual(user2.Id, client1.AuthToken.UserId);
+            Assert.AreEqual(user1.Name, client1.AuthToken.UserTextId.ToLower());
+            Assert.AreEqual(user2.Name, client1.AuthToken.UserTextId.ToLower());
+        }
+
+        [TestMethod]
         public async Task DeleteUser()
         {
             var client = TestUtil.GetClient();
