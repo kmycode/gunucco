@@ -21,7 +21,7 @@ namespace Gunucco.Controllers
     {
         public IActionResult Index()
         {
-            return View();
+            return Redirect("/");
         }
 
         #region Sign up / in
