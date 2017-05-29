@@ -21,6 +21,9 @@
         <h2>My profile</h2>
         <div class="header-user-name">@this.Model.AuthData.User.Name</div>
         <div class="header-user-text-id">@@@this.Model.AuthData.User.TextId</div>
+        <div class="go-profile-page-link">
+            <a href="/web/user/@this.Model.AuthData.User.TextId" target="_blank">Your public profile page</a>
+        </div>
     </div>
 
     <div class="mypage-block-container my-books">

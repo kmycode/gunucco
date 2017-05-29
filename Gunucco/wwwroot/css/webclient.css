@@ -384,6 +384,9 @@ input[type=submit].link-like:hover {
   color: gray;
   margin-top: 4px;
 }
+#mypage-container .my-profile .go-profile-page-link {
+  margin-top: 24px;
+}
 #mypage-container .my-books ul {
   margin: 24px 8px 12px;
   padding: 0;
