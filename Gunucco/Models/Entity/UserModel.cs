@@ -76,6 +76,32 @@ namespace Gunucco.Models.Entity
 
                 if (Config.IsEmailValidationNeed)
                 {
+                    if (!email.Contains('@'))
+                    {
+                        throw new GunuccoException(new ApiMessage
+                        {
+                            StatusCode = 400,
+                            Message = "Invalid email address.",
+                        });
+                    }
+                    var address = email.Split('@');
+                    if (!address.ElementAt(0).Any() || address.ElementAtOrDefault(1)?.Any() == false
+                            || !address.ElementAt(1).Contains('.'))
+                    {
+                        throw new GunuccoException(new ApiMessage
+                        {
+                            StatusCode = 400,
+                            Message = "Invalid email address.",
+                        });
+                    }
+                    if (Regex.IsMatch(address.ElementAt(1), "@[0-9.]+$"))
+                    {
+                        throw new GunuccoException(new ApiMessage
+                        {
+                            StatusCode = 400,
+                            Message = "Cannot use ip address email.",
+                        });
+                    }
                     if (db.User.Any(u => u.EmailHash == user.EmailHash))
                     {
                         throw new GunuccoException(new ApiMessage
