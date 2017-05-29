@@ -360,8 +360,16 @@ namespace Gunucco.Models.Entity
                     }
                     this.Media.FilePath = this.Media.FilePath ?? string.Empty;
                 }
-                else
+                else if (this.Media.Source == MediaSource.Outside)
                 {
+                    if (!Config.IsAllowOutsideMedias)
+                    {
+                        throw new GunuccoException(new ApiMessage
+                        {
+                            StatusCode = 400,
+                            Message = "Outside media is not allowed in this server.",
+                        });
+                    }
                     if (string.IsNullOrWhiteSpace(this.Media.FilePath))
                     {
                         throw new GunuccoException(new ApiMessage

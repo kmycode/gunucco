@@ -100,6 +100,7 @@ namespace Gunucco
                 Config.AdministratorUri = config.GetValue<string>("AdministratorUri", "https://www.google.com/");
                 Config.ServerPath = config.GetValue<string>("ServerPath", "http://localhost");
                 Config.IsDebugMode = config.GetValue<bool>("IsDebugMode", false);
+                Config.IsAllowOutsideMedias = config.GetValue<bool>("IsAllowOutsideMedias", false);
 
                 Config.IsEmailValidationNeed = config.GetValue<bool>("IsEmailValidationNeed", true);
                 Config.SmtpServer = config.GetValue<string>("SmtpServer", "");

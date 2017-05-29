@@ -37,6 +37,11 @@ namespace Gunucco
         /// </summary>
         public static bool IsDebugMode { get; set; }
 
+        /// <summary>
+        /// To allow post files which media source is outside (getting media file from outside servers)
+        /// </summary>
+        public static bool IsAllowOutsideMedias { get; set; }
+
         #region Mail Setting
 
         /// <summary>
