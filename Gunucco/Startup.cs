@@ -101,6 +101,7 @@ namespace Gunucco
                 Config.ServerPath = config.GetValue<string>("ServerPath", "http://localhost");
                 Config.IsDebugMode = config.GetValue<bool>("IsDebugMode", false);
                 Config.IsAllowOutsideMedias = config.GetValue<bool>("IsAllowOutsideMedias", false);
+                Config.IsAllowNewSignUp = config.GetValue<bool>("IsAllowNewSignUp", true);
 
                 Config.IsEmailValidationNeed = config.GetValue<bool>("IsEmailValidationNeed", true);
                 Config.SmtpServer = config.GetValue<string>("SmtpServer", "");

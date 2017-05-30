@@ -30,6 +30,16 @@ namespace Gunucco.Controllers
         [Route("signup")]
         public IActionResult SignUp()
         {
+            try
+            {
+                UserModel.CheckNewSignupable();
+            }
+            catch (GunuccoException ex)
+            {
+                this.HttpContext.Response.StatusCode = ex.Error.StatusCode;
+                return this.ShowMessage(ex.Error.Message);
+            }
+
             return View();
         }
 

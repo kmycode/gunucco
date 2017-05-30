@@ -42,6 +42,11 @@ namespace Gunucco
         /// </summary>
         public static bool IsAllowOutsideMedias { get; set; }
 
+        /// <summary>
+        /// To allow new user signing up.
+        /// </summary>
+        public static bool IsAllowNewSignUp { get; set; }
+
         #region Mail Setting
 
         /// <summary>
