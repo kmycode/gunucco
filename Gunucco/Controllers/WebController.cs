@@ -35,7 +35,7 @@ namespace Gunucco.Controllers
 
         [HttpPost]
         [Route("signup")]
-        public IActionResult SignUp_Post(string text_id, string password, string password_again, string email)
+        public IActionResult SignUp_Post(string text_id, string password, string password_again, string email, string email_again)
         {
             if (string.IsNullOrEmpty(text_id) || string.IsNullOrEmpty(password))
             {
@@ -45,6 +45,11 @@ namespace Gunucco.Controllers
             if (password != password_again)
             {
                 return this.ShowMessage("Re-typed password is different.");
+            }
+
+            if (email != email_again)
+            {
+                return this.ShowMessage("Re-typed email is different.");
             }
 
             if (Config.IsEmailValidationNeed)
