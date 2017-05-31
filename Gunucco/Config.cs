@@ -33,6 +33,11 @@ namespace Gunucco
         public static string ServerPath { get; set; }
 
         /// <summary>
+        /// The directory media files are put.
+        /// </summary>
+        public static string MediaDirPath { get; set; }
+
+        /// <summary>
         /// Server is in debug mode or not.
         /// </summary>
         public static bool IsDebugMode { get; set; }

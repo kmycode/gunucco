@@ -40,11 +40,15 @@ namespace Gunucco.Models.Entity
             }
         }
 
-        private void CreateMediaDirectory()
+        private void CheckMediaDirectory()
         {
-            if (!Directory.Exists("." + MediaDirPath))
+            if (!Directory.Exists(Config.MediaDirPath))
             {
-                Directory.CreateDirectory("." + MediaDirPath);
+                throw new GunuccoException(new ApiMessage
+                {
+                    StatusCode = 503,
+                    Message = "Media directory is not found. Report this to server administrator.",
+                });
             }
         }
 
@@ -52,14 +56,26 @@ namespace Gunucco.Models.Entity
         {
             if (this.Content.Type == ContentType.Image && this.Media.Source == MediaSource.Self)
             {
-                this.Media.FilePath = MediaDirPath + $"{this.Media.Id:00000000}";
-                this.CreateMediaDirectory();
+                var fileName = $"{this.Media.Id:00000000}";
+                this.Media.FilePath = MediaDirPath + fileName;
+                this.CheckMediaDirectory();
 
-                FileStream fs = new FileStream("." + this.Media.FilePath, FileMode.Create);
-                BinaryWriter bw = new BinaryWriter(fs);
-                bw.Write(this.Media.MediaDataRow);
-                bw.Dispose();
-                fs.Dispose();
+                try
+                {
+                    FileStream fs = new FileStream(Config.MediaDirPath + fileName, FileMode.Create);
+                    BinaryWriter bw = new BinaryWriter(fs);
+                    bw.Write(this.Media.MediaDataRow);
+                    bw.Dispose();
+                    fs.Dispose();
+                }
+                catch (Exception e)
+                {
+                    throw new GunuccoException(new ApiMessage
+                    {
+                        StatusCode = 503,
+                        Message = "Cannot write media file. Report this to server administrator.",
+                    }, e);
+                }
             }
         }
 
@@ -67,7 +83,9 @@ namespace Gunucco.Models.Entity
         {
             if (this.Media.Source == MediaSource.Self)
             {
-                var fi = new FileInfo("." + this.Media.FilePath);
+                var fileName = Config.MediaDirPath + this.Media.FilePath.Replace(MediaDirPath, "");
+
+                var fi = new FileInfo(fileName);
                 if (!fi.Exists)
                 {
                     throw new GunuccoException(new ApiMessage
@@ -78,7 +96,7 @@ namespace Gunucco.Models.Entity
                 }
                 var fileSize = (int)fi.Length;
 
-                FileStream fs = new FileStream("." + this.Media.FilePath, FileMode.Open, FileAccess.Read);
+                FileStream fs = fi.OpenRead();
                 BinaryReader br = new BinaryReader(fs);
                 this.Media.MediaDataRow = br.ReadBytes(fileSize);
                 br.Dispose();
@@ -90,9 +108,11 @@ namespace Gunucco.Models.Entity
         {
             if (this.Media.Source == MediaSource.Self)
             {
-                if (File.Exists("." + this.Media.FilePath))
+                var fileName = Config.MediaDirPath + this.Media.FilePath.Replace(MediaDirPath, "");
+
+                if (File.Exists(fileName))
                 {
-                    File.Delete("." + this.Media.FilePath);
+                    File.Delete(fileName);
                 }
             }
         }

@@ -99,6 +99,7 @@ namespace Gunucco
                 Config.AdministratorName = config.GetValue<string>("AdministratorName", "Do not look at me");
                 Config.AdministratorUri = config.GetValue<string>("AdministratorUri", "https://www.google.com/");
                 Config.ServerPath = config.GetValue<string>("ServerPath", "http://localhost");
+                Config.MediaDirPath = config.GetValue<string>("MediaDirPath", "./media/");
                 Config.IsDebugMode = config.GetValue<bool>("IsDebugMode", false);
                 Config.IsAllowOutsideMedias = config.GetValue<bool>("IsAllowOutsideMedias", false);
                 Config.IsAllowNewSignUp = config.GetValue<bool>("IsAllowNewSignUp", true);
