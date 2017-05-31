@@ -18,6 +18,8 @@ namespace Gunucco.Models.Database
 
         public DbSet<UserSession> UserSession { get; set; }
 
+        public DbSet<OauthCode> OauthCode { get; set; }
+
         public DbSet<Book> Book { get; set; }
 
         public DbSet<Chapter> Chapter { get; set; }
@@ -78,6 +80,21 @@ namespace Gunucco.Models.Database
                 entity.Property(e => e.ScopeValue)
                     .IsRequired()
                     .HasDefaultValue((int)Scope.None);
+            });
+
+            builder.Entity<OauthCode>(entity =>
+            {
+                entity.Property(e => e.Code)
+                    .IsRequired()
+                    .HasColumnType("varchar(64)");
+                entity.Property(e => e.ScopeValue)
+                    .IsRequired()
+                    .HasDefaultValue((short)Scope.None);
+                entity.Property(e => e.SessionId)
+                    .HasColumnType("varchar(64)");
+                entity.Property(e => e.UserTextId)
+                    .HasColumnType("varchar(32)");
+                entity.Property(e => e.UserId);
             });
 
             builder.Entity<Book>(entity =>

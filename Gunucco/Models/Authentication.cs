@@ -2,6 +2,7 @@
 using Gunucco.Entities;
 using Gunucco.Models.Database;
 using Gunucco.Models.Entities;
+using Gunucco.Models.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using NLog;
@@ -104,7 +105,7 @@ namespace Gunucco.Models
             token.AccessToken = GetBearerToken(session);
 
             // cleaning expired sessions per 1 hour
-            CleanExpiredSessions();
+            DBCleanerUtil.CleanUserSession();
 
             return new AuthorizationData
             {
@@ -113,6 +114,170 @@ namespace Gunucco.Models
                 AuthToken = token,
             };
         }
+
+        #region oauth
+
+        public static OauthCode CreateOauthCode(Scope scope)
+        {
+            if (scope.HasFlag(Scope.WebClient))
+            {
+                throw new GunuccoException(new ApiMessage
+                {
+                    StatusCode = 403,
+                    Message = "Invalid scope for creating oauth code.",
+                });
+            }
+
+            var code = new OauthCode
+            {
+                Code = CryptUtil.CreateKey(64),
+                ExpireDateTime = DateTime.Now.AddHours(2),
+                Scope = scope,
+            };
+
+            using (var db = new MainContext())
+            {
+                db.OauthCode.Add(code);
+                db.SaveChanges();
+            }
+
+            DBCleanerUtil.CleanOauthCode();
+
+            code.OauthUri = Config.ServerPath + "/web/oauth?code=" + Uri.EscapeDataString(code.Code);
+
+            return code;
+        }
+
+        public static Scope GetOauthCodeScopeForOauthRequest(string code)
+        {
+            using (var db = new MainContext())
+            {
+                // check oauth data
+                var codeData = db.OauthCode.SingleOrDefault(o => o.Code == code);
+                if (codeData == null)
+                {
+                    throw new GunuccoException(new ApiMessage
+                    {
+                        StatusCode = 400,
+                        Message = "No such oauth code found.",
+                    });
+                }
+                if (!string.IsNullOrWhiteSpace(codeData.SessionId))
+                {
+                    throw new GunuccoException(new ApiMessage
+                    {
+                        StatusCode = 400,
+                        Message = "This oauth code is already authorized.",
+                    });
+                }
+
+                return codeData.Scope;
+            }
+        }
+
+        public static void AuthorizeWithOauth(string code, AuthorizationData webClientAuthData)
+        {
+            if (!webClientAuthData.Session.Scope.HasFlag(Scope.WebClient))
+            {
+                throw new GunuccoException(new ApiMessage
+                {
+                    StatusCode = 403,
+                    Message = "Login failed. Invalid web-client scope for oauth.",
+                });
+            }
+
+            using (var db = new MainContext())
+            {
+                // check oauth data
+                var codeData = db.OauthCode.SingleOrDefault(o => o.Code == code);
+                if (codeData == null)
+                {
+                    throw new GunuccoException(new ApiMessage
+                    {
+                        StatusCode = 400,
+                        Message = "No such oauth code found.",
+                    });
+                }
+                if (!string.IsNullOrWhiteSpace(codeData.SessionId))
+                {
+                    throw new GunuccoException(new ApiMessage
+                    {
+                        StatusCode = 400,
+                        Message = "This oauth code is already authorized.",
+                    });
+                }
+
+                // create new session
+                var session = UserSession.Create(new User
+                {
+                    Id = webClientAuthData.User.Id,
+                    TextId = webClientAuthData.User.TextId,
+                }, codeData.Scope);
+                db.UserSession.Add(session);
+
+                // save access token
+                codeData.SessionId = session.Id;
+                codeData.UserId = webClientAuthData.User.Id;
+                codeData.UserTextId = webClientAuthData.User.TextId;
+
+                db.SaveChanges();
+            }
+        }
+
+        public static AuthorizationToken GetTokenWithAuthCode(string code)
+        {
+            AuthorizationToken token = new AuthorizationToken();
+            UserSession session = null;
+
+            using (var db = new MainContext())
+            {
+                // check oauth data
+                var codeData = db.OauthCode.SingleOrDefault(o => o.Code == code);
+                if (codeData == null)
+                {
+                    throw new GunuccoException(new ApiMessage
+                    {
+                        StatusCode = 400,
+                        Message = "No such oauth code found.",
+                    });
+                }
+                if (string.IsNullOrWhiteSpace(codeData.SessionId))
+                {
+                    throw new GunuccoException(new ApiMessage
+                    {
+                        StatusCode = 400,
+                        Message = "This oauth code is not authorized.",
+                    });
+                }
+
+                // get session
+                session = db.UserSession.Find(codeData.SessionId);
+                if (session == null)
+                {
+                    throw new GunuccoException(new ApiMessage
+                    {
+                        StatusCode = 400,
+                        Message = "No such session found.",
+                    });
+                }
+
+                // get data for build access token
+                token.UserId = codeData.UserId;
+                token.UserTextId = codeData.UserTextId;
+                token.Scope = codeData.Scope;
+
+                // remove auth code
+                db.OauthCode.Remove(codeData);
+
+                db.SaveChanges();
+            }
+
+            token.AccessToken = GetBearerToken(session);
+
+            return token;
+        }
+
+        #endregion
 
         private static User CheckLoginable(MainContext db, AuthorizationToken token, string password = null)
         {
@@ -200,47 +365,6 @@ namespace Gunucco.Models
                 UserTextId = cred[1],
                 SessionId = cred[2],
             };
-        }
-
-        private static DateTime nextCleanExpiredSessionTime = DateTime.MinValue;
-        private static readonly object cleanExpiredSessionsLocker = new object();
-        private static async Task CleanExpiredSessions()
-        {
-            var now = DateTime.Now;
-            lock (cleanExpiredSessionsLocker)
-            {
-                if (nextCleanExpiredSessionTime > now) return;
-            }
-
-            nextCleanExpiredSessionTime = now.AddHours(1);
-
-            // 6 hours after expired to output 'token already expired' error when user logined old token
-            var removeDateTime = now.AddHours(-6);
-
-            log.Info("[Start] Cleaning expired sessions");
-            log.Info("    delete sessions until " + removeDateTime.ToString("yyyy/MM/dd HH:mm:ss") + ".");
-
-            int deleteCount = 0;
-            try
-            {
-                using (var db = new MainContext())
-                {
-                    var expireds = db.UserSession.Where(e => e.ExpireDateTime < removeDateTime);
-                    foreach (var ee in expireds)
-                    {
-                        db.UserSession.Remove(ee);
-                        deleteCount++;
-                    }
-                    await db.SaveChangesAsync();
-                }
-            }
-            catch (Exception e)
-            {
-                log.Error(e, "    exception occured while using database.");
-            }
-
-            log.Info("    deleted " + (deleteCount == 0 ? "no" : deleteCount.ToString()) + " session" + (deleteCount <= 1 ? "." : "s."));
-            log.Info("[End] Cleaning expired sessions");
         }
     }
 }

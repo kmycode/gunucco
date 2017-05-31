@@ -107,7 +107,7 @@ namespace Gunucco.Controllers
 #if !DEBUG && !UNITTEST
         [AuthorizeFilter(Scope = Scope.WriteUserDangerousIdentity)]
 #else
-        [AuthorizeFilter(Scope = Scope.WriteUserIdentity)]
+        [AuthorizeFilter(Scope = Scope.None)]
 #endif
         public IActionResult DeleteUser()
         {
@@ -127,6 +127,24 @@ namespace Gunucco.Controllers
             var data = Authentication.Authorize(id, password);
 
             return Json(data.AuthToken);
+        }
+
+        [HttpGet]
+        [Route("user/login/oauthcode/create")]
+        public IActionResult GetOauthCode(short scope)
+        {
+            var code = Authentication.CreateOauthCode((Scope)scope);
+
+            return Json(code);
+        }
+
+        [HttpPost]
+        [Route("user/login/oauthcode")]
+        public IActionResult LoginWithOauthCode(string code)
+        {
+            var token = Authentication.GetTokenWithAuthCode(code);
+
+            return Json(token);
         }
 
         [HttpGet]

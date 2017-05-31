@@ -1,0 +1,45 @@
+﻿@model Gunucco.ViewModels.OauthViewViewModel
+@{
+    ViewData["Title"] = "Oauth request";
+}
+
+<!-- sign in -->
+<div id="conpact-form-container">
+    <h1>Oauth request</h1>
+
+    <form action="/web/oauth/done" method="post">
+        <input type="hidden" name="code" value="@this.Model.Code" />
+        <div class="form-label">Text id</div>
+        <input type="text" name="text_id" value="" />
+
+        <div class="form-label">Password</div>
+        <input type="password" name="password" value="" />
+
+        <h2>Required scopes</h2>
+        <ul>
+            @if (this.Model.Scope.HasFlag(Gunucco.Entities.Scope.ReadUserIdentity))
+            {
+                <li>Read user identity</li>
+            }
+            @if (this.Model.Scope.HasFlag(Gunucco.Entities.Scope.Read))
+            {
+                <li>Read user items</li>
+            }
+            @if (this.Model.Scope.HasFlag(Gunucco.Entities.Scope.WriteUserIdentity))
+            {
+                <li>Write user identity</li>
+            }
+            @if (this.Model.Scope.HasFlag(Gunucco.Entities.Scope.WriteUserDangerousIdentity))
+            {
+                <li>Change user password or delete user</li>
+            }
+            @if (this.Model.Scope.HasFlag(Gunucco.Entities.Scope.Write))
+            {
+                <li>Write or delete user items</li>
+            }
+        </ul>
+
+        <input type="submit" value="Accept" />
+        <a href="@Config.ServerPath/" style="padding-left:16px">Cancel</a>
+    </form>
+</div>

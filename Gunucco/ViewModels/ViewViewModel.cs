@@ -12,6 +12,13 @@ namespace Gunucco.ViewModels
         public MessageViewModel Message { get; set; } = new MessageViewModel();
     }
 
+    public class OauthViewViewModel : ViewViewModelBase
+    {
+        public string Code { get; set; }
+
+        public Scope Scope { get; set; }
+    }
+
     public class UserViewViewModel : ViewViewModelBase
     {
         public User User { get; set; }

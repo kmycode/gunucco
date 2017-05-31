@@ -155,6 +155,52 @@ namespace Gunucco.Controllers
 
         #endregion
 
+        #region Oauth
+
+        [HttpGet]
+        [Route("oauth")]
+        public IActionResult OauthRequest(string code)
+        {
+            Scope scope = Scope.None;
+            try
+            {
+                scope = Authentication.GetOauthCodeScopeForOauthRequest(code);
+            }
+            catch (GunuccoException ex)
+            {
+                this.HttpContext.Response.StatusCode = ex.Error.StatusCode;
+                return this.ShowMessage(ex.Error.Message);
+            }
+
+            var vm = new OauthViewViewModel
+            {
+                Code = code,
+                Scope = scope,
+            };
+
+            return View(vm);
+        }
+
+        [HttpPost]
+        [Route("oauth/done")]
+        public IActionResult OauthAccept(string code, string text_id, string password)
+        {
+            try
+            {
+                var authData = Authentication.Authorize(text_id, password, Scope.WebClient);
+                Authentication.AuthorizeWithOauth(code, authData);
+            }
+            catch (GunuccoException ex)
+            {
+                this.HttpContext.Response.StatusCode = ex.Error.StatusCode;
+                return this.ShowMessage(ex.Error.Message);
+            }
+
+            return this.ShowMessage("Oauth request is done. Back client application to continue.", false);
+        }
+
+        #endregion
+
         #region View
 
         [HttpGet]

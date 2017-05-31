@@ -8,9 +8,10 @@ using Gunucco.Models.Database;
 namespace Gunucco.Migrations
 {
     [DbContext(typeof(MainContext))]
-    partial class MainContextModelSnapshot : ModelSnapshot
+    [Migration("20170530140541_Mig_0_0_8")]
+    partial class Mig_0_0_8
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.1.2");
@@ -147,8 +148,6 @@ namespace Gunucco.Migrations
 
                     b.Property<string>("SessionId")
                         .HasColumnType("varchar(64)");
-
-                    b.Property<int>("UserId");
 
                     b.Property<string>("UserTextId")
                         .HasColumnType("varchar(32)");
