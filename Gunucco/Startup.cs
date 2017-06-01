@@ -102,6 +102,7 @@ namespace Gunucco
                 Config.MediaDirPath = config.GetValue<string>("MediaDirPath", "./media/");
                 Config.IsDebugMode = config.GetValue<bool>("IsDebugMode", false);
                 Config.IsAllowOutsideMedias = config.GetValue<bool>("IsAllowOutsideMedias", false);
+                Config.IsAllowHtmlContent = config.GetValue<bool>("IsAllowHtmlContent", false);
                 Config.IsAllowNewSignUp = config.GetValue<bool>("IsAllowNewSignUp", true);
 
                 Config.IsEmailValidationNeed = config.GetValue<bool>("IsEmailValidationNeed", true);

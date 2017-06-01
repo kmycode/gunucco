@@ -48,6 +48,11 @@ namespace Gunucco
         public static bool IsAllowOutsideMedias { get; set; }
 
         /// <summary>
+        /// To allow creating or updating html contents in chapter. For security, false is recommended.
+        /// </summary>
+        public static bool IsAllowHtmlContent { get; set; }
+
+        /// <summary>
         /// To allow new user signing up.
         /// </summary>
         public static bool IsAllowNewSignUp { get; set; }

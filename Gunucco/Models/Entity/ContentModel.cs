@@ -316,8 +316,16 @@ namespace Gunucco.Models.Entity
 
         private void CheckSentData(bool isUpdate = true)
         {
-            if (this.Content.Type == ContentType.Text)
+            if (this.Content.Type == ContentType.Text || this.Content.Type == ContentType.Html)
             {
+                if (this.Content.Type == ContentType.Html && !Config.IsAllowHtmlContent)
+                {
+                    throw new GunuccoException(new ApiMessage
+                    {
+                        StatusCode = 400,
+                        Message = "Html content is not allowed.",
+                    });
+                }
                 if (this.Content.Text == null)
                 {
                     this.Content.Text = string.Empty;
