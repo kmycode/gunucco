@@ -336,9 +336,12 @@ input[type=submit].link-like:hover {
   font-size: 20px;
 }
 #view-container .view-contents .text-content {
+  margin: 20px 0;
   line-height: 150%;
+  font-size: 18px;
 }
 #view-container .view-contents .image-content {
+  margin: 20px 0;
   text-align: center;
   max-width: 900px;
 }

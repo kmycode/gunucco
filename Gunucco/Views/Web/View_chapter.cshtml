@@ -34,6 +34,12 @@
                     @content.Content.HtmlText
                 </div>
             }
+            else if (content.Content.Type == Gunucco.Entities.ContentType.Html)
+            {
+                <div class="text-content">
+                    @Html.Raw(content.Content.HtmlText)
+                </div>
+            }
             else if (content.Content.Type == Gunucco.Entities.ContentType.Image)
             {
                 <div class="image-content">

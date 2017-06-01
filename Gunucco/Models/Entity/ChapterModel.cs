@@ -190,7 +190,7 @@ namespace Gunucco.Models.Entity
                 results.Select(r => r.Content).Load();
 
                 var array = results.ToArray();
-                foreach (var m in array.Where(r => r.Content.Type != ContentType.Text)
+                foreach (var m in array.Where(r => r.Content.Type == ContentType.Image)
                                        .Select(r => new MediaModel
                 {
                     AuthData = this.AuthData,

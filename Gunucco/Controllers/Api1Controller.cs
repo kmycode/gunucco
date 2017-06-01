@@ -395,6 +395,26 @@ namespace Gunucco.Controllers
         }
 
         [HttpPost]
+        [Route("content/create/html")]
+        [AuthorizeFilter(Scope = Scope.Write)]
+        public IActionResult CreateHtmlContent(int chapter_id, string html)
+        {
+            var mcont = new ContentModel
+            {
+                AuthData = this.AuthData,
+                Chapter = new Chapter { Id = chapter_id, },
+                Content = new Content
+                {
+                    Type = ContentType.Html,
+                    Text = html,
+                },
+            };
+            mcont.Create();
+
+            return Json(mcont.Pair);
+        }
+
+        [HttpPost]
         [Route("content/create/image")]
         [AuthorizeFilter(Scope = Scope.Write)]
         public IActionResult CreateImageContent(int chapter_id, short source, string extension, IList<IFormFile> data, string data_uri)

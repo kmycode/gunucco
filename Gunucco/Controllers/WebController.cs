@@ -560,8 +560,18 @@ namespace Gunucco.Controllers
 
         [HttpPost]
         [Route("mypage/content/text/new")]
-        public IActionResult MyChapter_CreateTextContent(string auth_token, int book_id, int chapter_id)
+        public IActionResult MyChapter_CreateTextContent(string auth_token, int book_id, int chapter_id, string content_type)
         {
+            ContentType type;
+            if (content_type == "html")
+            {
+                type = ContentType.Html;
+            }
+            else
+            {
+                type = ContentType.Text;
+            }
+
             return this.MyChapter_Common(auth_token, book_id, chapter_id, cm =>
             {
                 var mcont = new ContentModel
@@ -572,7 +582,7 @@ namespace Gunucco.Controllers
                     {
                         ChapterId = cm.Chapter.Id,
                         Text = "",
-                        Type = ContentType.Text,
+                        Type = type,
                     },
                 };
                 mcont.Create();

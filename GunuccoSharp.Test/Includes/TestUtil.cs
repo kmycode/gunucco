@@ -150,6 +150,35 @@ namespace GunuccoSharp.Test
                 },
             });
 
+        public static readonly TestDataGenerator<ContentMediaPair> HtmlContents = new TestDataGenerator<ContentMediaPair>(
+            async (c, n, args) => await c.Content.CreateHtmlAsync((int)args[0], n.Content.Text),
+            async (c, n) => await c.Content.DeleteAsync(n.Content.Id),
+            (a, b) => a.Media?.ContentId == b.Content.Id,
+            new Collection<ContentMediaPair>
+            {
+                new ContentMediaPair
+                {
+                    Content = new Content
+                    {
+                        Text = "<span>Wagahai ha neko de aru.</span>",
+                    },
+                },
+                new ContentMediaPair
+                {
+                    Content = new Content
+                    {
+                        Text = "<div>Let's war!</div>",
+                    },
+                },
+                new ContentMediaPair
+                {
+                    Content = new Content
+                    {
+                        Text = "American legs are <b>too</b> long.",
+                    },
+                },
+            });
+
         public static readonly TestDataGenerator<ContentMediaPair> ImageContents = new TestDataGenerator<ContentMediaPair>(
             async (c, n, args) =>
             {

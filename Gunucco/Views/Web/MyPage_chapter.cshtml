@@ -44,14 +44,14 @@
                     <input type="text" class="mini" name="content_order" value="@content.Content.Order" />
                     <input type="submit" class="link-like" value="Set order" />
                 </form>
-                @if (content.Content.Type == Gunucco.Entities.ContentType.Text)
+                @if (content.Content.Type == Gunucco.Entities.ContentType.Text || content.Content.Type == Gunucco.Entities.ContentType.Html)
                 {
                     <form action="/web/mypage/content/text/edit" method="post">
                         <input type="hidden" name="auth_token" value="@this.Model.AuthData.AuthToken.AccessToken" />
                         <input type="hidden" name="book_id" value="@this.Model.Book.Id" />
                         <input type="hidden" name="chapter_id" value="@content.Content.ChapterId" />
                         <input type="hidden" name="content_id" value="@content.Content.Id" />
-                        <div class="form-label">Text</div>
+                        <div class="form-label">@content.Content.Type.ToString()</div>
                         <textarea name="content_text" class="dynamic-height">@content.Content.Text</textarea>
                         <div class="checkbox-container">
                             <label>
@@ -99,10 +99,15 @@
 
     <div class="mypage-block-container my-contents">
         <h2>New text</h2>
-        <form action="/web/mypage/content/text/new">
+        <form action="/web/mypage/content/text/new" method="post">
             <input type="hidden" name="auth_token" value="@this.Model.AuthData.AuthToken.AccessToken" />
             <input type="hidden" name="book_id" value="@this.Model.Book.Id" />
             <input type="hidden" name="chapter_id" value="@this.Model.Chapter.Id" />
+            <div class="form-label">Type</div>
+            <select name="content_type">
+                <option value="text" selected>Text</option>
+                <option value="html">Html</option>
+            </select>
             <input type="submit" value="Create" />
         </form>
     </div>

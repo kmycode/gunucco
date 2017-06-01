@@ -48,7 +48,7 @@ namespace Gunucco.Entities
         /// </summary>
         [JsonIgnore]
         [DBIgnore]
-        public string HtmlText => this.Text.Replace("\n", "<br />");
+        public string HtmlText => this.Type == ContentType.Text ? this.Text.Replace("\n", "<br />") : this.Text;
 
         /// <summary>
         /// Created date time
@@ -67,5 +67,6 @@ namespace Gunucco.Entities
     {
         Text = 101,
         Image = 102,
+        Html = 103,
     }
 }
