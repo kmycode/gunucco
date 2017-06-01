@@ -99,7 +99,7 @@
 
     <div class="mypage-block-container my-contents">
         <h2>New text</h2>
-        <form action="/web/mypage/content/text/new">
+        <form action="/web/mypage/content/text/new" method="post">
             <input type="hidden" name="auth_token" value="@this.Model.AuthData.AuthToken.AccessToken" />
             <input type="hidden" name="book_id" value="@this.Model.Book.Id" />
             <input type="hidden" name="chapter_id" value="@this.Model.Chapter.Id" />
