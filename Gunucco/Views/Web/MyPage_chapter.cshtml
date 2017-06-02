@@ -17,16 +17,9 @@
 <div id="mypage-container" class="@(this.Model.Message.HasMessage ? "under-page-message" : "")">
     <h1>@this.Model.Chapter.Name</h1>
     <div class="mypage-subtitle">
-        <form action="/web/mypage" style="display:inline" method="post">
-            <input type="hidden" name="auth_token" value="@this.Model.AuthData.AuthToken.AccessToken" />
-            <input type="submit" class="link-like" value="My page" />
-        </form>
+        <a href="/web/mypage">My page</a>
         &gt;
-        <form action="/web/mypage/book" style="display:inline" method="post">
-            <input type="hidden" name="auth_token" value="@this.Model.AuthData.AuthToken.AccessToken" />
-            <input type="hidden" name="book_id" value="@this.Model.Book.Id" />
-            <input type="submit" class="link-like" value="@this.Model.Book.Name" />
-        </form>
+        <a href="/web/mypage/book/@this.Model.Book.Id">@this.Model.Book.Name</a>
         &gt;
         @this.Model.Chapter.Name
     </div>
@@ -37,7 +30,6 @@
         {
             <div class="content-container">
                 <form action="/web/mypage/content/reorder" style="float:right" method="post">
-                    <input type="hidden" name="auth_token" value="@this.Model.AuthData.AuthToken.AccessToken" />
                     <input type="hidden" name="book_id" value="@this.Model.Book.Id" />
                     <input type="hidden" name="chapter_id" value="@content.Content.ChapterId" />
                     <input type="hidden" name="content_id" value="@content.Content.Id" />
@@ -47,7 +39,6 @@
                 @if (content.Content.Type == Gunucco.Entities.ContentType.Text || content.Content.Type == Gunucco.Entities.ContentType.Html)
                 {
                     <form action="/web/mypage/content/text/edit" method="post">
-                        <input type="hidden" name="auth_token" value="@this.Model.AuthData.AuthToken.AccessToken" />
                         <input type="hidden" name="book_id" value="@this.Model.Book.Id" />
                         <input type="hidden" name="chapter_id" value="@content.Content.ChapterId" />
                         <input type="hidden" name="content_id" value="@content.Content.Id" />
@@ -68,7 +59,6 @@
                         <img src="@content.Media.Uri" />
                     </div>
                     <form action="/web/mypage/content/text/edit" method="post">
-                        <input type="hidden" name="auth_token" value="@this.Model.AuthData.AuthToken.AccessToken" />
                         <input type="hidden" name="book_id" value="@this.Model.Book.Id" />
                         <input type="hidden" name="chapter_id" value="@content.Content.ChapterId" />
                         <input type="hidden" name="content_id" value="@content.Content.Id" />

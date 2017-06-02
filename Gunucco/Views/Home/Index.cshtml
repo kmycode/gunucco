@@ -9,8 +9,15 @@
     <h2>Common api for creators and readers</h2>
 
     <ul>
-        <li id="top-container-nav-signin"><a href="/web/signin">Sign in</a></li>
-        <li id="top-container-nav-signup"><a href="/web/signup">Sign up</a></li>
+        @if ((ViewBag.IsAuthenticated as bool?) == true)
+        {
+            <li id="top-container-nav-mypage"><a href="/web/mypage">My page</a></li>
+        }
+        else
+        {
+            <li id="top-container-nav-signin"><a href="/web/signin">Sign in</a></li>
+            <li id="top-container-nav-signup"><a href="/web/signup">Sign up</a></li>
+        }
     </ul>
 
     <div id="top-server-path">

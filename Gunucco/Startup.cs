@@ -120,11 +120,18 @@ namespace Gunucco
                 Config.MailFromName = config.GetValue<string>("MailFromName", "Gunucco System");
             }
 
-            // Add framework services.
-            services.AddMvc();
-
             // enable cookie
             services.AddSingleton<ITempDataProvider, CookieTempDataProvider>();
+
+            // enable session
+            services.AddMemoryCache();
+            services.AddSession(opt =>
+            {
+                opt.IdleTimeout = new TimeSpan(22, 0, 0);
+            });
+
+            // Add framework services.
+            services.AddMvc();
 
             log.Info("==== ConfigureServices End ====");
         }
@@ -148,6 +155,8 @@ namespace Gunucco
             }
 
             app.UseStaticFiles();
+
+            app.UseSession();
 
             app.UseMvc(routes =>
             {

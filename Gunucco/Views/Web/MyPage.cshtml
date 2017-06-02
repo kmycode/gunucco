@@ -32,11 +32,7 @@
             @foreach (var book in this.Model.Books)
             {
                 <li>
-                    <form action="/web/mypage/book" method="post">
-                        <input type="hidden" name="auth_token" value="@this.Model.AuthData.AuthToken.AccessToken" />
-                        <input type="hidden" name="book_id" value="@book.Id" />
-                        <input type="submit" class="link-like" value="Edit" />
-                    </form>
+                    <a href="/web/mypage/book/@book.Id">Edit</a>
                     <span class="item-name">@book.Name</span>
                 </li>
             }
@@ -46,7 +42,6 @@
     <div class="mypage-block-container my-books">
         <h2>New book</h2>
         <form action="/web/mypage/book/new" method="post">
-            <input type="hidden" name="auth_token" value="@this.Model.AuthData.AuthToken.AccessToken" />
             <div class="form-label">Book name</div>
             <input type="text" name="book_name" value="" />
             <input type="submit" value="Create" />

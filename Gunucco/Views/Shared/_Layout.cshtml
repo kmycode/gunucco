@@ -22,8 +22,15 @@
                 <div id="gunucco-mini-logo"><a href="/">Gunucco</a></div>
 
                 <ul id="navigation-right-menu">
-                    <li><a href="/web/signin">Sign in</a></li>
-                    <li><a href="/web/signup">Sign up</a></li>
+                    @if ((ViewBag.IsAuthenticated as bool?) == true)
+                    {
+                        <li><a href="/web/mypage">My page</a></li>
+                    }
+                    else
+                    {
+                        <li><a href="/web/signin">Sign in</a></li>
+                        <li><a href="/web/signup">Sign up</a></li>
+                    }
                 </ul>
             </div>
         </div>

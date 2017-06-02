@@ -1,6 +1,7 @@
 ﻿using Gunucco.Common;
 using Gunucco.Entities;
 using Gunucco.Entities.Helpers;
+using Gunucco.Filters;
 using Gunucco.Models;
 using Gunucco.Models.Database;
 using Gunucco.Models.Entities;
@@ -17,7 +18,8 @@ using System.Threading.Tasks;
 namespace Gunucco.Controllers
 {
     [Route("/web")]
-    public class WebController : Controller
+    [AccessTokenSessionActionFilter]
+    public class WebController : GunuccoWebControllerBase
     {
         public IActionResult Index()
         {
@@ -150,7 +152,7 @@ namespace Gunucco.Controllers
                 return this.ShowMessage(ex.Error.Message);
             }
 
-            return this.MyPage(authData);
+            return this.MyPage_Redirect(authData.AuthToken.AccessToken);
         }
 
         #endregion
@@ -339,22 +341,24 @@ namespace Gunucco.Controllers
 
         [HttpPost]
         [Route("mypage")]
-        public IActionResult MyPage(string auth_token)
+        public IActionResult MyPage_Redirect(string auth_token)
         {
-            return this.MyPage_Common(auth_token);
+            this.AccessTokenSession = auth_token;
+            return RedirectToAction("MyPage");
         }
 
-        [HttpPost]
-        private IActionResult MyPage(AuthorizationData authData)
+        [HttpGet]
+        [Route("mypage")]
+        public IActionResult MyPage()
         {
-            return this.MyPage_Common(authData);
+            return this.MyPage_Common(this.AccessTokenSession);
         }
 
         [HttpPost]
         [Route("mypage/book/new")]
-        public IActionResult MyPage_CreateNewBook(string auth_token, string book_name)
+        public IActionResult MyPage_CreateNewBook(string book_name)
         {
-            return this.MyPage_Common(auth_token, authData =>
+            return this.MyPage_Common(this.AccessTokenSession, authData =>
             {
                 var mbook = new BookModel
                 {
@@ -413,11 +417,11 @@ namespace Gunucco.Controllers
             return View("MyPage", vm);
         }
 
-        [HttpPost]
-        [Route("mypage/book")]
-        public IActionResult MyBook(string auth_token, int book_id)
+        [HttpGet]
+        [Route("mypage/book/{book_id}")]
+        public IActionResult MyBook(int book_id)
         {
-            return this.MyBook_Common(auth_token, book_id);
+            return this.MyBook_Common(this.AccessTokenSession, book_id);
         }
 
         private IActionResult MyBook(AuthorizationData authData, int book_id)
@@ -427,9 +431,9 @@ namespace Gunucco.Controllers
 
         [HttpPost]
         [Route("mypage/chapter/new")]
-        public IActionResult MyBook_CreateChapter(string auth_token, int book_id, string chapter_name)
+        public IActionResult MyBook_CreateChapter(int book_id, string chapter_name)
         {
-            return this.MyBook_Common(auth_token, book_id, bm =>
+            return this.MyBook_Common(this.AccessTokenSession, book_id, bm =>
             {
                 var mchap = new ChapterModel
                 {
@@ -447,9 +451,9 @@ namespace Gunucco.Controllers
 
         [HttpPost]
         [Route("mypage/chapter/reorder")]
-        public IActionResult MyBook_Reorder(string auth_token, int book_id, int chapter_id, int? chapter_order)
+        public IActionResult MyBook_Reorder(int book_id, int chapter_id, int? chapter_order)
         {
-            return this.MyBook_Common(auth_token, book_id, bm =>
+            return this.MyBook_Common(this.AccessTokenSession, book_id, bm =>
             {
                 if (chapter_order == null)
                 {
@@ -555,16 +559,16 @@ namespace Gunucco.Controllers
             return View("MyPage_book", vm);
         }
 
-        [HttpPost]
-        [Route("mypage/chapter")]
-        public IActionResult MyChapter(string auth_token, int book_id, int chapter_id)
+        [HttpGet]
+        [Route("mypage/chapter/{chapter_id}")]
+        public IActionResult MyChapter(int chapter_id)
         {
-            return this.MyChapter_Common(auth_token, book_id, chapter_id);
+            return this.MyChapter_Common(this.AccessTokenSession, chapter_id);
         }
 
         [HttpPost]
         [Route("mypage/content/text/new")]
-        public IActionResult MyChapter_CreateTextContent(string auth_token, int book_id, int chapter_id, string content_type)
+        public IActionResult MyChapter_CreateTextContent(int chapter_id, string content_type)
         {
             ContentType type;
             if (content_type == "html")
@@ -576,7 +580,7 @@ namespace Gunucco.Controllers
                 type = ContentType.Text;
             }
 
-            return this.MyChapter_Common(auth_token, book_id, chapter_id, cm =>
+            return this.MyChapter_Common(this.AccessTokenSession, chapter_id, cm =>
             {
                 var mcont = new ContentModel
                 {
@@ -595,9 +599,9 @@ namespace Gunucco.Controllers
 
         [HttpPost]
         [Route("mypage/content/image/new")]
-        public IActionResult MyChapter_CreateImageContent(string auth_token, int book_id, int chapter_id, IList<IFormFile> content_images)
+        public IActionResult MyChapter_CreateImageContent(int chapter_id, IList<IFormFile> content_images)
         {
-            return this.MyChapter_Common(auth_token, book_id, chapter_id, cm =>
+            return this.MyChapter_Common(this.AccessTokenSession, chapter_id, cm =>
             {
                 int failedCount = 0;
 
@@ -665,9 +669,9 @@ namespace Gunucco.Controllers
 
         [HttpPost]
         [Route("mypage/content/reorder")]
-        public IActionResult MyChapter_Reorder(string auth_token, int book_id, int chapter_id, int content_id, int? content_order)
+        public IActionResult MyChapter_Reorder(int chapter_id, int content_id, int? content_order)
         {
-            return this.MyChapter_Common(auth_token, book_id, chapter_id, cm =>
+            return this.MyChapter_Common(this.AccessTokenSession, chapter_id, cm =>
             {
                 if (content_order == null)
                 {
@@ -698,9 +702,9 @@ namespace Gunucco.Controllers
 
         [HttpPost]
         [Route("mypage/content/text/edit")]
-        public IActionResult MyChapter_EditTextContent(string auth_token, int book_id, int chapter_id, int content_id, string content_text, string is_delete)
+        public IActionResult MyChapter_EditTextContent(int chapter_id, int content_id, string content_text, string is_delete)
         {
-            return this.MyChapter_Common(auth_token, book_id, chapter_id, cm =>
+            return this.MyChapter_Common(this.AccessTokenSession, chapter_id, cm =>
             {
                 var mcont = new ContentModel
                 {
@@ -729,11 +733,14 @@ namespace Gunucco.Controllers
 
         [HttpPost]
         [Route("mypage/chapter/edit")]
-        public IActionResult MyChapter_Edit(string auth_token, int book_id, int chapter_id, string chapter_name, string chapter_publish_range, string is_delete)
+        public IActionResult MyChapter_Edit(int chapter_id, string chapter_name, string chapter_publish_range, string is_delete)
         {
             AuthorizationData authData = null;
-            var result = this.MyChapter_Common(auth_token, book_id, chapter_id, cm =>
+            int bookId = -1;
+            var result = this.MyChapter_Common(this.AccessTokenSession, chapter_id, cm =>
             {
+                bookId = cm.Book.Id;
+
                 PublishRange range = PublishRange.All;
                 if (chapter_publish_range == "all") { }
                 else if (chapter_publish_range == "private")
@@ -769,11 +776,11 @@ namespace Gunucco.Controllers
             }
             else
             {
-                return this.MyBook(authData, book_id);
+                return this.MyBook(authData, bookId);
             }
         }
 
-        private IActionResult MyChapter_Common(string auth_token, int book_id, int chapter_id, Action<ChapterModel> action = null, bool isHeaderMessage = true)
+        private IActionResult MyChapter_Common(string auth_token, int chapter_id, Action<ChapterModel> action = null, bool isHeaderMessage = true)
         {
             AuthorizationData authData = null;
             try
@@ -790,26 +797,21 @@ namespace Gunucco.Controllers
                 AuthData = authData,
                 Book = new Book
                 {
-                    Id = book_id,
                 },
             };
             var mchap = new ChapterModel
             {
                 AuthData = authData,
-                Book = new Book
-                {
-                    Id = book_id,
-                },
                 Chapter = new Chapter
                 {
-                    BookId = book_id,
                     Id = chapter_id,
                 },
             };
             try
             {
-                mbook.Load();
                 mchap.Load();
+                mbook.Book.Id = mchap.Chapter.BookId;
+                mbook.Load();
             }
             catch (GunuccoException ex)
             {
