@@ -435,7 +435,11 @@ namespace Gunucco.Controllers
                 {
                     AuthData = bm.AuthData,
                     Book = bm.Book,
-                    Chapter = new Chapter { Name = chapter_name, },
+                    Chapter = new Chapter
+                    {
+                        Name = chapter_name,
+                        PublicRange = PublishRange.Private,
+                    },
                 };
                 mchap.Create();
             });
