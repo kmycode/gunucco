@@ -189,7 +189,18 @@ namespace Gunucco.Controllers
         {
             try
             {
-                var authData = Authentication.Authorize(text_id, password, Scope.WebClient);
+                // authentication at first
+                AuthorizationData authData;
+                if (string.IsNullOrEmpty(text_id) || string.IsNullOrEmpty(password))
+                {
+                    authData = Authentication.Authorize(this.AccessTokenSession);
+                }
+                else
+                {
+                    authData = Authentication.Authorize(text_id, password, Scope.WebClient);
+                }
+
+                // start authorizing
                 Authentication.AuthorizeWithOauth(code, authData);
             }
             catch (GunuccoException ex)

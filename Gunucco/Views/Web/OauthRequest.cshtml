@@ -9,11 +9,18 @@
 
     <form action="/web/oauth/done" method="post">
         <input type="hidden" name="code" value="@this.Model.Code" />
-        <div class="form-label">Text id</div>
-        <input type="text" name="text_id" value="" />
 
-        <div class="form-label">Password</div>
-        <input type="password" name="password" value="" />
+        @if ((ViewBag.IsAuthenticated as bool?) == true)
+        {
+        }
+        else
+        {
+            <div class="form-label">Text id</div>
+            <input type="text" name="text_id" value="" />
+
+            <div class="form-label">Password</div>
+            <input type="password" name="password" value="" />
+        }
 
         <h2>Required scopes</h2>
         <ul>
