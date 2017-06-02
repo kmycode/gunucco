@@ -303,7 +303,7 @@ namespace Gunucco.Controllers
             {
                 mbook.Load();
 
-                chapters = TreeEntity<Chapter>.FromEntities(mbook.GetChapters(), c => c.ParentId).Select(c => c.Item).ToList();
+                chapters = TreeEntity<Chapter>.FromEntities(mbook.GetChaptersWithPermissionCheck(), c => c.ParentId).Select(c => c.Item).ToList();
                 chapter = chapters.SingleOrDefault(c => c.Id == id);
                 if (chapter == null)
                 {
