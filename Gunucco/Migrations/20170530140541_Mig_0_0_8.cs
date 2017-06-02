@@ -16,7 +16,7 @@ namespace Gunucco.Migrations
                         .Annotation("MySql:ValueGeneratedOnAdd", true),
                     Code = table.Column<string>(type: "varchar(64)", nullable: false),
                     ExpireDateTime = table.Column<DateTime>(nullable: false),
-                    ScopeValue = table.Column<short>(nullable: false, defaultValue: (short)0)
+                    ScopeValue = table.Column<int>(nullable: false, defaultValue: (int)0)
                         .Annotation("MySql:ValueGeneratedOnAdd", true),
                     SessionId = table.Column<string>(type: "varchar(64)", nullable: true),
                     UserTextId = table.Column<string>(type: "varchar(32)", nullable: true)

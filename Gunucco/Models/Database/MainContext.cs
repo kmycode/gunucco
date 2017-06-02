@@ -89,7 +89,7 @@ namespace Gunucco.Models.Database
                     .HasColumnType("varchar(64)");
                 entity.Property(e => e.ScopeValue)
                     .IsRequired()
-                    .HasDefaultValue((short)Scope.None);
+                    .HasDefaultValue((int)Scope.None);
                 entity.Property(e => e.SessionId)
                     .HasColumnType("varchar(64)");
                 entity.Property(e => e.UserTextId)

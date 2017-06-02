@@ -22,7 +22,7 @@ namespace Gunucco.Entities
         internal string UserTextId { get; set; }
 
         [JsonProperty("scope")]
-        internal short ScopeValue { get; set; }
+        internal int ScopeValue { get; set; }
 
         [JsonIgnore]
         [DBIgnore]
