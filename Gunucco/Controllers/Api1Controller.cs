@@ -53,6 +53,38 @@ namespace Gunucco.Controllers
 
         #endregion
 
+        #region Authorization Management
+
+        [HttpGet]
+        [Route("auth/list")]
+        [AuthorizeFilter(Scope = Scope.ReadUserIdentity)]
+        public IActionResult GetAuthorizations()
+        {
+            var msess = new SessionModel
+            {
+                AuthData = this.AuthData,
+            };
+            var data = msess.GetData();
+
+            return Json(data);
+        }
+
+        [HttpDelete]
+        [Route("auth/delete")]
+        [AuthorizeFilter(Scope = Scope.WriteUserDangerousIdentity)]
+        public IActionResult DeleteAuthorization(string id_hash)
+        {
+            var msess = new SessionModel
+            {
+                AuthData = this.AuthData,
+            };
+            var mes = msess.CancelAuthorization(id_hash);
+
+            return Json(mes);
+        }
+
+        #endregion
+
         #region User
 
         [HttpPost]

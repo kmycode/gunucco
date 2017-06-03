@@ -22,5 +22,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)OauthCode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)User.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\TreeEntity.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UserSession.cs" />
   </ItemGroup>
 </Project>
