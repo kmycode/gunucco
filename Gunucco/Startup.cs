@@ -99,8 +99,11 @@ namespace Gunucco
                 Config.AdministratorName = config.GetValue<string>("AdministratorName", "Do not look at me");
                 Config.AdministratorUri = config.GetValue<string>("AdministratorUri", "https://www.google.com/");
                 Config.ServerPath = config.GetValue<string>("ServerPath", "http://localhost");
+                Config.MediaDirPath = config.GetValue<string>("MediaDirPath", "./media/");
                 Config.IsDebugMode = config.GetValue<bool>("IsDebugMode", false);
                 Config.IsAllowOutsideMedias = config.GetValue<bool>("IsAllowOutsideMedias", false);
+                Config.IsAllowHtmlContent = config.GetValue<bool>("IsAllowHtmlContent", false);
+                Config.IsAllowNewSignUp = config.GetValue<bool>("IsAllowNewSignUp", true);
 
                 Config.IsEmailValidationNeed = config.GetValue<bool>("IsEmailValidationNeed", true);
                 Config.SmtpServer = config.GetValue<string>("SmtpServer", "");
@@ -117,11 +120,18 @@ namespace Gunucco
                 Config.MailFromName = config.GetValue<string>("MailFromName", "Gunucco System");
             }
 
-            // Add framework services.
-            services.AddMvc();
-
             // enable cookie
             services.AddSingleton<ITempDataProvider, CookieTempDataProvider>();
+
+            // enable session
+            services.AddMemoryCache();
+            services.AddSession(opt =>
+            {
+                opt.IdleTimeout = new TimeSpan(22, 0, 0);
+            });
+
+            // Add framework services.
+            services.AddMvc();
 
             log.Info("==== ConfigureServices End ====");
         }
@@ -145,6 +155,8 @@ namespace Gunucco
             }
 
             app.UseStaticFiles();
+
+            app.UseSession();
 
             app.UseMvc(routes =>
             {

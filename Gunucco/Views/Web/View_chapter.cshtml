@@ -22,7 +22,7 @@
     <div class="breadcrumb">
         <a href="/web/book/@this.Model.Book.Id">@this.Model.Book.Name</a>
         &gt;
-        @this.Model.Chapter.Name;
+        @this.Model.Chapter.Name
     </div>
 
     <div class="view-block-container view-contents">
@@ -32,6 +32,12 @@
             {
                 <div class="text-content">
                     @content.Content.HtmlText
+                </div>
+            }
+            else if (content.Content.Type == Gunucco.Entities.ContentType.Html)
+            {
+                <div class="text-content">
+                    @Html.Raw(content.Content.HtmlText)
                 </div>
             }
             else if (content.Content.Type == Gunucco.Entities.ContentType.Image)

@@ -33,6 +33,11 @@ namespace Gunucco
         public static string ServerPath { get; set; }
 
         /// <summary>
+        /// The directory media files are put.
+        /// </summary>
+        public static string MediaDirPath { get; set; }
+
+        /// <summary>
         /// Server is in debug mode or not.
         /// </summary>
         public static bool IsDebugMode { get; set; }
@@ -41,6 +46,16 @@ namespace Gunucco
         /// To allow post files which media source is outside (getting media file from outside servers)
         /// </summary>
         public static bool IsAllowOutsideMedias { get; set; }
+
+        /// <summary>
+        /// To allow creating or updating html contents in chapter. For security, false is recommended.
+        /// </summary>
+        public static bool IsAllowHtmlContent { get; set; }
+
+        /// <summary>
+        /// To allow new user signing up.
+        /// </summary>
+        public static bool IsAllowNewSignUp { get; set; }
 
         #region Mail Setting
 

@@ -54,6 +54,36 @@ namespace GunuccoSharp.Test
         }
 
         [TestMethod]
+        public async Task CreateHtmlContent()
+        {
+            var html = "<a href=\"https://google.com/\">Google</a>";
+            var client = await TestUtil.GetUserClientAsync();
+
+            // create book
+            var book = await TestUtil.Books.CreateAsync(client);
+
+            // create chapter
+            var chap = await TestUtil.Chapters.CreateAsync(client, 0, book.Id);
+
+            // create content
+            var cont = await TestUtil.HtmlContents.CreateAsync(client, new ContentMediaPair
+            {
+                Content = new Content
+                {
+                    Text = html,
+                }
+            }, chap.Id);
+
+            Assert.IsNotNull(cont);
+            Assert.AreNotEqual(cont.Content.Id, 0);
+            Assert.AreEqual(cont.Content.ChapterId, chap.Id);
+            Assert.AreEqual(cont.Content.Text, html ?? string.Empty);
+            Assert.AreEqual(cont.Content.Type, ContentType.Html);
+            Assert.IsTrue(cont.Content.Created > DateTime.Now.AddMinutes(-3));
+            Assert.IsTrue(cont.Content.LastModified > DateTime.Now.AddMinutes(-3));
+        }
+
+        [TestMethod]
         public async Task CreateTextContent_Failed_InvalidChapterId()
         {
             var client = await TestUtil.GetUserClientAsync();

@@ -8,9 +8,10 @@ using Gunucco.Models.Database;
 namespace Gunucco.Migrations
 {
     [DbContext(typeof(MainContext))]
-    partial class MainContextModelSnapshot : ModelSnapshot
+    [Migration("20170531122043_Mig_0_0_9")]
+    partial class Mig_0_0_9
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.1.2");

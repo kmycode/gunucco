@@ -22,6 +22,7 @@ namespace Gunucco.Models.Entity
 
         public void Create(string id, string password, string email = "unset", bool isEmailValidated = true)
         {
+            CheckNewSignupable();
             this.CheckPasswordSafety(password);
 
             var token = new AuthorizationToken
@@ -122,6 +123,18 @@ namespace Gunucco.Models.Entity
                 AuthToken = token,
             };
             this.User = user;
+        }
+
+        public static void CheckNewSignupable()
+        {
+            if (!Config.IsAllowNewSignUp)
+            {
+                throw new GunuccoException(new ApiMessage
+                {
+                    StatusCode = 400,
+                    Message = "Create user failed. Signing up is stopped by server config.",
+                });
+            }
         }
 
         public void SendValidationEmail(string email)

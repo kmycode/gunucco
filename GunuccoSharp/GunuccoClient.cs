@@ -13,6 +13,11 @@ namespace GunuccoSharp
         public ServerCommand Server => new ServerCommand(this);
 
         /// <summary>
+        /// Get authorization management commands
+        /// </summary>
+        public AuthorizationCommand Auth => new AuthorizationCommand(this);
+
+        /// <summary>
         /// Get user commands
         /// </summary>
         public UserCommand User => new UserCommand(this);

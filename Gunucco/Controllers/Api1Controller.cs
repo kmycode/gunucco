@@ -53,6 +53,38 @@ namespace Gunucco.Controllers
 
         #endregion
 
+        #region Authorization Management
+
+        [HttpGet]
+        [Route("auth/list")]
+        [AuthorizeFilter(Scope = Scope.ReadUserIdentity)]
+        public IActionResult GetAuthorizations()
+        {
+            var msess = new SessionModel
+            {
+                AuthData = this.AuthData,
+            };
+            var data = msess.GetData();
+
+            return Json(data);
+        }
+
+        [HttpDelete]
+        [Route("auth/delete")]
+        [AuthorizeFilter(Scope = Scope.WriteUserDangerousIdentity)]
+        public IActionResult DeleteAuthorization(string id_hash)
+        {
+            var msess = new SessionModel
+            {
+                AuthData = this.AuthData,
+            };
+            var mes = msess.CancelAuthorization(id_hash);
+
+            return Json(mes);
+        }
+
+        #endregion
+
         #region User
 
         [HttpPost]
@@ -107,7 +139,7 @@ namespace Gunucco.Controllers
 #if !DEBUG && !UNITTEST
         [AuthorizeFilter(Scope = Scope.WriteUserDangerousIdentity)]
 #else
-        [AuthorizeFilter(Scope = Scope.WriteUserIdentity)]
+        [AuthorizeFilter(Scope = Scope.None)]
 #endif
         public IActionResult DeleteUser()
         {
@@ -127,6 +159,24 @@ namespace Gunucco.Controllers
             var data = Authentication.Authorize(id, password);
 
             return Json(data.AuthToken);
+        }
+
+        [HttpGet]
+        [Route("user/login/oauthcode/create")]
+        public IActionResult GetOauthCode(int scope)
+        {
+            var code = Authentication.CreateOauthCode((Scope)scope);
+
+            return Json(code);
+        }
+
+        [HttpPost]
+        [Route("user/login/oauthcode")]
+        public IActionResult LoginWithOauthCode(string code)
+        {
+            var token = Authentication.GetTokenWithAuthCode(code);
+
+            return Json(token);
         }
 
         [HttpGet]
@@ -369,6 +419,26 @@ namespace Gunucco.Controllers
                 {
                     Type = ContentType.Text,
                     Text = text,
+                },
+            };
+            mcont.Create();
+
+            return Json(mcont.Pair);
+        }
+
+        [HttpPost]
+        [Route("content/create/html")]
+        [AuthorizeFilter(Scope = Scope.Write)]
+        public IActionResult CreateHtmlContent(int chapter_id, string html)
+        {
+            var mcont = new ContentModel
+            {
+                AuthData = this.AuthData,
+                Chapter = new Chapter { Id = chapter_id, },
+                Content = new Content
+                {
+                    Type = ContentType.Html,
+                    Text = html,
                 },
             };
             mcont.Create();

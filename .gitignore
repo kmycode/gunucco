@@ -262,3 +262,5 @@ __pycache__/
 Gunucco/appsettings.json
 Gunucco/CentOS7.txt
 *.db
+Gunucco/media/
+Gunucco/applaunchoptions.json

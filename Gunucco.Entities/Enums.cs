@@ -43,7 +43,7 @@ namespace Gunucco.Entities
         /// <summary>
         /// Logined by official web client. It arrows apis own web client.
         /// </summary>
-        WebClient = 32 | ReadUserIdentity | Read | Write | WriteUserIdentity | WriteUserDangerousIdentity,
+        WebClient = 32 | Read,
 
         /// <summary>
         /// Logined with text id and password api. It arrows identity, read or write, however is deprecated.

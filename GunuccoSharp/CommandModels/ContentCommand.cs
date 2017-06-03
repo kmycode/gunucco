@@ -28,6 +28,20 @@ namespace GunuccoSharp.CommandModels
             });
         }
 
+        public async Task<ContentMediaPair> CreateHtmlAsync(int chapterId, string html)
+        {
+            return await this.Client.Command<ContentMediaPair>(new CommandInfo
+            {
+                Route = "content/create/html",
+                Method = HttpMethod.Post,
+                Data =
+                {
+                    { "chapter_id", chapterId.ToString() },
+                    { "html", html },
+                },
+            });
+        }
+
         public async Task<ContentMediaPair> CreateImageAsync(int chapterId, MediaExtension extension, Stream data)
         {
             var extensionStr = extension == MediaExtension.Gif ? "gif" : extension == MediaExtension.Jpeg ? "jpeg" : extension == MediaExtension.Png ? "png" : throw new GunuccoException("Invalid extension value.");

@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using Gunucco.Entities;
 using System.Security.Cryptography;
 using System.Text;
+using OpenQA.Selenium;
+using System.Linq;
 
 namespace GunuccoSharp.Test
 {
@@ -178,6 +180,195 @@ namespace GunuccoSharp.Test
             Assert.IsNotNull(exception.Error);
             Assert.AreEqual(exception.Error.StatusCode, 400);
             Assert.IsTrue(exception.Error.Message.Contains("No such user"));
+        }
+
+        [DataTestMethod]
+        [DataRow(Scope.Read)]
+        [DataRow(Scope.Write)]
+        [DataRow(Scope.Read | Scope.Write)]
+        [DataRow(Scope.Read | Scope.Write | Scope.WriteUserIdentity)]
+        [DataRow(Scope.Read | Scope.Write | Scope.WriteUserIdentity | Scope.WriteUserDangerousIdentity)]
+        public async Task LoginWithOauth(Scope scope)
+        {
+            var user = await TestUtil.Users.CreateAsync(TestUtil.GetClient(), 0);
+            var client = TestUtil.GetClient();
+
+            // get code
+            var code = await client.User.Login.Oauth.CreateCodeAsync(scope);
+            Assert.IsFalse(string.IsNullOrEmpty(code.OauthUri));
+            Assert.IsTrue(code.OauthUri.StartsWith("http://") || code.OauthUri.StartsWith("https://"));
+
+            using (var web = new TestBrowser(code.OauthUri))
+            {
+                // open browser and auth
+                var form = web.GetOauthRequestForm();
+
+                // check list
+                var list = web.GetOauthScopeList();
+                if (scope.HasFlag(Scope.Read))
+                {
+                    Assert.IsTrue(list.Contains("Read user items"));
+                }
+                else
+                {
+                    Assert.IsFalse(list.Contains("Read user items"));
+                }
+                if (scope.HasFlag(Scope.Write))
+                {
+                    Assert.IsTrue(list.Contains("Write or delete user items"));
+                }
+                else
+                {
+                    Assert.IsFalse(list.Contains("Write or delete user items"));
+                }
+                if (scope.HasFlag(Scope.WriteUserIdentity))
+                {
+                    Assert.IsTrue(list.Contains("Write user identity"));
+                }
+                else
+                {
+                    Assert.IsFalse(list.Contains("Write user identity"));
+                }
+                if (scope.HasFlag(Scope.WriteUserDangerousIdentity))
+                {
+                    Assert.IsTrue(list.Contains("Change user password or delete user"));
+                }
+                else
+                {
+                    Assert.IsFalse(list.Contains("Change user password or delete user"));
+                }
+
+                // auth
+                form.FindElement(By.Name("text_id")).SendKeys("test");
+                form.FindElement(By.Name("password")).SendKeys("testaa");
+                form.Submit();
+                while (!web.Driver.Url.EndsWith("done")) ;
+            }
+
+            // get token
+            var token = await client.User.Login.Oauth.LoginAsync(code);
+
+            Assert.IsFalse(string.IsNullOrEmpty(token.AccessToken));
+            Assert.AreEqual(token.Scope, scope);
+            Assert.AreEqual(token.UserId, user.Id);
+            Assert.AreEqual(token.UserTextId, "test");
+        }
+
+        [DataTestMethod]
+        [DataRow(Scope.WebClient)]
+        public async Task LoginWithOauth_Failed_InvalidScope(Scope scope)
+        {
+            var user = await TestUtil.Users.CreateAsync(TestUtil.GetClient(), 0);
+            var client = TestUtil.GetClient();
+
+            // get code
+            var ex = await Assert.ThrowsExceptionAsync<GunuccoErrorException>(async () =>
+            {
+                await client.User.Login.Oauth.CreateCodeAsync(scope);
+            });
+
+            TestUtil.CheckException(ex, 403, "scope");
+        }
+
+        [TestMethod]
+        public async Task LoginWithOauth_Failed_NoAuthedCode()
+        {
+            var user = await TestUtil.Users.CreateAsync(TestUtil.GetClient(), 0);
+            var client = TestUtil.GetClient();
+
+            // get code
+            var code = await client.User.Login.Oauth.CreateCodeAsync(Scope.Read);
+            Assert.IsFalse(string.IsNullOrEmpty(code.OauthUri));
+            Assert.IsTrue(code.OauthUri.StartsWith("http://") || code.OauthUri.StartsWith("https://"));
+
+            // get token
+            var ex = await Assert.ThrowsExceptionAsync<GunuccoErrorException>(async () =>
+            {
+                await client.User.Login.Oauth.LoginAsync(code);
+            });
+
+            TestUtil.CheckException(ex, 400, "authorized");
+        }
+
+        [TestMethod]
+        public async Task LoginWithOauth_Failed_InvalidCode()
+        {
+            var user = await TestUtil.Users.CreateAsync(TestUtil.GetClient(), 0);
+            var client = TestUtil.GetClient();
+
+            // get code
+            var code = await client.User.Login.Oauth.CreateCodeAsync(Scope.Read);
+            Assert.IsFalse(string.IsNullOrEmpty(code.OauthUri));
+            Assert.IsTrue(code.OauthUri.StartsWith("http://") || code.OauthUri.StartsWith("https://"));
+
+            // get token
+            var ex = await Assert.ThrowsExceptionAsync<GunuccoErrorException>(async () =>
+            {
+                await client.User.Login.Oauth.LoginAsync(code + "a");
+            });
+
+            TestUtil.CheckException(ex, 400, "found");
+        }
+
+        [TestMethod]
+        public async Task LoginWithOauth_And_DoActionInScope()
+        {
+            var user = await TestUtil.Users.CreateAsync(TestUtil.GetClient(), 0);
+            var client = TestUtil.GetClient();
+
+            // get code
+            var code = await client.User.Login.Oauth.CreateCodeAsync(Scope.Write);
+
+            using (var web = new TestBrowser(code.OauthUri))
+            {
+                // open browser and auth
+                var form = web.GetOauthRequestForm();
+
+                // auth
+                form.FindElement(By.Name("text_id")).SendKeys("test");
+                form.FindElement(By.Name("password")).SendKeys("testaa");
+                form.Submit();
+                while (!web.Driver.Url.EndsWith("done")) ;
+            }
+
+            // get token
+            var token = await client.User.Login.Oauth.LoginAsync(code);
+
+            // do action
+            await client.Book.CreateAsync("test");
+        }
+
+        [TestMethod]
+        public async Task LoginWithOauth_And_DoAction_Failed_OutScope()
+        {
+            var user = await TestUtil.Users.CreateAsync(TestUtil.GetClient(), 0);
+            var client = TestUtil.GetClient();
+
+            // get code
+            var code = await client.User.Login.Oauth.CreateCodeAsync(Scope.Read);
+
+            using (var web = new TestBrowser(code.OauthUri))
+            {
+                // open browser and auth
+                var form = web.GetOauthRequestForm();
+
+                // auth
+                form.FindElement(By.Name("text_id")).SendKeys("test");
+                form.FindElement(By.Name("password")).SendKeys("testaa");
+                form.Submit();
+                while (!web.Driver.Url.EndsWith("done")) ;
+            }
+
+            // get token
+            var token = await client.User.Login.Oauth.LoginAsync(code);
+
+            // do action
+            var ex = await Assert.ThrowsExceptionAsync<GunuccoErrorException>(async () =>
+            {
+                await client.Book.CreateAsync("test");
+            });
+
+            TestUtil.CheckException(ex, 403, "scope");
         }
 
         [TestMethod]

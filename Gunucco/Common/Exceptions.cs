@@ -13,5 +13,7 @@ namespace Gunucco.Common
         public GunuccoException(ApiMessage error) : base() { this.Error = error; }
 
         public GunuccoException(string message, ApiMessage error) : base(message) { this.Error = error; }
+
+        public GunuccoException(ApiMessage error, Exception e) : base(error.Message, e) { this.Error = error; }
     }
 }

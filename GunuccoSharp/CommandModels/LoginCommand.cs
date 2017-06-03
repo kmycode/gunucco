@@ -13,6 +13,11 @@ namespace GunuccoSharp.CommandModels
         }
 
         /// <summary>
+        /// Oauth command set
+        /// </summary>
+        public OauthCommand Oauth => new OauthCommand(this.Client);
+
+        /// <summary>
         /// Login user
         /// </summary>
         /// <param name="id">user text id</param>
