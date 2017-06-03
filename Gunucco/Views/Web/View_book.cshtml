@@ -30,7 +30,7 @@
         <ul>
             @foreach (var chapter in this.Model.Chapters)
             {
-                <li style="margin-left:@(chapter.Depth * 12)px">
+                <li style="margin-left:@(chapter.Depth * 12)px" class="@(chapter.Item.PublicRange == Gunucco.Entities.PublishRange.All ? "publishrange-all" : "publishrange-private")">
                     <a href="/web/book/@this.Model.Book.Id/chapter/@chapter.Item.Id"><span class="item-name">@chapter.Item.Name</span></a>
                 </li>
             }

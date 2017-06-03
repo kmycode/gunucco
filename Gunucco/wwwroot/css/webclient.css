@@ -291,6 +291,10 @@ input[type=submit].link-like:hover {
   border: 1px dashed #b5bbc2;
   border-width: 0px 0px 1px 0px;
 }
+#view-container .view-books ul li.publishrange-private {
+  font-style: italic;
+  background-color: #fce4e4;
+}
 #view-container .view-books ul li form {
   display: inline;
 }
@@ -313,6 +317,10 @@ input[type=submit].link-like:hover {
   padding: 4px 12px;
   border: 1px dashed #b5bbc2;
   border-width: 0px 0px 1px 0px;
+}
+#view-container .view-chapters ul li.publishrange-private {
+  font-style: italic;
+  background-color: #fce4e4;
 }
 #view-container .view-chapters ul li form {
   display: inline;
@@ -403,6 +411,10 @@ input[type=submit].link-like:hover {
   border: 1px dashed #b5bbc2;
   border-width: 0px 0px 1px 0px;
 }
+#mypage-container .my-books ul li.publishrange-private {
+  font-style: italic;
+  background-color: #fce4e4;
+}
 #mypage-container .my-books ul li form {
   display: inline;
 }
@@ -425,6 +437,10 @@ input[type=submit].link-like:hover {
   padding: 4px 12px;
   border: 1px dashed #b5bbc2;
   border-width: 0px 0px 1px 0px;
+}
+#mypage-container .my-chapters ul li.publishrange-private {
+  font-style: italic;
+  background-color: #fce4e4;
 }
 #mypage-container .my-chapters ul li form {
   display: inline;
