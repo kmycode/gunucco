@@ -1,6 +1,5 @@
 ﻿@{
     ViewData["Title"] = "Top";
-    ViewData["ExtraScript"] = "webclient_top";
 }
 
 <!-- Top page -->
@@ -8,7 +7,7 @@
     <h1>Gunucco</h1>
     <h2>Common api for creators and readers</h2>
 
-    <ul>
+    <ul class="inline">
         @if ((ViewBag.IsAuthenticated as bool?) == true)
         {
             <li id="top-container-nav-mypage"><a href="/web/mypage">My page</a></li>
@@ -20,7 +19,23 @@
         }
     </ul>
 
+    <h3>About Gunucco</h3>
+    <div class="top-container-block">
+        Gunucco provides the common api for creators and readers.
+        Anyone can read or write contents by using Gunucco REST API or web client.
+        Go <a href="https://github.com/kmycode/gunucco">project page</a> to get more information.
+    </div>
+
+    <h3>Local rule</h3>
+    <div class="top-container-block">
+        @Html.Partial("../Shared/LocalRule")
+    </div>
+
     <div id="top-server-path">
         ServerPath: <code>@Config.ServerPath</code>
+    </div>
+
+    <div id="top-server-version">
+        <code>@Config.ServerVersion</code>
     </div>
 </div>
