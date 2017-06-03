@@ -15,10 +15,10 @@ namespace Gunucco.Entities
         [JsonIgnore]
         internal string SessionId { get; set; }
 
-        [JsonProperty("user_id")]
+        [JsonIgnore]
         internal int UserId { get; set; }
 
-        [JsonProperty("user_text_id")]
+        [JsonIgnore]
         internal string UserTextId { get; set; }
 
         [JsonProperty("scope")]
@@ -32,7 +32,7 @@ namespace Gunucco.Entities
             set => this.ScopeValue = (short)value;
         }
 
-        [JsonProperty("expire_date_time")]
+        [JsonProperty("expire")]
         public DateTime ExpireDateTime { get; set; }
 
         [DBIgnore]
