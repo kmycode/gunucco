@@ -163,7 +163,7 @@ namespace Gunucco.Controllers
 
         [HttpGet]
         [Route("user/login/oauthcode/create")]
-        public IActionResult GetOauthCode(short scope)
+        public IActionResult GetOauthCode(int scope)
         {
             var code = Authentication.CreateOauthCode((Scope)scope);
 
