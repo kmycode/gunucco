@@ -1,4 +1,6 @@
 # gunucco
-Common api for read and write creative works
+Common api for read and write creative works.
 
-Detail information: [Wiki](https://github.com/kmycode/gunucco/wiki)
+![Sample](https://raw.githubusercontent.com/kmycode/gunucco/master/images/chapterpage_sample.png)
+
+Go [Wiki](https://github.com/kmycode/gunucco/wiki) to get more information!
