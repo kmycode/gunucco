@@ -244,7 +244,7 @@ namespace GunuccoSharp.Test
             // await TextContents.CleanAsync(client);
             // await ImageContents.CleanAsync(client);
             // await Chapters.CleanAsync(client);
-            await Books.CleanAsync(client);
+            // await Books.CleanAsync(client);
             await Users.CleanAsync(client);
         }
 

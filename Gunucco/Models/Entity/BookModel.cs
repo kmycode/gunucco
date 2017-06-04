@@ -192,6 +192,44 @@ namespace Gunucco.Models.Entity
             return books;
         }
 
+        public ApiMessage Save()
+        {
+            using (var db = new MainContext())
+            {
+                return this.Save(db);
+            }
+        }
+
+        public ApiMessage Save(MainContext db)
+        {
+            this.isLoaded = true;
+            this.CheckSentData();
+
+            var current = new BookModel
+            {
+                AuthData = this.AuthData,
+                Book = this.Book,
+            };
+            current.Load(db);
+
+            // do user change un-changable property?
+            // (no such property current)
+
+            current.CheckPermission(db);
+
+            // save
+            var b = current.Book;
+            db.Book.Attach(b);
+            b.Name = this.Book.Name;
+            db.SaveChanges();
+
+            return new ApiMessage
+            {
+                StatusCode = 200,
+                Message = "Update book succeed.",
+            };
+        }
+
         public ApiMessage Delete()
         {
             using (var db = new MainContext())

@@ -269,6 +269,23 @@ namespace Gunucco.Controllers
             return Json(chapters);
         }
 
+        [HttpPut]
+        [Route("book/update")]
+        [AuthorizeFilter(Scope = Scope.Write)]
+        public IActionResult UpdateBook(string book)
+        {
+            Book b = this.LoadJson<Book>(book);
+
+            var mbook = new BookModel
+            {
+                AuthData = this.AuthData,
+                Book = b,
+            };
+            var mes = mbook.Save();
+
+            return Json(mes);
+        }
+
         [HttpDelete]
         [Route("book/delete")]
         [AuthorizeFilter(Scope = Scope.Write)]

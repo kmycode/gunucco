@@ -1,4 +1,5 @@
 ﻿using Gunucco.Entities;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -49,6 +50,19 @@ namespace GunuccoSharp.CommandModels
             {
                 Route = "book/" + bookId + "/chapters/root",
                 Method = HttpMethod.Get,
+            });
+        }
+
+        public async Task<ApiMessage> UpdateAsync(Book book)
+        {
+            return await this.Client.Command<ApiMessage>(new CommandInfo
+            {
+                Route = "book/update",
+                Method = HttpMethod.Put,
+                Data =
+                {
+                    { "book", JsonConvert.SerializeObject(book) },
+                },
             });
         }
 

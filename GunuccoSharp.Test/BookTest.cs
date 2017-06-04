@@ -219,6 +219,89 @@ namespace GunuccoSharp.Test
         }
 
         [TestMethod]
+        public async Task UpdateBook()
+        {
+            var client = await TestUtil.GetUserClientAsync();
+
+            // create book
+            var book = await TestUtil.Books.CreateAsync(client);
+
+            // update book
+            book.Name += "Nara";
+            await client.Book.UpdateAsync(book);
+
+            // get newest chapter data
+            var newBook = await client.Book.GetAsync(book.Id);
+
+            Assert.IsNotNull(newBook);
+            Assert.AreEqual(newBook.Id, book.Id);
+            Assert.AreEqual(newBook.Name, book.Name);
+        }
+
+        [TestMethod]
+        public async Task UpdateBook_Failed_IdNotFound()
+        {
+            var client = await TestUtil.GetUserClientAsync();
+
+            // create book
+            var book = await TestUtil.Books.CreateAsync(client);
+
+            // update book
+            book.Id++;
+            var ex = await Assert.ThrowsExceptionAsync<GunuccoErrorException>(async () =>
+            {
+                await client.Book.UpdateAsync(book);
+            });
+
+            Assert.IsNotNull(ex.Error);
+            Assert.AreEqual(ex.Error.StatusCode, 404);
+            Assert.IsTrue(ex.Error.Message.Contains("found"));
+        }
+
+        [TestMethod]
+        public async Task UpdateBook_Failed_OthersId()
+        {
+            var client1 = await TestUtil.GetUserClientAsync(0);
+            var client2 = await TestUtil.GetUserClientAsync(1);
+
+            // create book
+            var book1 = await TestUtil.Books.CreateAsync(client1, 0);
+            var book2 = await TestUtil.Books.CreateAsync(client2, 1);
+
+            // update book
+            var ex = await Assert.ThrowsExceptionAsync<GunuccoErrorException>(async () =>
+            {
+                await client2.Book.UpdateAsync(book1);
+            });
+
+            Assert.IsNotNull(ex.Error);
+            Assert.AreEqual(ex.Error.StatusCode, 403);
+            Assert.IsTrue(ex.Error.Message.Contains("permission"));
+        }
+
+        [DataTestMethod]
+        [DataRow("")]
+        [DataRow("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")]
+        public async Task UpdateBook_Failed_InvalidBookName(string name)
+        {
+            var client = await TestUtil.GetUserClientAsync();
+
+            // create book
+            var book = await TestUtil.Books.CreateAsync(client);
+
+            // update book
+            book.Name = name;
+            var ex = await Assert.ThrowsExceptionAsync<GunuccoErrorException>(async () =>
+            {
+                await client.Book.UpdateAsync(book);
+            });
+
+            Assert.IsNotNull(ex.Error);
+            Assert.AreEqual(ex.Error.StatusCode, 400);
+            Assert.IsTrue(ex.Error.Message.Contains("too"));
+        }
+
+        [TestMethod]
         public async Task DeleteBook()
         {
             var client = await TestUtil.GetUserClientAsync();
