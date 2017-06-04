@@ -221,6 +221,7 @@ namespace Gunucco.Models.Entity
             var b = current.Book;
             db.Book.Attach(b);
             b.Name = this.Book.Name;
+            b.Description = this.Book.Description;
             db.SaveChanges();
 
             return new ApiMessage
@@ -322,6 +323,14 @@ namespace Gunucco.Models.Entity
                 });
             }
             if (this.Book.Name.Length > 120 / 3)        // utf8
+            {
+                throw new GunuccoException(new ApiMessage
+                {
+                    StatusCode = 400,
+                    Message = "Book name is too long.",
+                });
+            }
+            if (this.Book.Description?.Length > 1020 / 3)     // utf8
             {
                 throw new GunuccoException(new ApiMessage
                 {

@@ -436,7 +436,7 @@ namespace Gunucco.Models.Entity
                 throw new GunuccoException(new ApiMessage
                 {
                     StatusCode = 400,
-                    Message = "Book name is too long.",
+                    Message = "Chapter name is too long.",
                 });
             }
 

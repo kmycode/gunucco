@@ -228,6 +228,7 @@ namespace GunuccoSharp.Test
 
             // update book
             book.Name += "Nara";
+            book.Description = "This is update test";
             await client.Book.UpdateAsync(book);
 
             // get newest chapter data
@@ -236,6 +237,7 @@ namespace GunuccoSharp.Test
             Assert.IsNotNull(newBook);
             Assert.AreEqual(newBook.Id, book.Id);
             Assert.AreEqual(newBook.Name, book.Name);
+            Assert.AreEqual(newBook.Description, book.Description);
         }
 
         [TestMethod]
