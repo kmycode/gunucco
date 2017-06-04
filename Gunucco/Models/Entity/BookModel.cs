@@ -222,6 +222,7 @@ namespace Gunucco.Models.Entity
             db.Book.Attach(b);
             b.Name = this.Book.Name;
             b.Description = this.Book.Description;
+            b.PostTo = this.Book.PostTo;
             db.SaveChanges();
 
             return new ApiMessage
