@@ -398,6 +398,7 @@ namespace Gunucco.Controllers
             }
             catch (GunuccoException ex)
             {
+                this.AccessTokenSession = "";
                 return this.ShowMessage(ex.Error.Message);
             }
             return this.MyPage_Common(authData, action);
@@ -504,6 +505,7 @@ namespace Gunucco.Controllers
             }
             catch (GunuccoException ex)
             {
+                this.AccessTokenSession = "";
                 return this.ShowMessage(ex.Error.Message);
             }
 
@@ -805,6 +807,7 @@ namespace Gunucco.Controllers
             }
             catch (GunuccoException ex)
             {
+                this.AccessTokenSession = "";
                 return this.ShowMessage(ex.Error.Message);
             }
 
