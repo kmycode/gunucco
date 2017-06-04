@@ -23,7 +23,7 @@ namespace Gunucco.Models.Entity
             this.CheckSentData();
 
             // setting object data
-            this.Book.Created = DateTime.Now;
+            this.Book.Created = this.Book.LastModified = DateTime.Now;
             var permission = new BookPermission
             {
                 UserId = this.AuthData.User.Id,
@@ -223,6 +223,7 @@ namespace Gunucco.Models.Entity
             b.Name = this.Book.Name;
             b.Description = this.Book.Description;
             b.PostTo = this.Book.PostTo;
+            b.LastModified = DateTime.Now;
             db.SaveChanges();
 
             return new ApiMessage
