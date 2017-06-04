@@ -345,7 +345,7 @@ namespace Gunucco.Controllers
             }
             catch (GunuccoException ex)
             {
-                return this.ShowMessage(ex.Message);
+                return this.ShowMessage(ex.Error.Message);
             }
 
             return View(actionName, vm);
