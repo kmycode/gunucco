@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>cdd8a6e1-5aec-4122-ae5c-a2aea979b421</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>GunuccoSharp</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)CommandModels\AuthorizationCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CommandModels\BookCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CommandModels\ChapterCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CommandModels\CommandBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CommandModels\ContentCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CommandModels\LoginCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CommandModels\OauthCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CommandModels\ServerCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CommandModels\UserCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GunuccoClient.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HttpClientBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils.cs" />
+  </ItemGroup>
+</Project>

@@ -11,9 +11,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GunuccoSharp.Test", "Gunucc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GunuccoSharp", "GunuccoSharp\GunuccoSharp.csproj", "{217D41CA-5D90-4949-BBFD-076BCC8D62DD}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "GunuccoSharp.Core", "GunuccoSharp.Core\GunuccoSharp.Core.shproj", "{CDD8A6E1-5AEC-4122-AE5C-A2AEA979B421}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Gunucco.Entities\Gunucco.Entities.projitems*{31a3e2a1-46b2-418d-a141-b7920c06309a}*SharedItemsImports = 13
+		GunuccoSharp.Core\GunuccoSharp.Core.projitems*{cdd8a6e1-5aec-4122-ae5c-a2aea979b421}*SharedItemsImports = 13
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
