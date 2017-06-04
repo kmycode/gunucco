@@ -94,4 +94,30 @@ namespace Gunucco.Entities
         /// </summary>
         Outside = 102,
     }
+
+    /// <summary>
+    /// The range of posting on list
+    /// </summary>
+    public enum PostTo : short
+    {
+        /// <summary>
+        /// Post on none.
+        /// </summary>
+        None = 101,
+
+        /// <summary>
+        /// Post on global timeline. contains local timeline
+        /// </summary>
+        GlobalTimeline = 102,
+
+        /// <summary>
+        /// Post on local timeline. contains notification
+        /// </summary>
+        LocalTimeline = 103,
+
+        /// <summary>
+        /// Post on bookmarked user's notification column only.
+        /// </summary>
+        NotificationOnly = 104,
+    }
 }

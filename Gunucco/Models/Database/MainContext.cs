@@ -103,9 +103,19 @@ namespace Gunucco.Models.Database
                     .IsRequired();
                 entity.Property(e => e.Name)
                     .HasColumnType("varchar(128)");
+                entity.Property(e => e.Order)
+                    .IsRequired();
                 entity.Property(e => e.Created)
                     .IsRequired()
                     .HasDefaultValue(DateTime.MinValue);
+                entity.Property(e => e.LastModified)
+                    .IsRequired()
+                    .HasDefaultValue(DateTime.MinValue);
+                entity.Property(e => e.PostToValue)
+                    .IsRequired()
+                    .HasDefaultValue((short)PostTo.GlobalTimeline);
+                entity.Property(e => e.Description)
+                    .HasColumnType("varchar(1024)");
             });
 
             builder.Entity<Chapter>(entity =>
