@@ -423,8 +423,12 @@ namespace GunuccoSharp.Test
             // create content
             var cont1 = await TestUtil.ImageContents.CreateAsync(client1, 0, chap1.Id);
 
+            // cut access token from uri
+            var uri = cont1.Media.Uri;
+            uri = uri.Substring(0, uri.LastIndexOf('/'));
+
             // download image
-            var response = await httpClient.GetAsync(cont1.Media.Uri);
+            var response = await httpClient.GetAsync(uri);
             await response.Content.ReadAsByteArrayAsync();
 
             var json = await response.Content.ReadAsStringAsync();
