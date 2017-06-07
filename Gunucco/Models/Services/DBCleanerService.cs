@@ -1,19 +1,22 @@
-﻿using NLog;
+﻿using Gunucco.Models.Database;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Gunucco.Models.Database
+namespace Gunucco.Models.Services
 {
-    public static class DBCleanerUtil
+    public static class DBCleanerService
     {
         private static Logger log = LogManager.GetCurrentClassLogger();
 
-        public static async void CleanUserSession()
+        public static void StartServices()
         {
-            await _userSessionCleaner.CleanAsync();
+            Task.Run(() => _userSessionCleaner.StartService());
+            Task.Run(() => _oauthCodeCleaner.StartService());
         }
+
         private static DBCleaner _userSessionCleaner = new DBCleaner
         {
             NextCleaningTiming = dt => dt.AddHours(1),
@@ -24,7 +27,7 @@ namespace Gunucco.Models.Database
                 // 6 hours after expired to output 'token already expired' error when user logined old token
                 var removeDateTime = now.AddHours(-6);
 
-                log.Info("[Start] Cleaning expired sessions");
+                log.Info("[Start] Cleaning expired sessions service");
                 log.Info("    delete sessions until " + removeDateTime.ToString("yyyy/MM/dd HH:mm:ss") + ".");
 
                 int deleteCount = 0;
@@ -46,10 +49,6 @@ namespace Gunucco.Models.Database
             },
         };
 
-        public static async void CleanOauthCode()
-        {
-            await _oauthCodeCleaner.CleanAsync();
-        }
         private static DBCleaner _oauthCodeCleaner = new DBCleaner
         {
             NextCleaningTiming = dt => dt.AddHours(2),
@@ -60,7 +59,7 @@ namespace Gunucco.Models.Database
                 // 6 hours after expired to output 'token already expired' error when user logined old token
                 var removeDateTime = now;
 
-                log.Info("[Start] Cleaning expired oauth-codes");
+                log.Info("[Start] Cleaning expired oauth-codes service");
                 log.Info("    delete oauth-codes until " + removeDateTime.ToString("yyyy/MM/dd HH:mm:ss") + ".");
 
                 int deleteCount = 0;
@@ -91,6 +90,22 @@ namespace Gunucco.Models.Database
             public Func<MainContext, Task> CleaningAction { get; set; }
 
             private readonly object locker = new object();
+
+            public async void StartService()
+            {
+                while (true)
+                {
+                    try
+                    {
+                        await this.CleanAsync();
+                        Task.Delay(1000 * 60 * 2).Wait();
+                    }
+                    catch (Exception e)
+                    {
+                        log.Error(e, "Service failed");
+                    }
+                }
+            }
 
             public async Task CleanAsync()
             {

@@ -2,6 +2,7 @@
 using Gunucco.Entities;
 using Gunucco.Models.Database;
 using Gunucco.Models.Entities;
+using Gunucco.Models.Services;
 using Gunucco.Models.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -104,9 +105,6 @@ namespace Gunucco.Models
             token.SessionId = session.Id;
             token.AccessToken = GetBearerToken(session);
 
-            // cleaning expired sessions per 1 hour
-            DBCleanerUtil.CleanUserSession();
-
             return new AuthorizationData
             {
                 User = user,
@@ -140,8 +138,6 @@ namespace Gunucco.Models
                 db.OauthCode.Add(code);
                 db.SaveChanges();
             }
-
-            DBCleanerUtil.CleanOauthCode();
 
             code.OauthUri = Config.ServerPath + "/web/oauth?code=" + Uri.EscapeDataString(code.Code);
 

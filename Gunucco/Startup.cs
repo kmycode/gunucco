@@ -15,6 +15,7 @@ using System.IO;
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using MailKit.Security;
+using Gunucco.Models.Services;
 
 namespace Gunucco
 {
@@ -164,6 +165,9 @@ namespace Gunucco
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            // start gunucco services
+            DBCleanerService.StartServices();
 
             log.Info("==== Configure End ====");
         }
