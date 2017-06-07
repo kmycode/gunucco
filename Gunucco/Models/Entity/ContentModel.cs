@@ -2,6 +2,7 @@
 using Gunucco.Entities;
 using Gunucco.Models.Database;
 using Gunucco.Models.Entities;
+using Gunucco.Models.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,6 +43,21 @@ namespace Gunucco.Models.Entity
                 this.Content.Created = this.Content.LastModified = DateTime.Now;
                 this.Content.ChapterId = this.Chapter.Id;
                 db.Content.Add(this.Content);
+
+                // get chapter data
+                var mchap = new ChapterModel
+                {
+                    AuthData = this.AuthData,
+                    Chapter = new Chapter { Id = this.Content.ChapterId, },
+                };
+                mchap.Load(db);
+
+                // create content and get id
+                db.SaveChanges();
+
+                // add timeline
+                TimelineUtil.AddContentTimeline(db, this.AuthData, this.Content, TargetAction.Create, mchap.GetTimelineRange());
+
                 db.SaveChanges();
 
                 if (this.Content.Type == ContentType.Image)
@@ -211,6 +227,10 @@ namespace Gunucco.Models.Entity
             c.Text = this.Content.Text;
             c.LastModified = DateTime.Now;
             c.Order = this.Content.Order;
+
+            // add timeline
+            TimelineUtil.AddContentTimeline(db, this.AuthData, this.Content, TargetAction.Update);
+
             db.SaveChanges();
 
             return new ApiMessage
@@ -228,7 +248,7 @@ namespace Gunucco.Models.Entity
             }
         }
 
-        public ApiMessage Delete(MainContext db, bool isCheckPermission = true)
+        public ApiMessage Delete(MainContext db, bool isCheckPermission = true, bool isPublishTimeline = true)
         {
             // get content data
             this.Load(db);
@@ -252,6 +272,20 @@ namespace Gunucco.Models.Entity
                 mmedia.DeleteMediaFile();
                 db.Media.Attach(this.Media);
                 db.Media.Remove(this.Media);
+            }
+
+            if (isPublishTimeline)
+            {
+                // get chapter data
+                var mchap = new ChapterModel
+                {
+                    AuthData = this.AuthData,
+                    Chapter = new Chapter { Id = this.Content.ChapterId, },
+                };
+                mchap.Load(db);
+
+                // add timeline
+                TimelineUtil.AddContentTimeline(db, this.AuthData, this.Content, TargetAction.Delete, mchap.GetTimelineRange());
             }
 
             db.SaveChanges();

@@ -54,6 +54,9 @@
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="1.0.1" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Utils\Models\" />
+  </ItemGroup>
   <Import Project="..\Gunucco.Entities\Gunucco.Entities.projitems" Label="Shared" />
 
 </Project>

@@ -2,6 +2,7 @@
 using Gunucco.Entities;
 using Gunucco.Models.Database;
 using Gunucco.Models.Entities;
+using Gunucco.Models.Utils;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -44,6 +45,12 @@ namespace Gunucco.Models.Entity
 
                 // create chapter
                 db.Chapter.Add(this.Chapter);
+
+                // create chapter and get id
+                db.SaveChanges();
+
+                // add timeline
+                TimelineUtil.AddChapterTimeline(db, this.AuthData, this.Chapter, TargetAction.Create);
 
                 db.SaveChanges();
             }
@@ -224,6 +231,15 @@ namespace Gunucco.Models.Entity
             this.isLoaded = true;
             this.CheckSentData();
 
+            var mbook = new BookModel
+            {
+                AuthData = this.AuthData,
+                Book = new Book
+                {
+                    Id = this.Chapter.BookId,
+                    LastModified = DateTime.Now,        // won't saved
+                },
+            };
             var current = new ChapterModel
             {
                 AuthData = this.AuthData,
@@ -257,6 +273,10 @@ namespace Gunucco.Models.Entity
             c.ParentId = this.Chapter.ParentId;
             c.PublicRange = this.Chapter.PublicRange;
             c.Order = this.Chapter.Order;
+
+            // add timeline
+            TimelineUtil.AddChapterTimeline(db, this.AuthData, this.Chapter, TargetAction.Update, this.GetTimelineRange(true));
+
             db.SaveChanges();
 
             return new ApiMessage
@@ -274,7 +294,7 @@ namespace Gunucco.Models.Entity
             }
         }
 
-        public ApiMessage Delete(MainContext db, bool isCheckPermission = true)
+        public ApiMessage Delete(MainContext db, bool isCheckPermission = true, bool isPublishTimeline = true)
         {
             // get chapter data
             this.Load(db);
@@ -307,13 +327,16 @@ namespace Gunucco.Models.Entity
             // remove children
             foreach (var mchap in childModels)
             {
-                mchap.Delete(db);
+                mchap.Delete(db, false, false);
             }
 
             // remove data
             db.Chapter.Remove(this.Chapter);
             db.BookPermission.RemoveRange(permissions);
 
+            // add timeline
+            TimelineUtil.AddChapterTimeline(db, this.AuthData, this.Chapter, TargetAction.Delete, this.GetTimelineRange(isPublishTimeline));
+            
             db.SaveChanges();
 
             // remove contents
@@ -326,7 +349,7 @@ namespace Gunucco.Models.Entity
                     Chapter = this.Chapter,
                     Content = c,
                 };
-                mcont.Delete(db, false);
+                mcont.Delete(db, false, false);
             }
 
             return new ApiMessage
@@ -335,7 +358,7 @@ namespace Gunucco.Models.Entity
                 Message = "Delete chapter succeed.",
             };
         }
-        
+
         public IQueryable<BookPermission> GetPermissions(MainContext db)
         {
             return db.BookPermission.Where(p => p.UserId == this.AuthData.User.Id)
@@ -530,6 +553,12 @@ namespace Gunucco.Models.Entity
                 }
                 currentChap = pchap.Chapter;
             }
+        }
+
+        public TimelineListRange GetTimelineRange(bool isPublishTimeline = true)
+        {
+            return isPublishTimeline ? (this.Chapter.PublicRange == PublishRange.All ? TimelineListRange.All : TimelineListRange.None) :
+                                       TimelineListRange.None;
         }
     }
 }

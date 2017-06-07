@@ -2,6 +2,7 @@
 using Gunucco.Entities;
 using Gunucco.Models.Database;
 using Gunucco.Models.Entities;
+using Gunucco.Models.Utils;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -39,6 +40,10 @@ namespace Gunucco.Models.Entity
                 // create new permission arrow the user read and write book
                 permission.TargetId = this.Book.Id;
                 db.BookPermission.Add(permission);
+
+                // add timeline
+                TimelineUtil.AddBookTimeline(db, this.AuthData, this.Book, TargetAction.Create);
+
                 db.SaveChanges();
             }
         }
@@ -224,6 +229,10 @@ namespace Gunucco.Models.Entity
             b.Description = this.Book.Description;
             b.PostTo = this.Book.PostTo;
             b.LastModified = DateTime.Now;
+
+            // add timeline
+            TimelineUtil.AddBookTimeline(db, this.AuthData, this.Book, TargetAction.Update);
+
             db.SaveChanges();
 
             return new ApiMessage
@@ -260,13 +269,16 @@ namespace Gunucco.Models.Entity
                     Chapter = c,
                     Book = this.Book,
                 };
-                mchap.Delete(db, false);
+                mchap.Delete(db, false, false);
             }
 
             // remove data
             db.Book.Attach(this.Book);
             db.Book.Remove(this.Book);
             db.BookPermission.RemoveRange(permissions);
+
+            // add timeline
+            TimelineUtil.AddBookTimeline(db, this.AuthData, this.Book, TargetAction.Delete);
 
             db.SaveChanges();
 

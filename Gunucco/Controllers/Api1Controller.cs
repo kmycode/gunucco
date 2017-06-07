@@ -613,6 +613,24 @@ namespace Gunucco.Controllers
         #region BookPermission
         #endregion
 
+        #region Timeline
+
+        [HttpGet]
+        [Route("timeline/local")]
+        [AuthorizeFilter(IsCheckAuthorizable = false, Scope = Scope.Read)]
+        public IActionResult GetLocalTimeline(int? num, int? min_id, int? max_id)
+        {
+            var mtl = new TimelineModel
+            {
+                AuthData = this.AuthData,
+            };
+            var tl = mtl.GetLocalItems(num ?? 20, min_id ?? 0, max_id ?? int.MaxValue);
+
+            return Json(tl);
+        }
+
+        #endregion
+
         private T LoadJson<T>(string json)
         {
             try

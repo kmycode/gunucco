@@ -17,6 +17,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)CommandModels\LoginCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CommandModels\OauthCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CommandModels\ServerCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CommandModels\TimelineCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CommandModels\UserCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GunuccoClient.cs" />

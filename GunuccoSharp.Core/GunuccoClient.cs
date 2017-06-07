@@ -36,5 +36,10 @@ namespace GunuccoSharp
         /// Get content commands
         /// </summary>
         public ContentCommand Content => new ContentCommand(this);
+
+        /// <summary>
+        /// Get timeline commands
+        /// </summary>
+        public TimelineCommand Timeline => new TimelineCommand(this);
     }
 }

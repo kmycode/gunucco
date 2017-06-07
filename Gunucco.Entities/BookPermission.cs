@@ -36,11 +36,4 @@ namespace Gunucco.Entities
         [JsonProperty("target_id")]
         public int? TargetId { get; set; }
     }
-
-    public enum TargetType : short
-    {
-        Book = 101,
-        Chapter = 102,
-        Content = 103,
-    }
 }

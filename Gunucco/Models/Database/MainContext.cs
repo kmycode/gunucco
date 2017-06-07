@@ -30,6 +30,8 @@ namespace Gunucco.Models.Database
 
         public DbSet<BookPermission> BookPermission { get; set; }
 
+        public DbSet<TimelineItem> TimelineItem { get; set; }
+
         public MainContext() : base(new DbContextOptionsBuilder().UseMySql(ConnectionString).Options)
         {
         }
@@ -180,6 +182,24 @@ namespace Gunucco.Models.Database
                 entity.Property(e => e.TargetTypeValue)
                     .IsRequired()
                     .HasDefaultValue((short)TargetType.Book);
+            });
+
+            builder.Entity<TimelineItem>(entity =>
+            {
+                entity.Property(e => e.ServerPath)
+                    .HasColumnType("varchar(256)");
+                entity.Property(e => e.TargetTypeValue)
+                    .IsRequired()
+                    .HasDefaultValue((short)TargetType.Book);
+                entity.Property(e => e.ListRangeValue)
+                    .IsRequired()
+                    .HasDefaultValue((int)TimelineListRange.All);
+                entity.Property(e => e.Updated)
+                    .IsRequired()
+                    .HasDefaultValue(DateTime.MinValue);
+                entity.Property(e => e.TargetActionValue)
+                    .IsRequired()
+                    .HasDefaultValue((short)TargetAction.Ditch);
             });
         }
     }

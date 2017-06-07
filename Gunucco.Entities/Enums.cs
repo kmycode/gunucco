@@ -120,4 +120,77 @@ namespace Gunucco.Entities
         /// </summary>
         NotificationOnly = 104,
     }
+
+    /// <summary>
+    /// Operation target type. This value often effect to target id property
+    /// </summary>
+    public enum TargetType : short
+    {
+        /// <summary>
+        /// Book
+        /// </summary>
+        Book = 101,
+
+        /// <summary>
+        /// Chapter
+        /// </summary>
+        Chapter = 102,
+
+        /// <summary>
+        /// Content
+        /// </summary>
+        Content = 103,
+    }
+
+    /// <summary>
+    /// Target action
+    /// </summary>
+    public enum TargetAction : short
+    {
+        /// <summary>
+        /// Ditch any actions
+        /// </summary>
+        Ditch = 101,
+
+        /// <summary>
+        /// Create item
+        /// </summary>
+        Create = 103,
+
+        /// <summary>
+        /// Update item information
+        /// </summary>
+        Update = 105,
+
+        /// <summary>
+        /// Delete item
+        /// </summary>
+        Delete = 107,
+    }
+
+    /// <summary>
+    /// The range of item listed
+    /// </summary>
+    public enum TimelineListRange : int
+    {
+        /// <summary>
+        /// No list appeared
+        /// </summary>
+        None = 0,
+
+        /// <summary>
+        /// Global timeline
+        /// </summary>
+        Global = 2,
+
+        /// <summary>
+        /// Local timeline
+        /// </summary>
+        Local = 4,
+
+        /// <summary>
+        /// all timelines
+        /// </summary>
+        All = int.MaxValue,     // maxvalue = all bits are '1'
+    }
 }

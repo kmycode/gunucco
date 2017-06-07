@@ -20,6 +20,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Media.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Content.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)OauthCode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TimelineItem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TimelineItemContainer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)User.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\TreeEntity.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UserSession.cs" />
