@@ -32,7 +32,7 @@ namespace Gunucco.Models.Services
                     while (true)
                     {
                         await this.SignalAsync();
-                        await Task.Delay(10000);
+                        await Task.Delay(!Config.IsDebugMode ? 60000 : 10000);
                     }
                 });
             }
