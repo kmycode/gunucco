@@ -435,11 +435,7 @@ namespace GunuccoSharp.Test
         private class SimpleReceiver : IStreamingReceiver<TimelineItemContainer>
         {
             public Action<TimelineItemContainer> Action { get; set; }
-
-            public async Task OnConnectionAutomaticClosedAsync()
-            {
-            }
-
+            
             public void OnNext(TimelineItemContainer item)
             {
                 this.Action?.Invoke(item);

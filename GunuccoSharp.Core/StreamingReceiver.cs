@@ -31,8 +31,6 @@ namespace GunuccoSharp
         /// </summary>
         /// <param name="item">The next item</param>
         void OnNext(T item);
-
-        Task OnConnectionAutomaticClosedAsync();
     }
 
     class StreamingReceiver<T> : IGunuccoStreaming<T>
@@ -54,8 +52,7 @@ namespace GunuccoSharp
 
         private async void ReconnectTimer_Callback(object obj)
         {
-            this.Disconnect();
-            await this.receiver.OnConnectionAutomaticClosedAsync();
+            this.Disconnect(false);
         }
 
         public async Task ReceiveLoopAsync()
@@ -118,7 +115,15 @@ namespace GunuccoSharp
 
         public void Disconnect()
         {
-            this.CheckDisposing();
+            this.Disconnect(true);
+        }
+
+        public void Disconnect(bool isCheck)
+        {
+            if (isCheck)
+            {
+                this.CheckDisposing();
+            }
             this.isConnecting = false;
             this.reconnectTimer.Change(Timeout.Infinite, Timeout.Infinite);
 

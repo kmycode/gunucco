@@ -50,7 +50,7 @@ namespace Gunucco.Models.Entity
                 db.SaveChanges();
 
                 // add timeline
-                TimelineUtil.AddChapterTimeline(db, this.AuthData, this.Chapter, TargetAction.Create);
+                TimelineUtil.AddChapterTimeline(db, this.AuthData, this.Chapter, TargetAction.Create, this.GetTimelineRange());
 
                 db.SaveChanges();
             }
@@ -275,7 +275,7 @@ namespace Gunucco.Models.Entity
             c.Order = this.Chapter.Order;
 
             // add timeline
-            TimelineUtil.AddChapterTimeline(db, this.AuthData, this.Chapter, TargetAction.Update, this.GetTimelineRange(true));
+            TimelineUtil.AddChapterTimeline(db, this.AuthData, this.Chapter, TargetAction.Update, this.GetTimelineRange());
 
             db.SaveChanges();
 
