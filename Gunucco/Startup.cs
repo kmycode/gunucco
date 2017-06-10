@@ -16,6 +16,7 @@ using System.Reflection;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using MailKit.Security;
 using Gunucco.Models.Services;
+using System.Text;
 
 namespace Gunucco
 {
@@ -97,6 +98,7 @@ namespace Gunucco
             {
                 var config = this.Configuration.GetSection("GunuccoConfigs");
                 Config.ServerVersion = Assembly.GetEntryAssembly().GetName().Version.ToString();
+                Config.ServerLanguage = config.GetValue<string>("ServerLanguage", "en");
                 Config.AdministratorName = config.GetValue<string>("AdministratorName", "Do not look at me");
                 Config.AdministratorUri = config.GetValue<string>("AdministratorUri", "https://www.google.com/");
                 Config.ServerPath = config.GetValue<string>("ServerPath", "http://localhost");
@@ -166,8 +168,12 @@ namespace Gunucco
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
 
+            // enable sjis for sending ping
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
             // start gunucco services
             DBCleanerService.StartServices();
+            PingService.StartService();
 
             // start global streaming
             StreamingService.GlobalTimeline.StartListening();

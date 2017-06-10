@@ -18,6 +18,11 @@ namespace Gunucco
         public static string ServerVersion { get; set; }
 
         /// <summary>
+        /// Server language (2 letters: en, ja, ...)
+        /// </summary>
+        public static string ServerLanguage { get; set; }
+
+        /// <summary>
         /// Server administrator name.
         /// </summary>
         public static string AdministratorName { get; set; }

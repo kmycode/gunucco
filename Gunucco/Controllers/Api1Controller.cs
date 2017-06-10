@@ -39,6 +39,22 @@ namespace Gunucco.Controllers
             });
         }
 
+        #region RSS
+        
+        [HttpGet]
+        [Route("rss/localtimeline")]
+        public string GetRss()
+        {
+            var mtl = new TimelineModel
+            {
+            };
+            var tl = mtl.GetLocalItems(50, 0, int.MaxValue);
+
+            return XmlUtil.ParseXml(tl);
+        }
+
+        #endregion
+
         #region Server
 
         [HttpGet]

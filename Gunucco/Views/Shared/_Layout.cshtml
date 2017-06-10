@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@(ViewData["Title"]?.ToString() + (string.IsNullOrEmpty(ViewData["Title"]?.ToString()) ? "" : " - "))Gunucco, a common api for creators</title>
 
+    <link rel="alternate" type="application/rss+xml" title="Gunucco Rss" href="/api/v1/rss/localtimeline" />
+
     <environment names="Development">
         <link rel="stylesheet" href="~/css/webclient.css" asp-append-version="true" />
     </environment>
