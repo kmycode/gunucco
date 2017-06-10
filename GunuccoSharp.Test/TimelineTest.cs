@@ -432,6 +432,66 @@ namespace GunuccoSharp.Test
             Assert.AreEqual(items[2].TimelineItem.TargetType, TargetType.Content);
         }
 
+        [TestMethod]
+        public async Task GlobalTimelineStreaming_CreateBookAndChapterAndImageContent()
+        {
+            var client = TestUtil.GetClient();
+            var globalClient = await TestUtil.GetUserClientAsync(0, TestUtil.GetGlobalClient());
+            var items = new Collection<TimelineItemContainer>();
+            var ex = new ExceptionContainer();
+
+            // start streaming
+            var streaming = client.Timeline.GetGlobalStreaming(new SimpleReceiver
+            {
+                Action = (item) =>
+                {
+                    items.Add(item);
+                },
+            });
+
+            Task.Run(async () =>
+            {
+                try
+                {
+                    await Task.Delay(1500);
+
+                    // create book
+                    var book = await TestUtil.Books.CreateAsync(globalClient);
+
+                    // create chapter
+                    var chap = await TestUtil.Chapters.CreateAsync(globalClient, 0, book.Id);
+
+                    // create image content
+                    var cont = await TestUtil.ImageContents.CreateAsync(globalClient, 0, chap.Id);
+
+                    // wait for streaming
+                    await Task.Delay(10000);
+                    streaming.Dispose();
+                }
+                catch (Exception e)
+                {
+                    ex.OnError(e);
+                    streaming.Dispose();
+                }
+            });
+            await streaming.ReceiveLoopAsync();
+            ex.CheckError();
+
+            Assert.AreEqual(items.Count, 3);
+
+            Assert.IsNotNull(items[0].Book);
+            Assert.AreEqual(items[0].TimelineItem.TargetAction, TargetAction.Create);
+            Assert.AreEqual(items[0].TimelineItem.TargetType, TargetType.Book);
+
+            Assert.IsNotNull(items[1].Chapter);
+            Assert.AreEqual(items[1].TimelineItem.TargetAction, TargetAction.Create);
+            Assert.AreEqual(items[1].TimelineItem.TargetType, TargetType.Chapter);
+
+            Assert.IsNotNull(items[2].ContentMediaPair);
+            Assert.AreEqual(items[2].TimelineItem.TargetAction, TargetAction.Create);
+            Assert.AreEqual(items[2].TimelineItem.TargetType, TargetType.Content);
+        }
+
         private class SimpleReceiver : IStreamingReceiver<TimelineItemContainer>
         {
             public Action<TimelineItemContainer> Action { get; set; }

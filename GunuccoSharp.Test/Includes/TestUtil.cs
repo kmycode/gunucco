@@ -24,12 +24,17 @@ namespace GunuccoSharp.Test
         // server path in debug mode (running on VisualStudio)
         private const string debugServerPath = "http://localhost:51238";
 
+        // server path for global streaming test
+        private const string globalStreamingServerPath = "http://192.168.42.130/g";
+
         // server path in not debug mode (server on VM or real server)
         private const string serverPath = "https://gunucco.net";
 
         #endregion
 
         public static string ServerPath => IsLocalHost ? debugServerPath : serverPath;
+
+        public static string GlobalServerPath => globalStreamingServerPath;
     }
 
     public class TestUser : User
@@ -232,9 +237,17 @@ namespace GunuccoSharp.Test
             };
         }
 
-        public static async Task<GunuccoSharpClient> GetUserClientAsync(int dataId = 0)
+        public static GunuccoSharpClient GetGlobalClient()
         {
-            var client = GetClient();
+            return new GunuccoSharpClient
+            {
+                ServicePath = TestSetting.GlobalServerPath,
+            };
+        }
+
+        public static async Task<GunuccoSharpClient> GetUserClientAsync(int dataId = 0, GunuccoSharpClient client = null)
+        {
+            client = client ?? GetClient();
             await Users.CreateAsync(client, dataId);
             return client;
         }

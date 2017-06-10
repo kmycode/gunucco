@@ -30,6 +30,10 @@ namespace Gunucco.Models.Utils
             {
                 StreamingService.LocalTimeline.WriteAsync(item);
             }
+            if (range.HasFlag(TimelineListRange.Global) || Config.IsDebugMode)
+            {
+                StreamingService.GlobalTimeline.WriteAsync(item);
+            }
         }
 
         public static void AddBookTimeline(MainContext db, AuthorizationData authData, Book book, TargetAction action, TimelineListRange range = TimelineListRange.All, int? actionTargetId = null)

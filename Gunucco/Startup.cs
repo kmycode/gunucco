@@ -169,6 +169,9 @@ namespace Gunucco
             // start gunucco services
             DBCleanerService.StartServices();
 
+            // start global streaming
+            StreamingService.GlobalTimeline.StartListening();
+
             log.Info("==== Configure End ====");
         }
     }

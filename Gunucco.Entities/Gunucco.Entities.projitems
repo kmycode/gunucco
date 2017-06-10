@@ -17,6 +17,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ApiMessage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ContentMediaPair.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enums.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlobalServer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Media.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Content.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)OauthCode.cs" />

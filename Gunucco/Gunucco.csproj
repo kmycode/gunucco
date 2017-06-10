@@ -58,5 +58,6 @@
     <Folder Include="Utils\Models\" />
   </ItemGroup>
   <Import Project="..\Gunucco.Entities\Gunucco.Entities.projitems" Label="Shared" />
+  <Import Project="..\GunuccoSharp.Core\GunuccoSharp.Core.projitems" Label="Shared" />
 
 </Project>

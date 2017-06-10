@@ -60,6 +60,12 @@ namespace Gunucco.Filters
                     });
                 }
 
+                // change scope in debug mode
+                if (Config.IsDebugMode && (this.Scope == Scope.WriteUserDangerousIdentity || this.Scope == Scope.WriteUserIdentity))
+                {
+                    this.Scope = Scope.Write;
+                }
+
                 // scope check
                 if (data?.Session == null || !data.Session.Scope.HasFlag(this.Scope))
                 {

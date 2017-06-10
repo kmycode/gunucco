@@ -43,5 +43,20 @@ namespace GunuccoSharp.CommandModels
                 receiver
             );
         }
+
+        public IGunuccoStreaming<TimelineItemContainer> GetGlobalStreaming(IStreamingReceiver<TimelineItemContainer> receiver)
+        {
+            return new StreamingReceiver<TimelineItemContainer>(
+                async () =>
+                {
+                    return await this.Client.CommandStreaming(new CommandInfo
+                    {
+                        Route = "timeline/global/streaming",
+                        Method = HttpMethod.GetStreaming,
+                    });
+                },
+                receiver
+            );
+        }
     }
 }

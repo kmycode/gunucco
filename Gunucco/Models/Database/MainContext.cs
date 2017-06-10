@@ -32,6 +32,8 @@ namespace Gunucco.Models.Database
 
         public DbSet<TimelineItem> TimelineItem { get; set; }
 
+        public DbSet<GlobalServer> GlobalServer { get; set; }
+
         public MainContext() : base(new DbContextOptionsBuilder().UseMySql(ConnectionString).Options)
         {
         }
@@ -200,6 +202,13 @@ namespace Gunucco.Models.Database
                 entity.Property(e => e.TargetActionValue)
                     .IsRequired()
                     .HasDefaultValue((short)TargetAction.Ditch);
+            });
+
+            builder.Entity<GlobalServer>(entity =>
+            {
+                entity.Property(e => e.ServerPath)
+                    .IsRequired()
+                    .HasColumnType("varchar(512)");
             });
         }
     }
