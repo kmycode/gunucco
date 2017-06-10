@@ -16,6 +16,7 @@ using System.Text;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Http;
 using Gunucco.Models.Utils;
+using Gunucco.Models.Services;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -627,6 +628,17 @@ namespace Gunucco.Controllers
             var tl = mtl.GetLocalItems(num ?? 20, min_id ?? 0, max_id ?? int.MaxValue);
 
             return Json(tl);
+        }
+
+        [HttpGet]
+        [Route("timeline/local/streaming")]
+        [AuthorizeFilter(IsCheckAuthorizable = false, Scope = Scope.Read)]
+        public async Task StreamingLocalTimeline()
+        {
+            StreamingService.LocalTimeline.Responses.Add(this.Response);
+            this.Response.Headers.Add("Content-Type", "text/event-stream");
+
+            await Task.Delay(90 * 1000);
         }
 
         #endregion

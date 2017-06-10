@@ -1,6 +1,7 @@
 ﻿using Gunucco.Entities;
 using Gunucco.Models.Database;
 using Gunucco.Models.Entities;
+using Gunucco.Models.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace Gunucco.Models.Utils
     {
         public static void AddTimeline(MainContext db, int userId, DateTime dt, TargetType type, TargetAction action, int targetId, TimelineListRange range, int? actionTargetId = null)
         {
-            db.TimelineItem.Add(new TimelineItem
+            var item = new TimelineItem
             {
                 ServerPath = Config.ServerPath,
                 ListRange = range,
@@ -22,7 +23,13 @@ namespace Gunucco.Models.Utils
                 TargetType = type,
                 Updated = dt,
                 UserId = userId,
-            });
+            };
+            db.TimelineItem.Add(item);
+
+            if (range.HasFlag(TimelineListRange.Local) || Config.IsDebugMode)
+            {
+                StreamingService.LocalTimeline.WriteAsync(item);
+            }
         }
 
         public static void AddBookTimeline(MainContext db, AuthorizationData authData, Book book, TargetAction action, TimelineListRange range = TimelineListRange.All, int? actionTargetId = null)

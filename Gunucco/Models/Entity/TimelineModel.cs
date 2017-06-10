@@ -43,6 +43,45 @@ namespace Gunucco.Models.Entity
             return a;
         }
 
+        public static TimelineItemContainer GetContainer(TimelineItem item)
+        {
+            var container = new TimelineItemContainer
+            {
+                TimelineItem = item,
+            };
+
+            using (var db = new MainContext())
+            {
+                switch (item.TargetType)
+                {
+                    case TargetType.Book:
+                        container.Book = db.Book.Find(item.TargetId);
+                        break;
+                    case TargetType.Chapter:
+                        container.Chapter = db.Chapter.Find(item.TargetId);
+                        if (container.Chapter != null)
+                        {
+                            container.Book = db.Book.Find(container.Chapter.BookId);
+                        }
+                        break;
+                    case TargetType.Content:
+                        var pss = db.Content.Where(c => c.Id == item.TargetId).GroupJoin(db.Media, c => c.Id, m => m.ContentId, (c, ms) => new ContentMediaPair { Content = c, Media = ms.FirstOrDefault(), });
+                        container.ContentMediaPair = db.Content.Where(c => c.Id == item.TargetId).GroupJoin(db.Media, c => c.Id, m => m.ContentId, (c, ms) => new ContentMediaPair { Content = c, Media = ms.FirstOrDefault(), }).SingleOrDefault();
+                        if (container.ContentMediaPair != null)
+                        {
+                            container.Chapter = db.Chapter.Find(container.ContentMediaPair.Content.ChapterId);
+                        }
+                        if (container.Chapter != null)
+                        {
+                            container.Book = db.Book.Find(container.Chapter.BookId);
+                        }
+                        break;
+                }
+            }
+
+            return container;
+        }
+
         public IEnumerable<TimelineItemContainer> GetGlobalItems(int num, int minId, int maxId)
         {
             using (var db = new MainContext())

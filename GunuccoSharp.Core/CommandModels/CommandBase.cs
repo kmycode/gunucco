@@ -32,6 +32,7 @@ namespace GunuccoSharp.CommandModels
     internal enum HttpMethod
     {
         Get,
+        GetStreaming,
         Post,
         PostMedia,
         Put,

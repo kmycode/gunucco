@@ -28,5 +28,20 @@ namespace GunuccoSharp.CommandModels
                 },
             });
         }
+
+        public IGunuccoStreaming<TimelineItemContainer> GetLocalStreaming(IStreamingReceiver<TimelineItemContainer> receiver)
+        {
+            return new StreamingReceiver<TimelineItemContainer>(
+                async () =>
+                {
+                    return await this.Client.CommandStreaming(new CommandInfo
+                    {
+                        Route = "timeline/local/streaming",
+                        Method = HttpMethod.GetStreaming,
+                    });
+                },
+                receiver
+            );
+        }
     }
 }

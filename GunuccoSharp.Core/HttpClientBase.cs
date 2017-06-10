@@ -65,9 +65,23 @@ namespace GunuccoSharp
             throw new Exception();
         }
 
+        internal async Task<Stream> CommandStreaming(CommandInfo command)
+        {
+            var route = command.Route;
+            var data = command.Data;
+            var isJson = command.IsSendAsJson;
+            switch (command.Method)
+            {
+                case CommandModels.HttpMethod.GetStreaming:
+                    return await this.GetStreaming(route, data);
+            }
+
+            throw new Exception();
+        }
+
         protected async Task<string> Get(string route, IEnumerable<KeyValuePair<string, string>> data = null)
         {
-            var rp = await this.RequestHttpAsync(route, async (client, url) =>
+            var rp = await this.RequestHttpStringAsync(route, async (client, url) =>
             {
                 if (data != null)
                 {
@@ -81,6 +95,22 @@ namespace GunuccoSharp
             return rp;
         }
 
+        protected async Task<Stream> GetStreaming(string route, IEnumerable<KeyValuePair<string, string>> data = null)
+        {
+            var rp = await this.RequestHttpStreamAsync(route, async (client, url) =>
+            {
+                if (data != null)
+                {
+                    var querystring = "?" + string.Join("&", data.Select(kvp => kvp.Key + "=" + kvp.Value));
+                    url += querystring;
+                }
+
+                return await client.GetStreamAsync(url);
+            });
+
+            return rp;
+        }
+
         protected async Task<T> Get<T>(string route, IEnumerable<KeyValuePair<string, string>> data = null)
         {
             var json = await this.Get(route, data);
@@ -89,7 +119,7 @@ namespace GunuccoSharp
 
         private async Task<string> Post(string route, IEnumerable<KeyValuePair<string, string>> data = null, string methodName = "POST", bool isSendAsJson = false)
         {
-            var rp = await this.RequestHttpAsync(route, async (client, url) =>
+            var rp = await this.RequestHttpStringAsync(route, async (client, url) =>
             {
                 var method = new System.Net.Http.HttpMethod(methodName);
                 
@@ -110,7 +140,7 @@ namespace GunuccoSharp
 
         private async Task<string> PostMedia(string route, IEnumerable<KeyValuePair<string, string>> data = null, IEnumerable<Tuple<string, Stream, string>> media = null, string methodName = "POST")
         {
-            var rp = await this.RequestHttpAsync(route, async (client, url) =>
+            var rp = await this.RequestHttpStringAsync(route, async (client, url) =>
             {
                 var method = new System.Net.Http.HttpMethod(methodName);
 
@@ -171,7 +201,36 @@ namespace GunuccoSharp
             return this.JsonDeserialize<T>(json);
         }
 
-        private async Task<string> RequestHttpAsync(string route, Func<HttpClient, string, Task<HttpResponseMessage>> action)
+        private async Task<string> RequestHttpStringAsync(string route, Func<HttpClient, string, Task<HttpResponseMessage>> action)
+        {
+            var response = await this.RequestAsync(route, action);
+
+            var contents = await response.Content.ReadAsStringAsync();
+            if (string.IsNullOrEmpty(contents))
+            {
+                throw new GunuccoException("server returns empty result. Status code: " + (int)response.StatusCode);
+            }
+
+            if (!response.IsSuccessStatusCode && response.StatusCode != HttpStatusCode.NotModified && contents[0] == '{')
+            {
+                var error = this.JsonDeserialize<ApiMessage>(contents);
+                if (!string.IsNullOrEmpty(error?.Message))
+                {
+                    throw new GunuccoErrorException("Api failed. message: '" + error.Message + "'", error, (int)response.StatusCode);
+                }
+            }
+
+            return contents;
+        }
+
+        private async Task<Stream> RequestHttpStreamAsync(string route, Func<HttpClient, string, Task<Stream>> action)
+        {
+            var stream = await this.RequestAsync(route, action);
+
+            return stream;
+        }
+
+        private async Task<T> RequestAsync<T>(string route, Func<HttpClient, string, Task<T>> action)
         {
             HttpClient client;
             if (this.IsAllowInvalidSSLCert)
@@ -190,7 +249,7 @@ namespace GunuccoSharp
             string url = this.ServicePath + "/api/v1/" + route;
             this.AddAuthenticationHeader(client);
 
-            HttpResponseMessage response = null;
+            T response = default(T);
 
             try
             {
@@ -201,22 +260,7 @@ namespace GunuccoSharp
                 throw new GunuccoException("http connection failed.", e);
             }
 
-            var contents = await response.Content.ReadAsStringAsync();
-            if (string.IsNullOrEmpty(contents))
-            {
-                throw new GunuccoException("server returns empty result. Status code: " + (int)response.StatusCode);
-            }
-
-            if (!response.IsSuccessStatusCode && response.StatusCode != HttpStatusCode.NotModified && contents[0] == '{')
-            {
-                var error = this.JsonDeserialize<ApiMessage>(contents);
-                if (!string.IsNullOrEmpty(error?.Message))
-                {
-                    throw new GunuccoErrorException("Api failed. message: '" + error.Message + "'", error, (int)response.StatusCode);
-                }
-            }
-
-            return contents;
+            return response;
         }
 
         private T JsonDeserialize<T>(string json)

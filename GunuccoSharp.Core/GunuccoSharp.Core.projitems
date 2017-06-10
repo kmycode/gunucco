@@ -22,6 +22,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GunuccoClient.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HttpClientBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)StreamingReceiver.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utils.cs" />
   </ItemGroup>
 </Project>
